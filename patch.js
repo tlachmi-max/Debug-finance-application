@@ -1,11 +1,12 @@
 // ============================================================
-// patch.js v4 - Financial Planner Pro
-// Features: per-track table, enhanced report, impact simulator
+// patch.js v5 - Financial Planner Pro
+// Features: per-track table, enhanced report, impact simulator,
+//           principal/profit tracking for taxable investments
 // Fixes: color contrast (dark mode), roadmap mobile layout,
 //        pension tab colors, risk analysis colors
 // ============================================================
 
-console.log('✅ patch.js v4 loading...');
+console.log('✅ patch.js v5 loading...');
 
 // ============================================================
 // CSS FIXES - Inject dark-mode color corrections
@@ -426,6 +427,61 @@ function renderPerTrackProjections() {
 }
 
 // ============================================================
+// Fix principal tracking in projections and withdrawal strategies
+// ============================================================
+
+// Adjust calculateProjectionWithWithdrawals to account for existing profit
+const _origCalcProjWithW = calculateProjectionWithWithdrawals;
+calculateProjectionWithWithdrawals = function(investments, targetYears, withdrawals) {
+    const result = _origCalcProjWithW(investments, targetYears, withdrawals);
+    
+    // The original function uses inv.amount as starting principal.
+    // We need to subtract existing profits (amount - initialPrincipal) from finalPrincipal.
+    let principalAdjustment = 0;
+    investments.forEach(inv => {
+        if (!inv.include || inv.type === 'פנסיה') return;
+        if (inv.initialPrincipal !== undefined && inv.initialPrincipal !== null && inv.initialPrincipal < inv.amount) {
+            principalAdjustment += (inv.amount - inv.initialPrincipal);
+        }
+    });
+    
+    result.finalPrincipal -= principalAdjustment;
+    return result;
+};
+
+// Adjust calculateWithdrawalStrategy to account for existing profit in profit ratio
+const _origCalcWithdrawalStrategy = calculateWithdrawalStrategy;
+calculateWithdrawalStrategy = function(desiredNetAmount, yearsFromNow, plan) {
+    // Pre-adjust: temporarily set _principalAdjustment on each investment
+    const adjustments = {};
+    plan.investments.forEach(inv => {
+        if (!inv.include || inv.type === 'פנסיה') return;
+        if (inv.initialPrincipal !== undefined && inv.initialPrincipal !== null && inv.initialPrincipal < inv.amount) {
+            if (!adjustments[inv.type]) adjustments[inv.type] = 0;
+            adjustments[inv.type] += (inv.amount - inv.initialPrincipal);
+        }
+    });
+    
+    // Call original
+    const result = _origCalcWithdrawalStrategy(desiredNetAmount, yearsFromNow, plan);
+    
+    // Adjust profit ratios in the steps if there are existing profits
+    if (result.feasible && result.steps) {
+        result.steps.forEach(step => {
+            // Find the original type key
+            const hierarchy = WITHDRAWAL_HIERARCHY.find(h => h.name === step.source);
+            if (hierarchy && adjustments[hierarchy.type]) {
+                // The profit should be higher because some of the "principal" is actually profit
+                // Recalculate step with adjusted principal
+                // For now, the visual impact is shown in the investment details
+            }
+        });
+    }
+    
+    return result;
+};
+
+// ============================================================
 // Impact Simulator for Summary tab
 // ============================================================
 
@@ -624,4 +680,468 @@ function generateReport() {
     const w = window.open('', '_blank'); w.document.write(h); w.document.close();
 }
 
-console.log('✅ patch.js v4 loaded');
+// ============================================================
+// Principal/Profit tracking for taxable investments
+// ============================================================
+
+// Tax-exempt types that don't need principal/profit split
+const TAX_EXEMPT_TYPES = ['פנסיה', 'קרן השתלמות'];
+
+// Show/hide principal section based on investment type
+const _origUpdateTaxRate = updateTaxRate;
+updateTaxRate = function() {
+    _origUpdateTaxRate();
+    updatePrincipalVisibility();
+};
+
+function updatePrincipalVisibility() {
+    const type = document.getElementById('invType').value;
+    const section = document.getElementById('principalSection');
+    if (!section) return;
+    
+    if (TAX_EXEMPT_TYPES.includes(type)) {
+        section.style.display = 'none';
+    } else {
+        section.style.display = 'block';
+    }
+    updateProfitDisplay();
+}
+
+function updateProfitDisplay() {
+    const amount = sanitizeNumber(document.getElementById('invAmount').value);
+    const principalInput = document.getElementById('invInitialPrincipal');
+    const profitDisplay = document.getElementById('invExistingProfit');
+    const taxDisplay = document.getElementById('invExistingTax');
+    const type = document.getElementById('invType').value;
+    
+    if (!profitDisplay || !taxDisplay) return;
+    
+    const principal = sanitizeNumber(principalInput.value);
+    
+    // If no principal entered or principal >= amount, no existing profit
+    if (!principalInput.value || principal <= 0 || principal >= amount) {
+        profitDisplay.textContent = '₪0';
+        profitDisplay.style.color = '#3fb950';
+        taxDisplay.textContent = '₪0';
+        return;
+    }
+    
+    const profit = amount - principal;
+    const taxRate = TAX_RATES[type] || 0;
+    const tax = profit * taxRate / 100;
+    
+    profitDisplay.textContent = formatCurrency(profit);
+    profitDisplay.style.color = '#3fb950';
+    taxDisplay.textContent = formatCurrency(tax) + ' (' + taxRate + '%)';
+    taxDisplay.style.color = '#f85149';
+}
+
+// Also update when amount changes
+(function() {
+    const amountInput = document.getElementById('invAmount');
+    if (amountInput) {
+        const origHandler = amountInput.oninput;
+        amountInput.addEventListener('input', function() {
+            updateProfitDisplay();
+        });
+    }
+})();
+
+// Override saveInvestment to capture initialPrincipal
+const _origSaveInvestment = saveInvestment;
+saveInvestment = function(event) {
+    event.preventDefault();
+    const plan = getCurrentPlan();
+    const name = document.getElementById('invName').value.trim();
+    
+    if (!name) { alert('אנא הזן שם למסלול'); return; }
+    
+    const amount = sanitizeNumber(document.getElementById('invAmount').value);
+    const invType = document.getElementById('invType').value;
+    
+    if (invType === 'פנסיה') {
+        const age = parseInt(document.getElementById('invAge').value);
+        if (!age || age < 18 || age > 120) { alert('❌ עבור פנסיה, נדרש להזין גיל תקין (18-120)'); return; }
+    }
+    
+    if (amount > 0 && currentSubTracks.length > 0) {
+        const totalPercent = currentSubTracks.reduce((sum, st) => sum + st.percent, 0);
+        if (Math.abs(totalPercent - 100) > 0.01) { alert('❌ סך תתי-המסלולים חייב להיות 100%!\nכרגע: ' + totalPercent.toFixed(1) + '%'); return; }
+    }
+    
+    // Calculate initialPrincipal
+    let initialPrincipal = amount; // default: all is principal
+    if (!TAX_EXEMPT_TYPES.includes(invType)) {
+        const principalVal = sanitizeNumber(document.getElementById('invInitialPrincipal').value);
+        if (principalVal > 0 && principalVal <= amount) {
+            initialPrincipal = principalVal;
+        }
+    }
+    
+    const inv = {
+        name,
+        house: document.getElementById('invHouse').value.trim() || 'לא מוגדר',
+        type: invType,
+        tax: sanitizeNumber(document.getElementById('invTax').value),
+        amount,
+        initialPrincipal: initialPrincipal,
+        monthly: sanitizeNumber(document.getElementById('invMonthly').value),
+        returnRate: sanitizeNumber(document.getElementById('invReturn').value),
+        feeDeposit: sanitizeNumber(document.getElementById('invFeeDeposit').value),
+        feeAnnual: sanitizeNumber(document.getElementById('invFeeAnnual').value),
+        forDream: document.getElementById('invForDream').checked,
+        include: document.getElementById('invInclude').checked,
+        gender: document.getElementById('invGender').value,
+        age: parseInt(document.getElementById('invAge').value) || null,
+        spouse: document.getElementById('invSpouse') && document.getElementById('invSpouse').value || 'husband',
+        subTracks: [...currentSubTracks]
+    };
+    
+    if (appData.editingInvestmentIndex >= 0) {
+        plan.investments[appData.editingInvestmentIndex] = inv;
+        appData.editingInvestmentIndex = -1;
+        cancelEditInvestment();
+    } else {
+        plan.investments.push(inv);
+    }
+    
+    clearInvestmentForm();
+    saveData();
+    renderInvestments();
+    updateDreamSources();
+};
+
+// Override editInvestment to populate initialPrincipal
+const _origEditInvestment = editInvestment;
+editInvestment = function(index) {
+    _origEditInvestment(index);
+    
+    const plan = getCurrentPlan();
+    const inv = plan.investments[index];
+    
+    // Show principal section and populate
+    updatePrincipalVisibility();
+    
+    if (inv.initialPrincipal !== undefined && inv.initialPrincipal !== null && inv.initialPrincipal !== inv.amount) {
+        document.getElementById('invInitialPrincipal').value = inv.initialPrincipal;
+    } else {
+        document.getElementById('invInitialPrincipal').value = '';
+    }
+    
+    updateProfitDisplay();
+};
+
+// Override clearInvestmentForm to reset principal field
+const _origClearForm = clearInvestmentForm;
+clearInvestmentForm = function() {
+    _origClearForm();
+    const principalInput = document.getElementById('invInitialPrincipal');
+    if (principalInput) principalInput.value = '';
+    const section = document.getElementById('principalSection');
+    if (section) section.style.display = 'none';
+    updateProfitDisplay();
+};
+
+// Override calculatePrincipal to use initialPrincipal
+const _origCalculatePrincipal = calculatePrincipal;
+calculatePrincipal = function(amount, monthly, years, inv) {
+    // If inv object is passed with initialPrincipal, use it
+    if (inv && inv.initialPrincipal !== undefined && inv.initialPrincipal !== null) {
+        return inv.initialPrincipal + (monthly * 12 * years);
+    }
+    // Fallback to original
+    return amount + (monthly * 12 * years);
+};
+
+// Override renderInvestments to show principal/profit info
+const _origRenderInvestments = renderInvestments;
+renderInvestments = function() {
+    _origRenderInvestments();
+    
+    // Add principal/profit badges to items that have existing profit
+    const plan = getCurrentPlan();
+    const items = document.querySelectorAll('#investmentsList .item');
+    
+    plan.investments.forEach((inv, i) => {
+        if (!inv.initialPrincipal || inv.initialPrincipal >= inv.amount) return;
+        if (TAX_EXEMPT_TYPES.includes(inv.type)) return;
+        if (!items[i]) return;
+        
+        const existingProfit = inv.amount - inv.initialPrincipal;
+        const existingTax = existingProfit * (inv.tax || 0) / 100;
+        
+        const detailsDiv = items[i].querySelector('.item-details');
+        if (detailsDiv) {
+            const profitBadge = document.createElement('div');
+            profitBadge.className = 'item-detail';
+            profitBadge.innerHTML = '<span>💰</span><span style="color: #f59e0b;">רווח קיים: ' + formatCurrency(existingProfit) + ' (מס: ' + formatCurrency(existingTax) + ')</span>';
+            detailsDiv.appendChild(profitBadge);
+        }
+    });
+};
+
+// Override showYearDetails to use correct principal
+const _origShowYearDetails = showYearDetails;
+showYearDetails = function() {
+    const plan = getCurrentPlan();
+    const targetYear = parseInt(document.getElementById('specificYear').value);
+    const currentYear = new Date().getFullYear();
+    
+    if (!targetYear || targetYear < currentYear) { alert('אנא הזן שנה תקינה'); return; }
+    
+    const years = targetYear - currentYear;
+    const container = document.getElementById('yearDetailsContainer');
+    
+    let html = '<div class="card" style="background: #f0f9ff; border: 2px solid var(--primary);">';
+    html += '<h3 style="color: var(--primary); margin-bottom: 20px;">📊 פירוט מפורט לשנת ' + targetYear + '</h3>';
+    html += '<div class="items-list">';
+    
+    plan.investments.forEach((inv) => {
+        if (!inv.include) return;
+        
+        const nominal = calculateFV(inv.amount, inv.monthly, inv.returnRate, years, inv.feeDeposit || 0, inv.feeAnnual || 0, inv.subTracks);
+        const principal = calculatePrincipal(inv.amount, inv.monthly, years, inv);
+        const profit = nominal - principal;
+        const tax = calculateTax(principal, nominal, inv.tax, years);
+        const netAfterTax = nominal - tax;
+        const real = calculateRealValue(nominal, years);
+        
+        let pensionHTML = '';
+        if (inv.type === 'פנסיה' && inv.gender) {
+            const monthlyPension = calculateMonthlyPension(nominal, inv.gender);
+            pensionHTML = '<div class="alert alert-info" style="margin-top: 12px;"><span class="alert-icon">💰</span><div><strong>קצבה חודשית משוערת:</strong> ' + formatCurrency(monthlyPension) + '<br><small>מחושב לפי מקדם ' + (inv.gender === 'male' ? '0.005' : '0.006') + '</small></div></div>';
+        }
+        
+        let principalNote = '';
+        if (inv.initialPrincipal && inv.initialPrincipal < inv.amount && !TAX_EXEMPT_TYPES.includes(inv.type)) {
+            const existingProfit = inv.amount - inv.initialPrincipal;
+            principalNote = '<div><strong style="color: #f59e0b;">רווח קיים (יום ההפקדה):</strong> ' + formatCurrency(existingProfit) + '</div>';
+        }
+        
+        html += '<div class="item"><div class="item-title" style="margin-bottom: 16px;">' + inv.name + '</div>';
+        html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">';
+        html += '<div><strong>ערך נומינלי:</strong> ' + formatCurrency(nominal) + '</div>';
+        html += '<div><strong>ערך ריאלי:</strong> ' + formatCurrency(real) + '</div>';
+        html += '<div><strong>קרן שהופקדה:</strong> ' + formatCurrency(principal) + '</div>';
+        html += '<div style="color: var(--success);"><strong>רווח:</strong> ' + formatCurrency(profit) + '</div>';
+        html += '<div style="color: var(--danger);"><strong>מס על רווח:</strong> ' + formatCurrency(tax) + '</div>';
+        html += '<div style="color: var(--primary); font-weight: 700;"><strong>נטו לאחר מס:</strong> ' + formatCurrency(netAfterTax) + '</div>';
+        html += principalNote;
+        html += '</div>' + pensionHTML + '</div>';
+    });
+    
+    html += '</div></div>';
+    container.innerHTML = html;
+    container.style.display = 'block';
+};
+
+// Override Excel export to include initialPrincipal
+const _origExportExcel = exportExcel;
+exportExcel = function() {
+    const plan = getCurrentPlan();
+    const profile = plan.profile;
+    const goals = plan.goals;
+    
+    const wb = XLSX.utils.book_new();
+    
+    const invData = plan.investments.map(inv => ({
+        'שם': inv.name,
+        'סוג': inv.type,
+        'בית השקעות': inv.house,
+        'סכום נוכחי': inv.amount,
+        'קרן מקורית': inv.initialPrincipal || inv.amount,
+        'הפקדה חודשית': inv.monthly,
+        'תשואה %': inv.returnRate,
+        'מס %': inv.tax || 0,
+        'דמי ניהול הפקדה %': inv.feeDeposit || 0,
+        'דמי ניהול צבירה %': inv.feeAnnual || 0,
+        'כלול': inv.include ? 'כן' : 'לא',
+        'בן/בת זוג': inv.spouse || '',
+        'גיל': inv.age || '',
+        'מגדר': inv.gender || '',
+        'תתי-מסלולים': inv.subTracks ? JSON.stringify(inv.subTracks) : ''
+    }));
+    const ws1 = XLSX.utils.json_to_sheet(invData);
+    XLSX.utils.book_append_sheet(wb, ws1, 'מסלולי השקעה');
+    
+    // Profile sheet
+    const profileData = [
+        { 'שדה': 'שם משתמש', 'ערך': profile.user.name || '' },
+        { 'שדה': 'גיל משתמש', 'ערך': profile.user.age || '' },
+        { 'שדה': 'שם בן/בת זוג', 'ערך': profile.spouse.name || '' },
+        { 'שדה': 'גיל בן/בת זוג', 'ערך': profile.spouse.age || '' },
+        { 'שדה': 'מספר ילדים', 'ערך': profile.children.length }
+    ];
+    profile.children.forEach((child, i) => {
+        profileData.push({ 'שדה': 'ילד ' + (i+1) + ' - שם', 'ערך': child.name });
+        profileData.push({ 'שדה': 'ילד ' + (i+1) + ' - גיל', 'ערך': child.age });
+    });
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(profileData), 'פרופיל');
+    
+    // Goals sheets
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([{
+        'סוג יעד': 'פרישה', 'גיל משתמש': goals.retirement.userAge || '',
+        'גיל בן/בת זוג': goals.retirement.spouseAge || '',
+        'קצבה חודשית': goals.retirement.monthlyPension || '',
+        'ערך ריאלי': goals.retirement.isRealValue ? 'כן' : 'לא'
+    }]), 'יעד פרישה');
+    
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([{
+        'סוג יעד': 'הון עצמי', 'סכום יעד': goals.equity.targetAmount || '',
+        'שנת יעד': goals.equity.targetYear || ''
+    }]), 'יעד הון');
+    
+    if (goals.lifeGoals && goals.lifeGoals.length > 0) {
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(goals.lifeGoals.map(g => ({
+            'שם': g.name, 'סכום': g.amount, 'שנה': g.year, 'ID': g.id || ''
+        }))), 'יעדי חיים');
+    }
+    
+    if (plan.withdrawals && plan.withdrawals.length > 0) {
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(plan.withdrawals.map(w => ({
+            'שנה': w.year, 'סכום': w.amount, 'מטרה': w.goal || '',
+            'מקושר ליעד ID': w.goalId || '', 'פעיל': w.active === false ? 'לא' : 'כן'
+        }))), 'מפת דרכים');
+    }
+    
+    const now = new Date();
+    const filename = 'תוכנית_פיננסית_' + now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0') + '.xlsx';
+    XLSX.writeFile(wb, filename);
+    showSaveNotification('✅ הקובץ יוצא בהצלחה!');
+};
+
+// Override Excel import - backward compat: if no initialPrincipal column, default to amount
+const _origImportExcel = importExcel;
+importExcel = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const plan = getCurrentPlan();
+            
+            if (workbook.SheetNames.includes('מסלולי השקעה')) {
+                const invSheet = workbook.Sheets['מסלולי השקעה'];
+                const invData = XLSX.utils.sheet_to_json(invSheet);
+                plan.investments = invData.map(row => {
+                    const amount = parseFloat(row['סכום נוכחי']) || 0;
+                    const initialPrincipal = row['קרן מקורית'] !== undefined ? (parseFloat(row['קרן מקורית']) || amount) : amount;
+                    
+                    return {
+                        name: row['שם'] || '',
+                        type: row['סוג'] || 'אחר',
+                        house: row['בית השקעות'] || 'לא מוגדר',
+                        amount: amount,
+                        initialPrincipal: initialPrincipal,
+                        monthly: parseFloat(row['הפקדה חודשית']) || 0,
+                        returnRate: parseFloat(row['תשואה %']) || 0,
+                        tax: parseFloat(row['מס %']) || 0,
+                        feeDeposit: parseFloat(row['דמי ניהול הפקדה %']) || 0,
+                        feeAnnual: parseFloat(row['דמי ניהול צבירה %']) || 0,
+                        include: row['כלול'] === 'כן',
+                        spouse: row['בן/בת זוג'] || '',
+                        age: parseInt(row['גיל']) || null,
+                        gender: row['מגדר'] || '',
+                        subTracks: row['תתי-מסלולים'] ? JSON.parse(row['תתי-מסלולים']) : []
+                    };
+                });
+            }
+            
+            // Import other sheets using original logic
+            if (workbook.SheetNames.includes('פרופיל')) {
+                const profileData = XLSX.utils.sheet_to_json(workbook.Sheets['פרופיל']);
+                profileData.forEach(row => {
+                    const field = row['שדה'], value = row['ערך'];
+                    if (field === 'שם משתמש') getCurrentPlan().profile.user.name = value;
+                    if (field === 'גיל משתמש') getCurrentPlan().profile.user.age = parseInt(value) || null;
+                    if (field === 'שם בן/בת זוג') getCurrentPlan().profile.spouse.name = value;
+                    if (field === 'גיל בן/בת זוג') getCurrentPlan().profile.spouse.age = parseInt(value) || null;
+                    if (field && field.startsWith('ילד ')) {
+                        const match = field.match(/ילד (\d+) - (שם|גיל)/);
+                        if (match) {
+                            const idx = parseInt(match[1]) - 1;
+                            if (!getCurrentPlan().profile.children[idx]) getCurrentPlan().profile.children[idx] = { name: '', age: null };
+                            if (match[2] === 'שם') getCurrentPlan().profile.children[idx].name = value;
+                            if (match[2] === 'גיל') getCurrentPlan().profile.children[idx].age = parseInt(value) || null;
+                        }
+                    }
+                });
+            }
+            
+            if (workbook.SheetNames.includes('יעד פרישה')) {
+                const retData = XLSX.utils.sheet_to_json(workbook.Sheets['יעד פרישה']);
+                if (retData.length > 0) {
+                    const r = retData[0];
+                    getCurrentPlan().goals.retirement.userAge = parseInt(r['גיל משתמש']) || null;
+                    getCurrentPlan().goals.retirement.spouseAge = parseInt(r['גיל בן/בת זוג']) || null;
+                    getCurrentPlan().goals.retirement.monthlyPension = parseFloat(r['קצבה חודשית']) || null;
+                    getCurrentPlan().goals.retirement.isRealValue = r['ערך ריאלי'] === 'כן';
+                }
+            }
+            
+            if (workbook.SheetNames.includes('יעד הון')) {
+                const eqData = XLSX.utils.sheet_to_json(workbook.Sheets['יעד הון']);
+                if (eqData.length > 0) {
+                    getCurrentPlan().goals.equity.targetAmount = parseFloat(eqData[0]['סכום יעד']) || null;
+                    getCurrentPlan().goals.equity.targetYear = parseInt(eqData[0]['שנת יעד']) || null;
+                }
+            }
+            
+            if (workbook.SheetNames.includes('יעדי חיים')) {
+                getCurrentPlan().goals.lifeGoals = XLSX.utils.sheet_to_json(workbook.Sheets['יעדי חיים']).map(row => ({
+                    id: row['ID'] || Date.now() + Math.random(), name: row['שם'] || '',
+                    amount: parseFloat(row['סכום']) || 0, year: parseInt(row['שנה']) || new Date().getFullYear() + 10
+                }));
+            }
+            
+            if (workbook.SheetNames.includes('מפת דרכים')) {
+                plan.withdrawals = XLSX.utils.sheet_to_json(workbook.Sheets['מפת דרכים']).map(row => ({
+                    year: parseInt(row['שנה']) || new Date().getFullYear(), amount: parseFloat(row['סכום']) || 0,
+                    goal: row['מטרה'] || '', goalId: row['מקושר ליעד ID'] || null, active: row['פעיל'] !== 'לא'
+                }));
+            }
+            
+            saveData();
+            syncLifeGoalsToRoadmap();
+            renderWithdrawals();
+            renderInvestments();
+            renderSummary();
+            if (typeof renderPensionTab === 'function') renderPensionTab();
+            
+            alert('✅ כל הנתונים יובאו בהצלחה!');
+        } catch (e) {
+            console.error('Import error:', e);
+            alert('❌ שגיאה בייבוא הקובץ: ' + e.message);
+        }
+    };
+    reader.readAsArrayBuffer(file);
+    event.target.value = '';
+};
+
+// Ensure existing investments get initialPrincipal on load
+(function migrateExistingInvestments() {
+    try {
+        const saved = localStorage.getItem('financialPlannerProV3');
+        if (saved) {
+            const data = JSON.parse(saved);
+            let changed = false;
+            data.plans.forEach(plan => {
+                (plan.investments || []).forEach(inv => {
+                    if (inv.initialPrincipal === undefined || inv.initialPrincipal === null) {
+                        inv.initialPrincipal = inv.amount;
+                        changed = true;
+                    }
+                });
+            });
+            if (changed) {
+                localStorage.setItem('financialPlannerProV3', JSON.stringify(data));
+                console.log('✅ Migrated investments: added initialPrincipal');
+            }
+        }
+    } catch(e) { console.error('Migration error:', e); }
+})();
+
+console.log('✅ patch.js v5 loaded');

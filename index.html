@@ -138,6 +138,26 @@
                             <div class="form-group"><label class="form-label">תשואה צפויה (% שנתי)</label><input type="number" class="form-input" id="invReturn" value="6" min="0" max="30" step="0.1"></div>
                             <div class="form-group"><label class="form-label">דמי ניהול מהפקדה (%)</label><input type="number" class="form-input" id="invFeeDeposit" value="0" min="0" max="10" step="0.1"></div>
                         </div>
+                        
+                        <!-- Principal/Profit split (taxable tracks only) -->
+                        <div id="principalSection" style="display: none; margin: 12px 0; padding: 16px; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px;">
+                            <div style="font-weight: bold; margin-bottom: 10px; color: #f59e0b;">💰 פיצול קרן / רווח קיים</div>
+                            <p style="font-size: 0.85em; color: #8b949e; margin-bottom: 12px;">הגדר כמה מהסכום הנוכחי הוא קרן מקורית. הרווח הקיים יחויב במס רווחי הון בעת משיכה.</p>
+                            <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                                <div class="form-group">
+                                    <label class="form-label">קרן מקורית (₪)</label>
+                                    <input type="text" inputmode="numeric" pattern="[0-9,\.]*" class="form-input" id="invInitialPrincipal" placeholder="הכל קרן" oninput="updateProfitDisplay()">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">רווח קיים (₪)</label>
+                                    <div id="invExistingProfit" style="padding: 10px; background: rgba(255,255,255,0.06); border-radius: 6px; font-weight: bold; color: #3fb950; min-height: 42px; display: flex; align-items: center;">₪0</div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">מס על רווח קיים</label>
+                                    <div id="invExistingTax" style="padding: 10px; background: rgba(255,255,255,0.06); border-radius: 6px; font-weight: bold; color: #f85149; min-height: 42px; display: flex; align-items: center;">₪0</div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="form-grid">
                             <div class="form-group"><label class="form-label">דמי ניהול מצבירה (% שנתי)</label><input type="number" class="form-input" id="invFeeAnnual" value="0" min="0" max="5" step="0.01"></div>
                             <div class="form-group"><label class="checkbox-group"><input type="checkbox" class="checkbox" id="invForDream"><span>מיועד למימוש חלומות</span></label></div>
@@ -341,6 +361,6 @@
         if (typeof window.supabase !== 'undefined') { console.log('✅ Supabase loaded'); } else { console.error('❌ Supabase NOT loaded'); }
     </script>
     <script src="script.js?v=FORCE_RESET_999999"></script>
-    <script src="patch.js?v=4.1"></script>
+    <script src="patch.js?v=5"></script>
 </body>
 </html>
