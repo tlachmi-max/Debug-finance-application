@@ -1,8 +1,36 @@
 // ============================================================
-// glide.js v3 - Concrete Glide Path + Charts Toggle + Report
+// glide.js v4 - Glide Path + Charts + Report + Risk Fix
 // ============================================================
 
-console.log('✅ glide.js v3 loading...');
+console.log('✅ glide.js v4 loading...');
+
+// ============================================================
+// 0. FIX: classifyRisk by return rate (not by name)
+// 1-4% = low, 5-6% = medium, 7%+ = high
+// ============================================================
+
+classifyRisk = function(subTrack) {
+    // If manual risk is set, use it
+    if (typeof subTrack === 'object' && subTrack.manualRisk) {
+        return subTrack.manualRisk;
+    }
+    
+    // Get the return rate
+    let returnRate = 0;
+    if (typeof subTrack === 'object' && subTrack.returnRate !== undefined) {
+        returnRate = subTrack.returnRate;
+    } else if (typeof subTrack === 'number') {
+        returnRate = subTrack;
+    }
+    
+    // Classify by return rate
+    if (returnRate >= 7) return 'high';
+    if (returnRate >= 5) return 'medium';
+    if (returnRate >= 1) return 'low';
+    
+    // 0% or undefined
+    return 'low';
+};
 
 // ============================================================
 // 1. CHARTS - Toggle pension inclusion
@@ -30,7 +58,7 @@ renderCharts = function() {
             inv.subTracks.forEach(st => { const v = value * (st.percent / 100); bySubTrack[st.type] = (bySubTrack[st.type] || 0) + v; subTrackObjects.push({ ...st, value: v }); });
         } else {
             bySubTrack['לא מחולק'] = (bySubTrack['לא מחולק'] || 0) + value;
-            subTrackObjects.push({ type: 'לא מחולק', value: value });
+            subTrackObjects.push({ type: 'לא מחולק', value: value, returnRate: inv.returnRate || 0 });
         }
         if (inv.tax > 0) taxable += value; else taxExempt += value;
     });
@@ -102,7 +130,13 @@ generateReport = function() {
     const byType = {}, byHouse = {}; let txE = 0, txT = 0;
     allInvs.forEach(inv => { byType[inv.type] = (byType[inv.type] || 0) + (inv.amount || 0); byHouse[inv.house || 'לא מוגדר'] = (byHouse[inv.house || 'לא מוגדר'] || 0) + (inv.amount || 0); if (inv.tax > 0) txT += (inv.amount || 0); else txE += (inv.amount || 0); });
     const riskT = { 'סיכון גבוה': 0, 'סיכון בינוני': 0, 'סיכון נמוך': 0 };
-    allInvs.forEach(inv => { if (inv.subTracks && inv.subTracks.length > 0) inv.subTracks.forEach(st => { const v = (inv.amount || 0) * (st.percent / 100); const r = classifyRisk(st); if (r === 'high') riskT['סיכון גבוה'] += v; else if (r === 'medium') riskT['סיכון בינוני'] += v; else if (r === 'low') riskT['סיכון נמוך'] += v; }); });
+    allInvs.forEach(inv => {
+        if (inv.subTracks && inv.subTracks.length > 0) {
+            inv.subTracks.forEach(st => { const v = (inv.amount || 0) * (st.percent / 100); const r = classifyRisk(st); if (r === 'high') riskT['סיכון גבוה'] += v; else if (r === 'medium') riskT['סיכון בינוני'] += v; else if (r === 'low') riskT['סיכון נמוך'] += v; });
+        } else {
+            const v = inv.amount || 0; const r = classifyRisk({ returnRate: inv.returnRate || 0 }); if (r === 'high') riskT['סיכון גבוה'] += v; else if (r === 'medium') riskT['סיכון בינוני'] += v; else if (r === 'low') riskT['סיכון נמוך'] += v;
+        }
+    });
     
     function dT(title, data, total) {
         let t = '<h2>' + title + '</h2><table><thead><tr><th>קטגוריה</th><th>סכום</th><th>אחוז</th></tr></thead><tbody>';
@@ -362,4 +396,4 @@ function renderGlidePathAdvisor() {
     container.innerHTML = html;
 }
 
-console.log('✅ glide.js v3 loaded');
+console.log('✅ glide.js v4 loaded');
