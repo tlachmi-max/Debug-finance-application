@@ -124,19 +124,26 @@ generateReport = function() {
         ptR += '<td style="font-weight:700;color:#10b981;">' + formatCurrency(rt) + '</td></tr>';
     }
     
-    // Distribution tables data
+    // Distribution tables - build for BOTH with and without pension
+    function buildDistData(invList) {
+        const total = invList.reduce((s, i) => s + (i.amount || 0), 0);
+        const bt = {}, bh = {}; let te = 0, tt = 0;
+        invList.forEach(inv => { bt[inv.type] = (bt[inv.type] || 0) + (inv.amount || 0); bh[inv.house || 'לא מוגדר'] = (bh[inv.house || 'לא מוגדר'] || 0) + (inv.amount || 0); if (inv.tax > 0) tt += (inv.amount || 0); else te += (inv.amount || 0); });
+        const rt = { 'סיכון גבוה': 0, 'סיכון בינוני': 0, 'סיכון נמוך': 0 };
+        invList.forEach(inv => {
+            if (inv.subTracks && inv.subTracks.length > 0) {
+                inv.subTracks.forEach(st => { const v = (inv.amount || 0) * (st.percent / 100); const r = classifyRisk(st); if (r === 'high') rt['סיכון גבוה'] += v; else if (r === 'medium') rt['סיכון בינוני'] += v; else if (r === 'low') rt['סיכון נמוך'] += v; });
+            } else {
+                const v = inv.amount || 0; const r = classifyRisk({ returnRate: inv.returnRate || 0 }); if (r === 'high') rt['סיכון גבוה'] += v; else if (r === 'medium') rt['סיכון בינוני'] += v; else if (r === 'low') rt['סיכון נמוך'] += v;
+            }
+        });
+        return { total, bt, bh, te, tt, rt };
+    }
+    
     const allInvs = plan.investments.filter(inv => inv.include);
-    const allTotal = allInvs.reduce((s, i) => s + (i.amount || 0), 0);
-    const byType = {}, byHouse = {}; let txE = 0, txT = 0;
-    allInvs.forEach(inv => { byType[inv.type] = (byType[inv.type] || 0) + (inv.amount || 0); byHouse[inv.house || 'לא מוגדר'] = (byHouse[inv.house || 'לא מוגדר'] || 0) + (inv.amount || 0); if (inv.tax > 0) txT += (inv.amount || 0); else txE += (inv.amount || 0); });
-    const riskT = { 'סיכון גבוה': 0, 'סיכון בינוני': 0, 'סיכון נמוך': 0 };
-    allInvs.forEach(inv => {
-        if (inv.subTracks && inv.subTracks.length > 0) {
-            inv.subTracks.forEach(st => { const v = (inv.amount || 0) * (st.percent / 100); const r = classifyRisk(st); if (r === 'high') riskT['סיכון גבוה'] += v; else if (r === 'medium') riskT['סיכון בינוני'] += v; else if (r === 'low') riskT['סיכון נמוך'] += v; });
-        } else {
-            const v = inv.amount || 0; const r = classifyRisk({ returnRate: inv.returnRate || 0 }); if (r === 'high') riskT['סיכון גבוה'] += v; else if (r === 'medium') riskT['סיכון בינוני'] += v; else if (r === 'low') riskT['סיכון נמוך'] += v;
-        }
-    });
+    const noPensionInvs = allInvs.filter(inv => inv.type !== 'פנסיה');
+    const distAll = buildDistData(allInvs);
+    const distNoPension = buildDistData(noPensionInvs);
     
     function dT(title, data, total) {
         let t = '<h2>' + title + '</h2><table><thead><tr><th>קטגוריה</th><th>סכום</th><th>אחוז</th></tr></thead><tbody>';
@@ -153,9 +160,13 @@ generateReport = function() {
     breakdown.forEach(i => { h += '<tr><td><strong>' + i.name + '</strong></td><td>' + i.house + '</td><td>' + formatCurrency(i.today) + '</td><td>' + formatCurrency(i.monthly) + '</td><td>' + formatCurrency(i.future) + '</td><td class="p">' + formatCurrency(i.profit) + '</td></tr>'; });
     const tm = equityInvs.reduce((s, i) => s + (i.monthly || 0), 0);
     h += '<tr style="background:#f3f4f6;font-weight:bold"><td colspan="2">סה"כ</td><td>' + formatCurrency(totalToday) + '</td><td>' + formatCurrency(tm) + '</td><td>' + formatCurrency(projection.finalNominal) + '</td><td class="p">' + formatCurrency(projection.finalNominal - projection.finalPrincipal) + '</td></tr></tbody></table>';
-    h += '<h2>📊 חלוקת התיק</h2><div class="dg"><div>' + dT('🏷️ סוג מסלול', byType, allTotal) + '</div><div>' + dT('🏢 בית השקעות', byHouse, allTotal) + '</div></div><div class="dg"><div>' + dT('💸 מיסוי', { 'פטור': txE, 'חייב': txT }, allTotal) + '</div>';
-    const rTotal = Object.values(riskT).reduce((s, v) => s + v, 0);
-    if (rTotal > 0) h += '<div>' + dT('⚠️ סיכון', riskT, rTotal) + '</div>';
+    h += '<h2>📊 חלוקת התיק — כולל פנסיה</h2><div class="dg"><div>' + dT('🏷️ סוג מסלול', distAll.bt, distAll.total) + '</div><div>' + dT('🏢 בית השקעות', distAll.bh, distAll.total) + '</div></div><div class="dg"><div>' + dT('💸 מיסוי', { 'פטור': distAll.te, 'חייב': distAll.tt }, distAll.total) + '</div>';
+    const rTotalAll = Object.values(distAll.rt).reduce((s, v) => s + v, 0);
+    if (rTotalAll > 0) h += '<div>' + dT('⚠️ סיכון', distAll.rt, rTotalAll) + '</div>';
+    h += '</div>';
+    h += '<h2>📊 חלוקת התיק — ללא פנסיה (הון עצמי)</h2><div class="dg"><div>' + dT('🏷️ סוג מסלול', distNoPension.bt, distNoPension.total) + '</div><div>' + dT('🏢 בית השקעות', distNoPension.bh, distNoPension.total) + '</div></div><div class="dg"><div>' + dT('💸 מיסוי', { 'פטור': distNoPension.te, 'חייב': distNoPension.tt }, distNoPension.total) + '</div>';
+    const rTotalNP = Object.values(distNoPension.rt).reduce((s, v) => s + v, 0);
+    if (rTotalNP > 0) h += '<div>' + dT('⚠️ סיכון', distNoPension.rt, rTotalNP) + '</div>';
     h += '</div>';
     h += '<h2>📈 תחזית (כל ' + il + ')' + (hasW ? ' ⚠️' : '') + '</h2><table><thead><tr><th>שנה</th><th>נומינלי</th>' + (hasW ? '<th style="background:#dc2626;">משיכה</th><th style="background:#dc2626;">מטרה</th>' : '') + '<th>ריאלי</th><th>מס</th><th>נטו</th></tr></thead><tbody>' + projRows + '</tbody></table>';
     if (equityInvs.length > 1) h += '<h2>📊 לפי מסלול</h2><div class="ts"><table><thead><tr>' + ptH + '</tr></thead><tbody>' + ptR + '</tbody></table></div>';
