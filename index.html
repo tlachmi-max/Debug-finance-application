@@ -36,16 +36,13 @@
                 <div class="hero-logo-sub">השותף לצמיחה של המשפחה שלך</div>
             </div>
         </div>
-        <!-- Action buttons -->
+        <!-- Plan selector (minimal) -->
         <div class="hero-actions">
             <div id="storageStatus" class="storage-status" title="מצב שמירה"><span class="status-icon">💾</span><span class="status-text">מקומי</span></div>
             <button id="cloudSyncBtn" class="btn-hero btn-cloud" disabled style="opacity:0.5;cursor:not-allowed;" title="סנכרון כרגע לא זמין"><span>☁️</span><span>סנכרון</span></button>
             <select id="planSelector" class="plan-select" onchange="switchPlan(this.value)"><option value="">בחר תוכנית...</option></select>
-            <button class="btn-hero" onclick="renamePlan()" title="שנה שם"><span>✏️</span></button>
-            <button class="btn-hero" onclick="showPlanManager()" title="תוכניות"><span>📂</span></button>
-            <button class="btn-hero" onclick="generateReport()" title="דוח"><span>📋</span></button>
-            <button class="btn-hero" onclick="exportExcel()" title="ייצוא"><span>📤</span></button>
-            <button class="btn-hero" onclick="document.getElementById('excelImport').click()" title="ייבוא"><span>📥</span></button>
+            <button class="btn-hero" onclick="renamePlan()" title="שנה שם תוכנית"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            <!-- Hidden: file input for import (used by utility bar below) -->
             <input type="file" id="excelImport" accept=".xlsx,.xls" style="display:none" onchange="importExcel(event)">
         </div>
     </div>
@@ -72,6 +69,28 @@
     <button class="nav-item" data-panel="charts" onclick="switchPanel('charts')"><span>📊</span><span>גרפים</span></button>
     <button class="nav-item" data-panel="tasks" onclick="switchPanel('tasks')"><span>✓</span><span>משימות</span></button>
 </nav>
+
+<!-- ========== UTILITY BAR — Slim action icons ========== -->
+<div class="utility-bar" id="utilityBar">
+    <div class="utility-bar-inner">
+        <div class="utility-group">
+            <button class="utility-btn" onclick="showPlanManager()" title="ניהול תוכניות">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                <span>ניהול תוכניות</span>
+            </button>
+        </div>
+        <div class="utility-group">
+            <button class="utility-btn" onclick="exportExcel()" title="הורדת נתונים">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>הורדת נתונים</span>
+            </button>
+            <button class="utility-btn" onclick="document.getElementById('excelImport').click()" title="טעינת קובץ">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span>טעינת קובץ</span>
+            </button>
+        </div>
+    </div>
+</div>
 
 <!-- ========== LAUNCHPAD (Cards Grid) ========== -->
 <div class="launchpad" id="launchpad">
@@ -155,6 +174,17 @@
 
 <!-- ===== Investments ===== -->
 <div id="investments" class="panel">
+    <!-- Plan management bar -->
+    <div class="plan-actions-bar">
+        <button class="btn-ghost" onclick="showPlanManager()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            ניהול תוכניות
+        </button>
+        <button class="btn-ghost" onclick="createNewPlan()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            בניית מסלול חדש
+        </button>
+    </div>
     <div class="card auto-import-card" style="margin-bottom:20px;"><div style="text-align:center;padding:8px;"><h3 style="margin:0 0 12px;font-size:1.2em;">🔄 ייבוא אוטומטי מחברות ביטוח ופנסיה</h3><p style="margin:0 0 16px;opacity:0.9;font-size:0.9em;">חבר את חשבונות הפנסיה שלך ויבא את הנתונים אוטומטית</p><button type="button" class="btn" onclick="initAutoImport()" style="padding:12px 24px;font-size:1em;">🚀 התחל ייבוא אוטומטי</button><div id="extensionStatus" style="margin-top:12px;font-size:0.85em;opacity:0.9;"></div></div></div>
     <div class="card"><div class="card-header"><div class="card-title"><span>➕</span><span id="investmentFormTitle">הוסף מסלול השקעה</span></div></div>
         <form id="investmentForm" onsubmit="saveInvestment(event)">
@@ -209,10 +239,20 @@
         <div class="stat-card purple"><div class="stat-label">ממוצע דמי ניהול</div><div class="stat-value" id="sumAvgFees" style="font-size:2em;">-</div><div class="stat-detail">צבירה: <span id="sumAvgFeeAnnual">-</span> | הפקדה: <span id="sumAvgFeeDeposit">-</span></div></div>
         <div class="stat-card teal"><div class="stat-label">ממוצע תשואה</div><div class="stat-value" id="sumAvgReturn" style="font-size:2em;">-</div><div class="stat-detail">ממוצע משוקלל</div></div>
     </div>
+    <!-- Report ghost button -->
+    <div class="report-action-bar">
+        <button class="btn-ghost-report" onclick="generateReport()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            הפק דוח מסכם
+        </button>
+    </div>
     <div class="card" style="border:2px solid #7C3AED;"><div class="card-title" style="margin-bottom:16px;">🧮 מחשבון השפעה — דמי ניהול ותשואה</div><p style="color:var(--text-secondary);font-size:0.9em;margin-bottom:16px;">בדוק איך שינוי בדמי ניהול או בתשואה ישפיע על ההון הריאלי שלך.</p><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;"><div class="form-group"><label class="form-label">תשואה (%)</label><input type="number" class="form-input" id="impactReturn" min="0" max="30" step="0.1"><div style="font-size:0.8em;color:var(--text-secondary);margin-top:4px;">נוכחי: <span id="impactCurReturn">-</span></div></div><div class="form-group"><label class="form-label">דמ"נ צבירה (%)</label><input type="number" class="form-input" id="impactFeeAnnual" min="0" max="5" step="0.01"><div style="font-size:0.8em;color:var(--text-secondary);margin-top:4px;">נוכחי: <span id="impactCurFeeAnnual">-</span></div></div><div class="form-group"><label class="form-label">דמ"נ הפקדה (%)</label><input type="number" class="form-input" id="impactFeeDeposit" min="0" max="10" step="0.1"><div style="font-size:0.8em;color:var(--text-secondary);margin-top:4px;">נוכחי: <span id="impactCurFeeDeposit">-</span></div></div></div><div style="display:flex;gap:12px;"><button class="btn btn-primary" onclick="calculateImpact()" style="flex:1;">🧮 חשב השפעה</button><button class="btn btn-secondary" onclick="resetImpactForm()">🔄 אפס</button></div><div id="impactResults"></div></div>
     <div class="card"><div class="card-title mb-3">פירוט מסלולי השקעה</div><div id="summaryBreakdown" class="items-list"></div></div>
     <div id="goalProgress"></div>
-    <div style="text-align:center;margin:30px 0;"><button class="btn btn-primary" onclick="generateAnalysisReport()" style="font-size:1.1em;padding:14px 28px;">📊 דוח ניתוח מפורט</button></div>
+    <div style="text-align:center;margin:30px 0;"><button class="btn-ghost-report" onclick="generateAnalysisReport()" style="font-size:1em;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            דוח ניתוח מפורט
+        </button></div>
     <div id="recommendations"></div>
     <div id="riskAnalysis"></div>
 </div>
@@ -276,8 +316,10 @@ function openModule(panelId) {
     var hero = document.getElementById('heroSection');
     hero.classList.remove('hero-full');
     hero.classList.add('hero-slim');
-    // Hide launchpad
+    // Hide launchpad + utility bar
     document.getElementById('launchpad').classList.add('hidden');
+    var ubar = document.getElementById('utilityBar');
+    if (ubar) ubar.classList.add('hidden-bar');
     // Show module
     document.getElementById('moduleWrapper').classList.add('visible');
     // Set title
@@ -303,6 +345,8 @@ function showLaunchpad() {
     hero.classList.add('hero-full');
     document.getElementById('launchpad').classList.remove('hidden');
     document.getElementById('moduleWrapper').classList.remove('visible');
+    var ubar = document.getElementById('utilityBar');
+    if (ubar) ubar.classList.remove('hidden-bar');
     document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }

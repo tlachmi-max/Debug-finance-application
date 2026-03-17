@@ -738,6 +738,141 @@ h2 { font-size: 1.35em; font-weight: 700; color: var(--text-primary); }
 canvas { max-width: 100%; }
 
 /* ============================================================
+   UTILITY BAR — Slim action icons below hero
+   ============================================================ */
+.utility-bar {
+    background: #FFFFFF;
+    border-bottom: 1px solid var(--border);
+    padding: 0;
+}
+
+.utility-bar-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 8px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.utility-group {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.utility-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    font-size: 0.82em;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.utility-btn:hover {
+    background: var(--bg-hover);
+    color: var(--brand-primary);
+}
+
+.utility-btn svg {
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+.utility-btn:hover svg {
+    opacity: 1;
+}
+
+/* Hide utility bar when inside a module */
+.utility-bar.hidden-bar { display: none; }
+
+/* ============================================================
+   PLAN ACTIONS BAR — Inside investments panel
+   ============================================================ */
+.plan-actions-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+/* ============================================================
+   GHOST BUTTONS — Outlined, elegant
+   ============================================================ */
+.btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #FFFFFF;
+    border: 1.5px solid var(--brand-pale);
+    border-radius: var(--radius-lg);
+    color: var(--brand-primary);
+    font-size: 0.88em;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.btn-ghost:hover {
+    background: var(--brand-bg);
+    border-color: var(--brand-light);
+    box-shadow: 0 2px 8px rgba(30, 64, 175, 0.1);
+}
+
+.btn-ghost svg { flex-shrink: 0; }
+
+/* ============================================================
+   REPORT GHOST BUTTON — Prominent centered ghost
+   ============================================================ */
+.report-action-bar {
+    display: flex;
+    justify-content: center;
+    margin: 24px 0;
+}
+
+.btn-ghost-report {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 32px;
+    background: #FFFFFF;
+    border: 2px solid var(--brand-primary);
+    border-radius: var(--radius-lg);
+    color: var(--brand-primary);
+    font-size: 1em;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.btn-ghost-report:hover {
+    background: var(--brand-primary);
+    color: #FFFFFF;
+    box-shadow: 0 4px 16px rgba(30, 64, 175, 0.25);
+    transform: translateY(-2px);
+}
+
+.btn-ghost-report:hover svg {
+    stroke: #FFFFFF;
+}
+
+.btn-ghost-report svg { flex-shrink: 0; }
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 @media (max-width: 900px) {
@@ -752,9 +887,16 @@ canvas { max-width: 100%; }
     .hero-actions { justify-content: center; }
     .hero-tagline h2 { font-size: 1.4em; }
 
+    .utility-bar-inner { padding: 6px 16px; }
+    .utility-btn span { display: none; }
+    .utility-btn { padding: 8px 10px; }
+
     .launchpad { padding: 24px 16px 40px; }
     .module-wrapper { padding: 0 16px 40px; }
     .module-container { padding: 24px 18px; border-radius: var(--radius-lg); }
+
+    .plan-actions-bar { gap: 8px; }
+    .btn-ghost { padding: 8px 14px; font-size: 0.82em; }
 
     .card { padding: 18px !important; }
     .form-grid { grid-template-columns: 1fr; }
