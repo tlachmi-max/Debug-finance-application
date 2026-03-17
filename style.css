@@ -398,28 +398,39 @@ body {
 
 .module-wrapper.visible { display: block; }
 
-.back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 22px;
-    margin: 24px 0 20px;
-    background: #FFFFFF;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
+/* Sticky floating home button */
+.home-fab {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    z-index: 900;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--brand-primary);
+    color: white;
+    border: none;
     cursor: pointer;
-    font-size: 0.9em;
-    font-weight: 600;
-    color: var(--brand-primary);
-    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(30, 64, 175, 0.35), 0 2px 6px rgba(0,0,0,0.1);
+    transition: all 0.25s ease;
     font-family: inherit;
-    box-shadow: var(--shadow-sm);
 }
 
-.back-btn:hover {
-    background: var(--brand-bg);
-    border-color: var(--brand-pale);
-    box-shadow: var(--shadow);
+.home-fab:hover {
+    background: var(--brand-deep);
+    transform: scale(1.08);
+    box-shadow: 0 6px 24px rgba(30, 64, 175, 0.4);
+}
+
+.home-fab:active {
+    transform: scale(0.95);
+}
+
+.home-fab svg {
+    stroke: white;
 }
 
 .module-container {
@@ -738,6 +749,288 @@ h2 { font-size: 1.35em; font-weight: 700; color: var(--text-primary); }
 canvas { max-width: 100%; }
 
 /* ============================================================
+   CRITICAL: Override ALL dark-mode inline colors from script.js
+   These were designed for dark backgrounds but we now use white.
+   ============================================================ */
+
+/* --- Summary breakdown items (#summaryBreakdown) --- */
+#summaryBreakdown .item,
+#summaryBreakdown .item * {
+    color: var(--text-primary) !important;
+}
+
+#summaryBreakdown .item-title {
+    color: var(--text-primary) !important;
+}
+
+#summaryBreakdown .item-subtitle {
+    color: var(--text-secondary) !important;
+}
+
+#summaryBreakdown .item-details,
+#summaryBreakdown .item-details * {
+    color: var(--text-secondary) !important;
+}
+
+/* Green values in summary */
+#summaryBreakdown div[style*="color: #3fb950"],
+#summaryBreakdown div[style*="color:#3fb950"],
+#summaryBreakdown span[style*="color: #3fb950"],
+#summaryBreakdown span[style*="color:#3fb950"] {
+    color: var(--success) !important;
+}
+
+/* Blue values */
+#summaryBreakdown div[style*="color: #58a6ff"],
+#summaryBreakdown div[style*="color:#58a6ff"],
+#summaryBreakdown span[style*="color: #58a6ff"],
+#summaryBreakdown span[style*="color:#58a6ff"] {
+    color: var(--brand-primary) !important;
+}
+
+/* Red values */
+#summaryBreakdown div[style*="color: #f85149"],
+#summaryBreakdown div[style*="color:#f85149"],
+#summaryBreakdown span[style*="color: #f85149"],
+#summaryBreakdown span[style*="color:#f85149"] {
+    color: var(--danger) !important;
+}
+
+/* Yellow/warning values */
+#summaryBreakdown div[style*="color: #d29922"],
+#summaryBreakdown div[style*="color:#d29922"],
+#summaryBreakdown span[style*="color: #d29922"],
+#summaryBreakdown span[style*="color:#d29922"] {
+    color: var(--warning) !important;
+}
+
+/* Near-white text on white bg — FORCE dark */
+#summaryBreakdown div[style*="color: #f0f6fc"],
+#summaryBreakdown div[style*="color:#f0f6fc"],
+#summaryBreakdown span[style*="color: #f0f6fc"],
+#summaryBreakdown span[style*="color:#f0f6fc"] {
+    color: var(--text-primary) !important;
+}
+
+/* Gray text */
+#summaryBreakdown div[style*="color: #8b949e"],
+#summaryBreakdown div[style*="color:#8b949e"],
+#summaryBreakdown span[style*="color: #8b949e"],
+#summaryBreakdown span[style*="color:#8b949e"] {
+    color: var(--text-secondary) !important;
+}
+
+/* --- Risk Analysis (#riskAnalysis) --- */
+#riskAnalysis,
+#riskAnalysis * {
+    color: var(--text-primary);
+}
+
+#riskAnalysis .card {
+    color: var(--text-primary) !important;
+}
+
+#riskAnalysis div[style*="color: #f0f6fc"],
+#riskAnalysis div[style*="color:#f0f6fc"] {
+    color: var(--text-primary) !important;
+}
+
+#riskAnalysis div[style*="color: #8b949e"],
+#riskAnalysis div[style*="color:#8b949e"] {
+    color: var(--text-secondary) !important;
+}
+
+#riskAnalysis div[style*="color: #c9d1d9"],
+#riskAnalysis div[style*="color:#c9d1d9"],
+#riskAnalysis span[style*="color: #c9d1d9"] {
+    color: var(--text-primary) !important;
+}
+
+#riskAnalysis div[style*="color: #10b981"],
+#riskAnalysis div[style*="color:#10b981"] {
+    color: var(--success) !important;
+}
+
+#riskAnalysis div[style*="color: #f59e0b"],
+#riskAnalysis div[style*="color:#f59e0b"] {
+    color: var(--warning) !important;
+}
+
+#riskAnalysis div[style*="color: #ef4444"],
+#riskAnalysis div[style*="color:#ef4444"] {
+    color: var(--danger) !important;
+}
+
+/* Force text on white/light cards to be dark */
+#riskAnalysis div[style*="background: white"],
+#riskAnalysis div[style*="background:white"],
+#riskAnalysis div[style*="background: rgba(255"],
+#riskAnalysis div[style*="background:rgba(255"] {
+    color: var(--text-primary) !important;
+}
+
+/* --- Recommendations (#recommendations) --- */
+#recommendations,
+#recommendations * {
+    color: var(--text-primary);
+}
+
+#recommendations div[style*="color: #666"],
+#recommendations div[style*="color:#666"] {
+    color: var(--text-secondary) !important;
+}
+
+/* --- Goal Progress (#goalProgress) --- */
+#goalProgress div[style*="color: #1f2937"],
+#goalProgress div[style*="color:#1f2937"],
+#goalProgress div[style*="color: #374151"],
+#goalProgress div[style*="color:#374151"],
+#goalProgress div[style*="color: #4b5563"],
+#goalProgress div[style*="color:#4b5563"] {
+    color: var(--text-primary) !important;
+}
+
+/* --- Pension Tab --- */
+#pensionHusband .item-card,
+#pensionHusband .item-card *,
+#pensionWife .item-card,
+#pensionWife .item-card * {
+    color: var(--text-primary) !important;
+}
+
+/* Fix pension list dark-mode overrides from patch.js */
+#pensionHusband div[style*="color: #f0f6fc"],
+#pensionHusband div[style*="color:#f0f6fc"],
+#pensionWife div[style*="color: #f0f6fc"],
+#pensionWife div[style*="color:#f0f6fc"] {
+    color: var(--text-primary) !important;
+}
+
+#pensionHusband div[style*="color: #8b949e"],
+#pensionHusband div[style*="color:#8b949e"],
+#pensionWife div[style*="color: #8b949e"],
+#pensionWife div[style*="color:#8b949e"] {
+    color: var(--text-secondary) !important;
+}
+
+#pensionHusband div[style*="color: #58a6ff"],
+#pensionHusband div[style*="color:#58a6ff"],
+#pensionWife div[style*="color: #58a6ff"],
+#pensionWife div[style*="color:#58a6ff"] {
+    color: var(--brand-primary) !important;
+}
+
+#pensionHusband div[style*="color: #3fb950"],
+#pensionHusband div[style*="color:#3fb950"],
+#pensionWife div[style*="color: #3fb950"],
+#pensionWife div[style*="color:#3fb950"] {
+    color: var(--success) !important;
+}
+
+/* Pension item backgrounds from patch.js */
+#pensionHusband div[style*="background: rgba(255,255,255,0.06)"],
+#pensionWife div[style*="background: rgba(255,255,255,0.06)"] {
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border) !important;
+}
+
+#pensionHusband div[style*="border-top: 1px solid rgba(255,255,255,0.1)"],
+#pensionWife div[style*="border-top: 1px solid rgba(255,255,255,0.1)"] {
+    border-top-color: var(--border) !important;
+}
+
+/* --- Projections: per-track and year details --- */
+#perTrackBody td {
+    color: var(--text-primary) !important;
+}
+
+/* Year details fix */
+#yearDetailsContainer div[style*="color: var(--success)"],
+#yearDetailsContainer div[style*="color: var(--primary)"],
+#yearDetailsContainer div[style*="color: var(--danger)"] {
+    /* These use CSS vars which should be fine */
+}
+
+/* --- Roadmap: withdrawal timeline & strategies --- */
+#withdrawalTimeline div[style*="color: #f0f6fc"],
+#withdrawalTimeline div[style*="color:#f0f6fc"] {
+    color: var(--text-primary) !important;
+}
+
+#withdrawalTimeline div[style*="color: #8b949e"],
+#withdrawalTimeline div[style*="color:#8b949e"] {
+    color: var(--text-secondary) !important;
+}
+
+#withdrawalTimeline div[style*="color: #58a6ff"],
+#withdrawalTimeline div[style*="color:#58a6ff"] {
+    color: var(--brand-primary) !important;
+}
+
+#withdrawalStrategies div[style*="color: #f0f6fc"],
+#withdrawalStrategies div[style*="color:#f0f6fc"] {
+    color: var(--text-primary) !important;
+}
+
+#withdrawalStrategies div[style*="color: #8b949e"],
+#withdrawalStrategies div[style*="color:#8b949e"] {
+    color: var(--text-secondary) !important;
+}
+
+#withdrawalStrategies div[style*="color: #1f2937"],
+#withdrawalStrategies div[style*="color:#1f2937"] {
+    color: var(--text-primary) !important;
+}
+
+/* --- Glide Path Advisor --- */
+#glidePathAdvisor div[style*="color: #f0f6fc"],
+#glidePathAdvisor div[style*="color:#f0f6fc"] {
+    color: var(--text-primary) !important;
+}
+
+#glidePathAdvisor div[style*="color: #8b949e"],
+#glidePathAdvisor div[style*="color:#8b949e"],
+#glidePathAdvisor span[style*="color: #8b949e"],
+#glidePathAdvisor span[style*="color:#8b949e"] {
+    color: var(--text-secondary) !important;
+}
+
+#glidePathAdvisor div[style*="color: #c9d1d9"],
+#glidePathAdvisor div[style*="color:#c9d1d9"],
+#glidePathAdvisor span[style*="color: #c9d1d9"],
+#glidePathAdvisor span[style*="color:#c9d1d9"] {
+    color: var(--text-primary) !important;
+}
+
+/* --- Impact Results --- */
+#impactResults div[style*="color: #8b949e"],
+#impactResults div[style*="color:#8b949e"] {
+    color: var(--text-secondary) !important;
+}
+
+#impactResults div[style*="color: #f0f6fc"],
+#impactResults div[style*="color:#f0f6fc"] {
+    color: var(--text-primary) !important;
+}
+
+/* --- GLOBAL: catch-all for any remaining dark-mode colors on white --- */
+.panel div[style*="background: rgba(255,255,255,0.06)"] {
+    background: var(--bg-surface) !important;
+}
+
+.panel div[style*="background: rgba(255,255,255,0.04)"] {
+    background: var(--bg-surface) !important;
+}
+
+.panel div[style*="border: 1px solid rgba(255,255,255,0.1)"] {
+    border-color: var(--border) !important;
+}
+
+.panel div[style*="border-top: 1px solid rgba(255,255,255,0.1)"] {
+    border-top-color: var(--border) !important;
+}
+
+/* ============================================================
    UTILITY BAR — Slim action icons below hero
    ============================================================ */
 .utility-bar {
@@ -897,6 +1190,9 @@ canvas { max-width: 100%; }
 
     .plan-actions-bar { gap: 8px; }
     .btn-ghost { padding: 8px 14px; font-size: 0.82em; }
+
+    .home-fab { bottom: 18px; left: 18px; width: 48px; height: 48px; }
+    .home-fab svg { width: 20px; height: 20px; }
 
     .card { padding: 18px !important; }
     .form-grid { grid-template-columns: 1fr; }

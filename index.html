@@ -155,9 +155,9 @@
 
 <!-- ========== MODULE VIEW ========== -->
 <div class="module-wrapper" id="moduleWrapper">
-    <button class="back-btn" onclick="showLaunchpad()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-        חזרה לדף הבית
+    <!-- Sticky floating home button -->
+    <button class="home-fab" id="homeFab" onclick="showLaunchpad()" title="חזרה לדף הבית" style="display:none;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     </button>
     <div class="module-container">
         <div class="module-title-bar" id="moduleTitleBar"></div>
@@ -182,7 +182,7 @@
         </button>
         <button class="btn-ghost" onclick="createNewPlan()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            בניית מסלול חדש
+            צור תוכנית נוספת
         </button>
     </div>
     <div class="card auto-import-card" style="margin-bottom:20px;"><div style="text-align:center;padding:8px;"><h3 style="margin:0 0 12px;font-size:1.2em;">🔄 ייבוא אוטומטי מחברות ביטוח ופנסיה</h3><p style="margin:0 0 16px;opacity:0.9;font-size:0.9em;">חבר את חשבונות הפנסיה שלך ויבא את הנתונים אוטומטית</p><button type="button" class="btn" onclick="initAutoImport()" style="padding:12px 24px;font-size:1em;">🚀 התחל ייבוא אוטומטי</button><div id="extensionStatus" style="margin-top:12px;font-size:0.85em;opacity:0.9;"></div></div></div>
@@ -322,6 +322,9 @@ function openModule(panelId) {
     if (ubar) ubar.classList.add('hidden-bar');
     // Show module
     document.getElementById('moduleWrapper').classList.add('visible');
+    // Show home FAB
+    var fab = document.getElementById('homeFab');
+    if (fab) fab.style.display = 'flex';
     // Set title
     document.getElementById('moduleTitleBar').textContent = MODULE_TITLES[panelId] || panelId;
     // Activate panel
@@ -329,13 +332,7 @@ function openModule(panelId) {
     var target = document.getElementById(panelId);
     if (target) target.classList.add('active');
     // Trigger renders
-    if (panelId === 'profile' && typeof renderChildren === 'function') renderChildren();
-    if (panelId === 'goals' && typeof renderLifeGoals === 'function') renderLifeGoals();
-    if (panelId === 'summary' && typeof renderSummary === 'function') renderSummary();
-    if (panelId === 'projections' && typeof renderProjections === 'function') renderProjections();
-    if (panelId === 'charts') setTimeout(function() { if (typeof renderCharts === 'function') renderCharts(); }, 120);
-    if (panelId === 'pension' && typeof renderPensionTab === 'function') renderPensionTab();
-    if (panelId === 'roadmap' && typeof renderWithdrawals === 'function') renderWithdrawals();
+    renderActivePanel(panelId);
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -345,6 +342,9 @@ function showLaunchpad() {
     hero.classList.add('hero-full');
     document.getElementById('launchpad').classList.remove('hidden');
     document.getElementById('moduleWrapper').classList.remove('visible');
+    // Hide home FAB
+    var fab = document.getElementById('homeFab');
+    if (fab) fab.style.display = 'none';
     var ubar = document.getElementById('utilityBar');
     if (ubar) ubar.classList.remove('hidden-bar');
     document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
@@ -362,12 +362,30 @@ switchPanel = function(panelId) {
     var target = document.getElementById(panelId);
     if (target) target.classList.add('active');
     document.getElementById('moduleTitleBar').textContent = MODULE_TITLES[panelId] || panelId;
+    renderActivePanel(panelId);
+};
+
+// Helper: render current panel content
+function renderActivePanel(panelId) {
     if (panelId === 'profile' && typeof renderChildren === 'function') renderChildren();
     if (panelId === 'goals' && typeof renderLifeGoals === 'function') renderLifeGoals();
     if (panelId === 'summary' && typeof renderSummary === 'function') renderSummary();
     if (panelId === 'projections' && typeof renderProjections === 'function') renderProjections();
     if (panelId === 'charts') setTimeout(function() { if (typeof renderCharts === 'function') renderCharts(); }, 120);
     if (panelId === 'pension' && typeof renderPensionTab === 'function') renderPensionTab();
+    if (panelId === 'roadmap' && typeof renderWithdrawals === 'function') renderWithdrawals();
+    if (panelId === 'investments' && typeof renderInvestments === 'function') renderInvestments();
+}
+
+// Override switchPlan (plan selector) to re-render active panel
+var _origSwitchPlan = switchPlan;
+switchPlan = function(planId) {
+    _origSwitchPlan(planId);
+    // After plan switch, find which panel is active and re-render it
+    var activePanel = document.querySelector('.panel.active');
+    if (activePanel) {
+        renderActivePanel(activePanel.id);
+    }
 };
 
 // On load: show launchpad
