@@ -185,18 +185,47 @@
             צור תוכנית נוספת
         </button>
     </div>
-    <div class="card auto-import-card" style="margin-bottom:20px;"><div style="text-align:center;padding:8px;"><h3 style="margin:0 0 12px;font-size:1.2em;">🔄 ייבוא אוטומטי מחברות ביטוח ופנסיה</h3><p style="margin:0 0 16px;opacity:0.9;font-size:0.9em;">חבר את חשבונות הפנסיה שלך ויבא את הנתונים אוטומטית</p><button type="button" class="btn" onclick="initAutoImport()" style="padding:12px 24px;font-size:1em;">🚀 התחל ייבוא אוטומטי</button><div id="extensionStatus" style="margin-top:12px;font-size:0.85em;opacity:0.9;"></div></div></div>
-    <div class="card"><div class="card-header"><div class="card-title"><span>➕</span><span id="investmentFormTitle">הוסף מסלול השקעה</span></div></div>
-        <form id="investmentForm" onsubmit="saveInvestment(event)">
-            <div class="form-grid"><div class="form-group"><label class="form-label"><span class="required">*</span> שם המסלול</label><input type="text" class="form-input" id="invName" placeholder="קרן פנסיה מיטב דש" required></div><div class="form-group"><label class="form-label">בית השקעות / תיק</label><input type="text" class="form-input" id="invHouse" placeholder="מיטב / תיק אישי"></div><div class="form-group"><label class="form-label"><span class="required">*</span> סוג המסלול</label><select class="form-select" id="invType" onchange="updateTaxRate()" required><option value="פנסיה">פנסיה (פטור ממס)</option><option value="קרן השתלמות">קרן השתלמות (פטור ממס)</option><option value="גמל להשקעה">גמל להשקעה (מס 25%)</option><option value="תיק עצמאי">תיק עצמאי (מס 25%)</option><option value="פוליסת חסכון">פוליסת חסכון (מס 25%)</option><option value="פקדון">פקדון (מס 15%)</option><option value="אחר">אחר</option></select></div><div class="form-group"><label class="form-label">שיעור מס על רווחים (%)</label><input type="number" class="form-input" id="invTax" value="0" min="0" max="100" step="0.1"></div></div>
-            <div id="genderSection" style="display:none;"><div class="form-group" style="margin-bottom:16px;"><label class="form-label"><span class="required">*</span> שייך ל</label><select class="form-select" id="invSpouse"><option value="husband">👨 בעל</option><option value="wife">👩 אשה</option></select></div><div class="form-grid" style="grid-template-columns:1fr 1fr;"><div class="form-group"><label class="form-label"><span class="required">*</span> מגדר (לחישוב פנסיה)</label><select class="form-select" id="invGender"><option value="male">זכר (פרישה 67)</option><option value="female">נקבה (פרישה 62)</option></select></div><div class="form-group"><label class="form-label"><span class="required">*</span> גיל נוכחי</label><input type="number" class="form-input" id="invAge" min="18" max="120" placeholder="35"></div></div></div>
-            <div class="form-grid"><div class="form-group"><label class="form-label">סכום נוכחי (₪)</label><input type="text" inputmode="numeric" pattern="[0-9,\.]*" class="form-input" id="invAmount" value="0" placeholder="0"></div><div class="form-group"><label class="form-label">הפקדה חודשית (₪)</label><input type="text" inputmode="numeric" pattern="[0-9,\.]*" class="form-input" id="invMonthly" value="0" placeholder="0"></div><div class="form-group"><label class="form-label">תשואה צפויה (% שנתי)</label><input type="number" class="form-input" id="invReturn" value="6" min="0" max="30" step="0.1"></div><div class="form-group"><label class="form-label">דמי ניהול מהפקדה (%)</label><input type="number" class="form-input" id="invFeeDeposit" value="0" min="0" max="10" step="0.1"></div></div>
-            <div id="principalSection" style="display:none;margin:12px 0;padding:16px;border-radius:10px;"><div style="font-weight:bold;margin-bottom:10px;color:#92400e;">💰 פיצול קרן / רווח קיים</div><p style="font-size:0.85em;color:var(--text-secondary);margin-bottom:12px;">הגדר כמה מהסכום הנוכחי הוא קרן מקורית.</p><div class="form-grid" style="grid-template-columns:1fr 1fr 1fr;"><div class="form-group"><label class="form-label">קרן מקורית (₪)</label><input type="text" inputmode="numeric" pattern="[0-9,\.]*" class="form-input" id="invInitialPrincipal" placeholder="הכל קרן" oninput="updateProfitDisplay()"></div><div class="form-group"><label class="form-label">רווח קיים (₪)</label><div id="invExistingProfit" style="padding:10px;background:var(--success-bg);border-radius:6px;font-weight:bold;color:var(--success);min-height:42px;display:flex;align-items:center;">₪0</div></div><div class="form-group"><label class="form-label">מס על רווח קיים</label><div id="invExistingTax" style="padding:10px;background:var(--danger-bg);border-radius:6px;font-weight:bold;color:var(--danger);min-height:42px;display:flex;align-items:center;">₪0</div></div></div></div>
-            <div class="form-grid"><div class="form-group"><label class="form-label">דמי ניהול מצבירה (% שנתי)</label><input type="number" class="form-input" id="invFeeAnnual" value="0" min="0" max="5" step="0.01"></div><div class="form-group"><label class="checkbox-group"><input type="checkbox" class="checkbox" id="invForDream"><span>מיועד למימוש חלומות</span></label></div><div class="form-group"><label class="checkbox-group"><input type="checkbox" class="checkbox" id="invInclude" checked><span>כלול בחישוב הון עצמי</span></label></div></div>
-            <div id="subTracksSection" style="display:none;"><div class="sub-tracks-header"><h3>תתי-מסלולים (פיצול השקעות)</h3><p class="sub-tracks-note">חובה: סך כל האחוזים חייב להיות 100%</p></div><div id="subTracksList" class="sub-tracks-list"></div><div class="sub-track-add"><div class="form-group" style="margin-bottom:16px;"><label class="form-label">סוג תת-מסלול</label><select class="form-select" id="subTrackType" style="width:100%;"><option value="מדדי מניות חו״ל">מדדי מניות חו״ל (7%)</option><option value="מדדי מניות בארץ">מדדי מניות בארץ (7%)</option><option value="מניות סחיר חו״ל">מניות סחיר חו״ל (7%)</option><option value="מניות סחיר בארץ">מניות סחיר בארץ (7%)</option><option value="אג״ח ממשלתי">אג״ח ממשלתי (3%)</option><option value="אג״ח קונצרני">אג״ח קונצרני (5%)</option><option value="S&P 500">S&P 500 (7%)</option><option value="נדל״ן">נדל״ן (6%)</option><option value="עו״ש">עו״ש (0%)</option><option value="קרן כספית">קרן כספית/פקדון (3%)</option><option value="כללי">כללי (5%)</option><option value="אחר">אחר - הזן שם מותאם</option></select></div><div class="form-group" id="customNameField" style="margin-bottom:16px;display:none;"><label class="form-label">שם תת-מסלול מותאם</label><input type="text" class="form-input" id="subTrackCustomName" placeholder="לדוגמה: קרן נאמנות טכנולוגיה" style="width:100%;"></div><div class="form-group" id="manualRiskField" style="margin-bottom:16px;display:none;"><label class="form-label">רמת סיכון</label><select class="form-select" id="subTrackRiskLevel" style="width:100%;"><option value="">בחר רמת סיכון...</option><option value="low">נמוך 🟢</option><option value="medium">בינוני 🟡</option><option value="high">גבוה 🔴</option></select></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;"><div class="form-group"><label class="form-label">אחוז %</label><input type="text" inputmode="decimal" pattern="[0-9,\.]*" class="form-input" id="subTrackPercent" placeholder="60" style="width:100%;"></div><div class="form-group"><label class="form-label">תשואה %</label><input type="number" class="form-input" id="subTrackReturn" placeholder="7" step="0.1" style="width:100%;"></div></div><button type="button" class="btn btn-success" onclick="addSubTrack()" style="width:100%;min-height:54px;font-size:1.2em;margin-bottom:12px;">➕ הוסף תת-מסלול</button><div id="subTrackError" class="error-message"></div><div id="subTrackTotal" class="sub-track-total"></div></div></div>
-            <div class="form-actions"><button type="submit" class="btn btn-success btn-full"><span>💾</span><span id="btnSaveText">שמור מסלול</span></button><button type="button" class="btn btn-secondary btn-full" id="btnCancelEdit" onclick="cancelEditInvestment()" style="display:none;"><span>❌</span><span>בטל עריכה</span></button></div>
-        </form>
+
+    <!-- Module hero explanation -->
+    <div class="inv-hero">
+        <div class="inv-hero-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
+        </div>
+        <p>כאן מגדירים את מקורות הכסף שלך. הוסף את קופות הגמל, קרנות ההשתלמות והפנסיה כדי לבדוק באיזה מסלולי השקעה הן נמצאות ומה דמי הניהול שאתה משלם.</p>
+        <!-- Hidden: auto-import status (for JS compatibility) -->
+        <div id="extensionStatus" style="display:none;"></div>
     </div>
+
+    <!-- Big ADD button (visible by default) -->
+    <div class="inv-add-trigger" id="invAddTrigger">
+        <button class="inv-add-btn" onclick="toggleInvestmentForm(true)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            הוסף מסלול השקעה
+        </button>
+    </div>
+
+    <!-- Collapsible form (hidden by default) -->
+    <div class="inv-form-wrapper" id="invFormWrapper">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><span>➕</span><span id="investmentFormTitle">הוסף מסלול השקעה</span></div>
+                <button class="inv-form-close" onclick="toggleInvestmentForm(false)" title="סגור טופס">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <form id="investmentForm" onsubmit="saveInvestment(event)">
+                <div class="form-grid"><div class="form-group"><label class="form-label"><span class="required">*</span> שם המסלול</label><input type="text" class="form-input" id="invName" placeholder="קרן פנסיה מיטב דש" required></div><div class="form-group"><label class="form-label">בית השקעות / תיק</label><input type="text" class="form-input" id="invHouse" placeholder="מיטב / תיק אישי"></div><div class="form-group"><label class="form-label"><span class="required">*</span> סוג המסלול</label><select class="form-select" id="invType" onchange="updateTaxRate()" required><option value="פנסיה">פנסיה (פטור ממס)</option><option value="קרן השתלמות">קרן השתלמות (פטור ממס)</option><option value="גמל להשקעה">גמל להשקעה (מס 25%)</option><option value="תיק עצמאי">תיק עצמאי (מס 25%)</option><option value="פוליסת חסכון">פוליסת חסכון (מס 25%)</option><option value="פקדון">פקדון (מס 15%)</option><option value="אחר">אחר</option></select></div><div class="form-group"><label class="form-label">שיעור מס על רווחים (%)</label><input type="number" class="form-input" id="invTax" value="0" min="0" max="100" step="0.1"></div></div>
+                <div id="genderSection" style="display:none;"><div class="form-group" style="margin-bottom:16px;"><label class="form-label"><span class="required">*</span> שייך ל</label><select class="form-select" id="invSpouse"><option value="husband">👨 בעל</option><option value="wife">👩 אשה</option></select></div><div class="form-grid" style="grid-template-columns:1fr 1fr;"><div class="form-group"><label class="form-label"><span class="required">*</span> מגדר (לחישוב פנסיה)</label><select class="form-select" id="invGender"><option value="male">זכר (פרישה 67)</option><option value="female">נקבה (פרישה 62)</option></select></div><div class="form-group"><label class="form-label"><span class="required">*</span> גיל נוכחי</label><input type="number" class="form-input" id="invAge" min="18" max="120" placeholder="35"></div></div></div>
+                <div class="form-grid"><div class="form-group"><label class="form-label">סכום נוכחי (₪)</label><input type="text" inputmode="numeric" pattern="[0-9,\.]*" class="form-input" id="invAmount" value="0" placeholder="0"></div><div class="form-group"><label class="form-label">הפקדה חודשית (₪)</label><input type="text" inputmode="numeric" pattern="[0-9,\.]*" class="form-input" id="invMonthly" value="0" placeholder="0"></div><div class="form-group"><label class="form-label">תשואה צפויה (% שנתי)</label><input type="number" class="form-input" id="invReturn" value="6" min="0" max="30" step="0.1"></div><div class="form-group"><label class="form-label">דמי ניהול מהפקדה (%)</label><input type="number" class="form-input" id="invFeeDeposit" value="0" min="0" max="10" step="0.1"></div></div>
+                <div id="principalSection" style="display:none;margin:12px 0;padding:16px;border-radius:10px;"><div style="font-weight:bold;margin-bottom:10px;color:#92400e;">💰 פיצול קרן / רווח קיים</div><p style="font-size:0.85em;color:var(--text-secondary);margin-bottom:12px;">הגדר כמה מהסכום הנוכחי הוא קרן מקורית.</p><div class="form-grid" style="grid-template-columns:1fr 1fr 1fr;"><div class="form-group"><label class="form-label">קרן מקורית (₪)</label><input type="text" inputmode="numeric" pattern="[0-9,\.]*" class="form-input" id="invInitialPrincipal" placeholder="הכל קרן" oninput="updateProfitDisplay()"></div><div class="form-group"><label class="form-label">רווח קיים (₪)</label><div id="invExistingProfit" style="padding:10px;background:var(--success-bg);border-radius:6px;font-weight:bold;color:var(--success);min-height:42px;display:flex;align-items:center;">₪0</div></div><div class="form-group"><label class="form-label">מס על רווח קיים</label><div id="invExistingTax" style="padding:10px;background:var(--danger-bg);border-radius:6px;font-weight:bold;color:var(--danger);min-height:42px;display:flex;align-items:center;">₪0</div></div></div></div>
+                <div class="form-grid"><div class="form-group"><label class="form-label">דמי ניהול מצבירה (% שנתי)</label><input type="number" class="form-input" id="invFeeAnnual" value="0" min="0" max="5" step="0.01"></div><div class="form-group"><label class="checkbox-group"><input type="checkbox" class="checkbox" id="invForDream"><span>מיועד למימוש חלומות</span></label></div><div class="form-group"><label class="checkbox-group"><input type="checkbox" class="checkbox" id="invInclude" checked><span>כלול בחישוב הון עצמי</span></label></div></div>
+                <div id="subTracksSection" style="display:none;"><div class="sub-tracks-header"><h3>תתי-מסלולים (פיצול השקעות)</h3><p class="sub-tracks-note">חובה: סך כל האחוזים חייב להיות 100%</p></div><div id="subTracksList" class="sub-tracks-list"></div><div class="sub-track-add"><div class="form-group" style="margin-bottom:16px;"><label class="form-label">סוג תת-מסלול</label><select class="form-select" id="subTrackType" style="width:100%;"><option value="מדדי מניות חו״ל">מדדי מניות חו״ל (7%)</option><option value="מדדי מניות בארץ">מדדי מניות בארץ (7%)</option><option value="מניות סחיר חו״ל">מניות סחיר חו״ל (7%)</option><option value="מניות סחיר בארץ">מניות סחיר בארץ (7%)</option><option value="אג״ח ממשלתי">אג״ח ממשלתי (3%)</option><option value="אג״ח קונצרני">אג״ח קונצרני (5%)</option><option value="S&P 500">S&P 500 (7%)</option><option value="נדל״ן">נדל״ן (6%)</option><option value="עו״ש">עו״ש (0%)</option><option value="קרן כספית">קרן כספית/פקדון (3%)</option><option value="כללי">כללי (5%)</option><option value="אחר">אחר - הזן שם מותאם</option></select></div><div class="form-group" id="customNameField" style="margin-bottom:16px;display:none;"><label class="form-label">שם תת-מסלול מותאם</label><input type="text" class="form-input" id="subTrackCustomName" placeholder="לדוגמה: קרן נאמנות טכנולוגיה" style="width:100%;"></div><div class="form-group" id="manualRiskField" style="margin-bottom:16px;display:none;"><label class="form-label">רמת סיכון</label><select class="form-select" id="subTrackRiskLevel" style="width:100%;"><option value="">בחר רמת סיכון...</option><option value="low">נמוך 🟢</option><option value="medium">בינוני 🟡</option><option value="high">גבוה 🔴</option></select></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;"><div class="form-group"><label class="form-label">אחוז %</label><input type="text" inputmode="decimal" pattern="[0-9,\.]*" class="form-input" id="subTrackPercent" placeholder="60" style="width:100%;"></div><div class="form-group"><label class="form-label">תשואה %</label><input type="number" class="form-input" id="subTrackReturn" placeholder="7" step="0.1" style="width:100%;"></div></div><button type="button" class="btn btn-success" onclick="addSubTrack()" style="width:100%;min-height:54px;font-size:1.2em;margin-bottom:12px;">➕ הוסף תת-מסלול</button><div id="subTrackError" class="error-message"></div><div id="subTrackTotal" class="sub-track-total"></div></div></div>
+                <div class="form-actions"><button type="submit" class="btn btn-success btn-full"><span>💾</span><span id="btnSaveText">שמור מסלול</span></button><button type="button" class="btn btn-secondary btn-full" id="btnCancelEdit" onclick="cancelEditInvestment()" style="display:none;"><span>❌</span><span>בטל עריכה</span></button></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Existing investments list (always visible) -->
     <div class="card"><div class="card-header"><div class="card-title"><span>📋</span><span>מסלולים קיימים (<span id="invCount">0</span>)</span></div></div><div id="investmentsList" class="items-list"></div></div>
 </div>
 
@@ -392,6 +421,40 @@ switchPlan = function(planId) {
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(showLaunchpad, 60);
 });
+
+// Toggle investment form visibility
+function toggleInvestmentForm(show) {
+    var wrapper = document.getElementById('invFormWrapper');
+    var trigger = document.getElementById('invAddTrigger');
+    if (show) {
+        wrapper.classList.add('open');
+        trigger.style.display = 'none';
+        // Scroll to form
+        setTimeout(function() { wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+    } else {
+        wrapper.classList.remove('open');
+        trigger.style.display = 'block';
+        // If editing, cancel
+        if (typeof cancelEditInvestment === 'function' && appData && appData.editingInvestmentIndex >= 0) {
+            cancelEditInvestment();
+        }
+    }
+}
+
+// Hook into editInvestment to auto-open the form
+var _hookedEditInv = editInvestment;
+editInvestment = function(index) {
+    toggleInvestmentForm(true);
+    _hookedEditInv(index);
+};
+
+// After saving, close form
+var _hookedClearForm = clearInvestmentForm;
+clearInvestmentForm = function() {
+    _hookedClearForm();
+    // Close form after save (small delay so UI updates first)
+    setTimeout(function() { toggleInvestmentForm(false); }, 50);
+};
 </script>
 </body>
 </html>

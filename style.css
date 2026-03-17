@@ -1166,6 +1166,128 @@ canvas { max-width: 100%; }
 .btn-ghost-report svg { flex-shrink: 0; }
 
 /* ============================================================
+   INVESTMENT MODULE — Hero, Add Button, Collapsible Form
+   ============================================================ */
+
+/* Module hero explanation */
+.inv-hero {
+    background: linear-gradient(135deg, var(--brand-deep), var(--brand-primary));
+    border-radius: var(--radius-xl);
+    padding: 28px 28px 24px;
+    margin-bottom: 24px;
+    color: white;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    position: relative;
+    overflow: hidden;
+}
+
+.inv-hero::after {
+    content: '';
+    position: absolute;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    top: -80px; left: -60px;
+    pointer-events: none;
+}
+
+.inv-hero-icon {
+    width: 52px; height: 52px;
+    border-radius: var(--radius);
+    background: rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.inv-hero p {
+    font-size: 0.95em;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.92);
+    margin: 0;
+}
+
+/* Big ADD button */
+.inv-add-trigger {
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.inv-add-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 18px 40px;
+    background: #FFFFFF;
+    border: 2.5px solid var(--brand-primary);
+    border-radius: var(--radius-xl);
+    color: var(--brand-primary);
+    font-size: 1.1em;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 12px rgba(30, 64, 175, 0.1);
+    width: 100%;
+    max-width: 420px;
+}
+
+.inv-add-btn:hover {
+    background: var(--brand-primary);
+    color: #FFFFFF;
+    box-shadow: 0 6px 24px rgba(30, 64, 175, 0.25);
+    transform: translateY(-3px);
+}
+
+.inv-add-btn:hover svg {
+    stroke: #FFFFFF;
+}
+
+.inv-add-btn:active {
+    transform: translateY(-1px);
+}
+
+/* Collapsible form wrapper */
+.inv-form-wrapper {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.3s ease,
+                margin 0.3s ease;
+    margin-bottom: 0;
+}
+
+.inv-form-wrapper.open {
+    max-height: 4000px;
+    opacity: 1;
+    margin-bottom: 24px;
+}
+
+/* Close button inside form header */
+.inv-form-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    color: var(--text-muted);
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.inv-form-close:hover {
+    background: var(--danger-bg);
+    color: var(--danger);
+}
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 @media (max-width: 900px) {
