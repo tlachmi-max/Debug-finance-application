@@ -95,53 +95,83 @@
 <!-- ========== DASHBOARD (Home) ========== -->
 <div class="launchpad" id="launchpad">
 
-    <!-- Retirement Readiness Gauge + Key Metrics -->
-    <div class="dash-overview" id="dashOverview">
-        <div class="dash-gauge-card">
-            <div class="dash-gauge-title">מדד המוכנות לפרישה</div>
-            <div class="dash-gauge-ring" id="dashGaugeRing">
-                <svg viewBox="0 0 120 120" class="gauge-svg">
-                    <circle cx="60" cy="60" r="52" fill="none" stroke="#E5E7EB" stroke-width="10"/>
-                    <circle cx="60" cy="60" r="52" fill="none" stroke="var(--brand-primary)" stroke-width="10" stroke-dasharray="327" stroke-dashoffset="327" stroke-linecap="round" transform="rotate(-90 60 60)" id="gaugeArc"/>
-                </svg>
-                <div class="gauge-pct" id="gaugePct">—</div>
+    <!-- Card 1: Liquid Assets (full width, hero) -->
+    <div class="dcard dcard-hero" onclick="openModule('investments')">
+        <div class="dcard-row">
+            <div class="dcard-main">
+                <div class="dcard-label">הון נזיל</div>
+                <div class="dcard-big-value" id="dashLiquid">₪0</div>
+                <div class="dcard-sub" id="dashLiquidSub">חשיפה מנייתית בתיק הנזיל: —</div>
             </div>
-            <div class="dash-gauge-sub" id="dashGaugeSub"></div>
-            <div class="dash-gauge-label" id="dashGaugeLabel">הגדר יעדים כדי לראות את המדד</div>
+            <div class="dcard-icon-wrap dcard-icon-blue"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></div>
         </div>
-        <div class="dash-kpi-col">
-            <div class="dash-kpi" onclick="openModule('investments')">
-                <div class="dash-kpi-icon" style="background:#EFF6FF;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></div>
-                <div class="dash-kpi-data"><div class="dash-kpi-value" id="dashLiquid">₪0</div><div class="dash-kpi-label">הון נזיל</div><div class="dash-kpi-sub" id="dashLiquidSub"></div></div>
+        <div class="dcard-chevron">‹</div>
+    </div>
+
+    <!-- Cards 2-3: Goals + Pension (side by side) -->
+    <div class="dcard-duo">
+        <div class="dcard dcard-half" onclick="openModule('goals')">
+            <div class="dcard-label">יעדים קרובים</div>
+            <div class="dcard-icon-center" id="dashGoalIcon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             </div>
-            <div class="dash-kpi" onclick="openModule('pension')">
-                <div class="dash-kpi-icon" style="background:#FFFBEB;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg></div>
-                <div class="dash-kpi-data"><div class="dash-kpi-value" id="dashPension">₪0</div><div class="dash-kpi-label">פנסיה</div><div class="dash-kpi-sub" id="dashPensionSub"></div></div>
+            <div class="dcard-goal-text" id="dashGoalText">טוען...</div>
+            <div class="dcard-chevron">‹</div>
+        </div>
+
+        <div class="dcard dcard-half" onclick="openModule('pension')">
+            <div class="dcard-label">פנסיה וקצבה</div>
+            <div class="dcard-mid-value" id="dashPension">₪0</div>
+            <div class="dcard-gauge-mini">
+                <svg viewBox="0 0 80 80" class="gauge-mini-svg">
+                    <circle cx="40" cy="40" r="34" fill="none" stroke="#E5E7EB" stroke-width="7"/>
+                    <circle cx="40" cy="40" r="34" fill="none" stroke="#059669" stroke-width="7" stroke-dasharray="214" stroke-dashoffset="214" stroke-linecap="round" transform="rotate(-90 40 40)" id="gaugeArc"/>
+                </svg>
+                <div class="gauge-mini-pct" id="gaugePct">—</div>
             </div>
-            <div class="dash-kpi" onclick="openModule('projections')">
-                <div class="dash-kpi-icon" style="background:#ECFDF5;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-                <div class="dash-kpi-data"><div class="dash-kpi-value" id="dashTotal">₪0</div><div class="dash-kpi-label">סה״כ הון</div><div class="dash-kpi-sub" id="dashTotalSub"></div></div>
-            </div>
+            <div class="dcard-sub" id="dashGaugeLabel" style="font-size:0.78em;">מדד המוכנות</div>
+            <div class="dcard-chevron">‹</div>
+            <!-- Hidden compat elements -->
+            <div id="dashGaugeSub" style="display:none;"></div>
+            <div id="dashGaugeRing" style="display:none;"></div>
         </div>
     </div>
 
-    <!-- Urgent Action Widget -->
-    <div class="dash-action-widget" id="dashActionWidget" style="display:none;" onclick="openModule('strategy')"></div>
+    <!-- Card 4: Total (full width) -->
+    <div class="dcard dcard-total" onclick="openModule('projections')">
+        <div class="dcard-row">
+            <div class="dcard-main">
+                <div class="dcard-label">סה״כ הון</div>
+                <div class="dcard-big-value dcard-total-val" id="dashTotal">₪0</div>
+            </div>
+            <div class="dcard-icon-wrap dcard-icon-green"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        </div>
+        <div class="dcard-sub" id="dashTotalSub"></div>
+        <div class="dcard-chevron">‹</div>
+    </div>
 
-    <!-- Report + Snapshot buttons -->
-    <div class="dash-actions">
-        <button class="btn-ghost-report" onclick="generateReport()" style="flex:1;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            הפקת דו״ח מצב מלא
+    <!-- Card 5: Urgent Insight -->
+    <div class="dcard dcard-insight" id="dashActionWidget" style="display:none;" onclick="openModule('strategy')"></div>
+
+    <!-- Report button (full width, bottom) -->
+    <div class="dcard-report-row">
+        <button class="dcard-report-btn" onclick="generateReport()">
+            הפק דו״ח מצב מלא (HTML)
         </button>
-        <button class="btn-ghost" onclick="saveHistorySnapshot()" style="white-space:nowrap;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    </div>
+
+    <!-- History + Snapshot -->
+    <div class="dash-snap-row">
+        <button class="btn-ghost btn-sm" onclick="saveHistorySnapshot()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             שמור סטטוס
         </button>
     </div>
-
-    <!-- History table -->
     <div class="dash-history" id="dashHistory" style="display:none;"></div>
+
+    <!-- Hidden compat elements -->
+    <div id="dashPensionSub" style="display:none;"></div>
+    <div id="dashOverview" style="display:none;"></div>
 
     <!-- Module cards grid -->
     <div class="launchpad-grid">
@@ -567,7 +597,9 @@ function renderActivePanel(panelId) {
 var _origSwitchPlan = switchPlan;
 switchPlan = function(planId) {
     _origSwitchPlan(planId);
-    // After plan switch, find which panel is active and re-render it
+    // Refresh dashboard if on launchpad
+    renderDashboard();
+    // Refresh active panel if in module
     var activePanel = document.querySelector('.panel.active');
     if (activePanel) {
         renderActivePanel(activePanel.id);
@@ -1019,89 +1051,108 @@ function renderDashboard() {
             } else {
                 liquid += (inv.amount || 0);
                 liquidTotal += (inv.amount || 0);
-                // Estimate stock exposure
                 if (inv.subTracks && inv.subTracks.length > 0) {
                     inv.subTracks.forEach(function(st) {
-                        if (st.type && st.type.match(/מניות|S&P|סנופי/i)) {
-                            stockPctTotal += (inv.amount || 0) * (st.percent || 0) / 100;
-                        }
+                        if (st.type && st.type.match(/מניות|S&P|סנופי/i)) stockPctTotal += (inv.amount || 0) * (st.percent || 0) / 100;
                     });
-                } else if (inv.returnRate >= 6) {
-                    stockPctTotal += (inv.amount || 0) * 0.7; // Assume ~70% equity
-                }
+                } else if (inv.returnRate >= 6) stockPctTotal += (inv.amount || 0) * 0.7;
             }
         });
 
         var total = liquid + pension;
-        var el;
-        el = document.getElementById('dashLiquid'); if (el) el.textContent = formatCurrency(liquid);
-        el = document.getElementById('dashPension'); if (el) el.textContent = formatCurrency(pension);
-        el = document.getElementById('dashTotal'); if (el) el.textContent = formatCurrency(total);
 
-        // Sub-labels
-        // Liquid: stock exposure %
+        // Card 1: Liquid
+        var el = document.getElementById('dashLiquid');
+        if (el) el.textContent = formatCurrency(liquid);
         el = document.getElementById('dashLiquidSub');
-        if (el && liquidTotal > 0) {
-            var stockPct = Math.round(stockPctTotal / liquidTotal * 100);
-            el.textContent = 'חשיפה מנייתית: ' + stockPct + '%';
-            el.style.display = 'block';
-        } else if (el) { el.style.display = 'none'; }
-
-        // Pension: avg fee
-        el = document.getElementById('dashPensionSub');
-        if (el && pensionCount > 0) {
-            var avgFee = (pensionFeeSum / pensionCount).toFixed(2);
-            el.textContent = 'דמ"נ ממוצע: ' + avgFee + '%';
-            el.style.display = 'block';
-        } else if (el) { el.style.display = 'none'; }
-
-        // Total: number of tracks
-        el = document.getElementById('dashTotalSub');
         if (el) {
-            var count = plan.investments.filter(function(i) { return i.include; }).length;
-            el.textContent = count + ' מסלולים פעילים';
-            el.style.display = 'block';
+            var stockPct = liquidTotal > 0 ? Math.round(stockPctTotal / liquidTotal * 100) : 0;
+            el.textContent = 'חשיפה מנייתית בתיק הנזיל: ' + stockPct + '%';
         }
 
-        // Retirement readiness gauge
-        renderRetirementGauge(plan);
+        // Card 2: Nearest goal
+        renderDashGoal(plan);
 
-        // Action widget
-        renderDashActionWidget(plan);
+        // Card 3: Pension + gauge
+        el = document.getElementById('dashPension');
+        if (el) el.textContent = formatCurrency(pension);
+        renderDashGauge(plan);
 
-        // History table
+        // Card 4: Total
+        el = document.getElementById('dashTotal');
+        if (el) el.textContent = formatCurrency(total);
+        el = document.getElementById('dashTotalSub');
+        if (el) {
+            var cnt = plan.investments.filter(function(i) { return i.include; }).length;
+            el.textContent = cnt + ' מסלולים פעילים';
+        }
+
+        // Card 5: Insight
+        renderDashInsight(plan);
+
+        // History
         renderHistoryTable();
-    } catch(e) { console.error('Dashboard render error:', e); }
+    } catch(e) { console.error('Dashboard:', e); }
 }
 
-function renderRetirementGauge(plan) {
+function renderDashGoal(plan) {
+    var textEl = document.getElementById('dashGoalText');
+    var iconEl = document.getElementById('dashGoalIcon');
+    if (!textEl) return;
+
+    // Find nearest life goal
+    var goals = plan.goals;
+    if (!goals || !goals.lifeGoals || goals.lifeGoals.length === 0) {
+        textEl.innerHTML = '<span style="color:var(--text-secondary);font-size:0.85em;">הגדר יעדי חיים</span>';
+        return;
+    }
+
+    var now = new Date().getFullYear();
+    var nearest = null;
+    goals.lifeGoals.forEach(function(lg) {
+        if (!nearest || (lg.year && lg.year >= now && lg.year < (nearest.year || 9999))) nearest = lg;
+    });
+
+    if (!nearest) {
+        textEl.innerHTML = '<span style="color:var(--text-secondary);font-size:0.85em;">אין יעדים קרובים</span>';
+        return;
+    }
+
+    // Calculate progress
+    var pct = 0;
+    if (nearest.amount && typeof calculateFV === 'function') {
+        var yearsToGoal = (nearest.year || now) - now;
+        if (yearsToGoal < 1) yearsToGoal = 1;
+        var liquid = 0;
+        plan.investments.forEach(function(inv) { if (inv.include && inv.type !== 'פנסיה') liquid += (inv.amount || 0); });
+        pct = Math.min(100, Math.round(liquid / nearest.amount * 100));
+    }
+
+    textEl.innerHTML = '<div style="font-weight:700;color:var(--text-primary);font-size:0.95em;">' + (nearest.name || 'יעד') + ': ' + pct + '%</div>';
+}
+
+function renderDashGauge(plan) {
     var arc = document.getElementById('gaugeArc');
     var pctEl = document.getElementById('gaugePct');
     var labelEl = document.getElementById('dashGaugeLabel');
-    var subEl = document.getElementById('dashGaugeSub');
     if (!arc || !pctEl) return;
 
     var goals = plan.goals;
     var profile = plan.profile;
     if (!goals || !goals.retirement || !goals.retirement.monthlyPension || !profile || !profile.user || !profile.user.age) {
-        arc.style.strokeDashoffset = '327';
+        arc.style.strokeDashoffset = '214';
         pctEl.textContent = '—';
-        labelEl.textContent = 'הגדר פרופיל ויעדים כדי לראות את המדד';
-        if (subEl) subEl.textContent = '';
+        if (labelEl) labelEl.textContent = 'הגדר יעדים';
         return;
     }
 
     var pct = 0;
-    var projectedPension = 0;
     if (typeof analyzeGoals === 'function') {
         var analysis = analyzeGoals();
-        if (analysis && analysis.pension) {
-            pct = Math.min(Math.round(analysis.pension.percentage), 100);
-            projectedPension = analysis.pension.projected || 0;
-        }
+        if (analysis && analysis.pension) pct = Math.min(Math.round(analysis.pension.percentage), 100);
     }
 
-    // Check if there are costly fees (modify color)
+    // Check cost issues
     var hasCostIssues = false;
     plan.investments.forEach(function(inv) {
         if (!inv.include) return;
@@ -1109,42 +1160,24 @@ function renderRetirementGauge(plan) {
         if (inv.type === 'קרן השתלמות' && inv.feeAnnual >= 0.7) hasCostIssues = true;
     });
 
-    var circumference = 327;
-    var offset = circumference - (circumference * pct / 100);
-    arc.style.strokeDashoffset = offset;
-
-    if (hasCostIssues) {
-        arc.style.stroke = '#D97706'; // Orange — costs need attention
-    } else {
-        arc.style.stroke = pct >= 90 ? '#059669' : pct >= 60 ? '#D97706' : '#DC2626';
-    }
-
+    var circ = 214; // 2*PI*34
+    arc.style.strokeDashoffset = circ - (circ * pct / 100);
+    arc.style.stroke = hasCostIssues ? '#D97706' : pct >= 90 ? '#059669' : pct >= 60 ? '#D97706' : '#DC2626';
     pctEl.textContent = pct + '%';
 
-    // Sub-line: projected pension
-    if (subEl && projectedPension > 0) {
-        subEl.textContent = 'צפי לקצבה חודשית: ' + formatCurrency(Math.round(projectedPension)) + ' ₪';
-        subEl.style.display = 'block';
-    } else if (subEl) { subEl.style.display = 'none'; }
-
-    if (hasCostIssues) {
-        labelEl.textContent = '⚠️ דמי ניהול גבוהים — שפר לחסוך יותר';
-    } else if (pct >= 90) {
-        labelEl.textContent = '✅ מצוין! אתה במסלול הנכון';
-    } else if (pct >= 60) {
-        labelEl.textContent = '🟡 במסלול, אך יש מקום לשיפור';
-    } else {
-        labelEl.textContent = '🔴 דרוש שיפור — עדכן יעדים או הגדל הפקדות';
+    if (labelEl) {
+        if (hasCostIssues) labelEl.textContent = '⚠️ דמ"נ גבוהים';
+        else if (pct >= 90) labelEl.textContent = 'מצוין! אתה במסלול';
+        else if (pct >= 60) labelEl.textContent = 'במסלול, יש מקום לשיפור';
+        else labelEl.textContent = 'דרוש שיפור';
     }
 }
 
-function renderDashActionWidget(plan) {
+function renderDashInsight(plan) {
     var widget = document.getElementById('dashActionWidget');
     if (!widget) return;
 
-    // Find most urgent action: high fees
-    var worstSaving = 0;
-    var worstName = '';
+    var worstSaving = 0, worstName = '';
     var BENCH_MAP = { 'קרן השתלמות': 0.4, 'גמל להשקעה': 0.45, 'פוליסת חסכון': 0.8, 'פנסיה': 0.15 };
 
     plan.investments.forEach(function(inv) {
@@ -1152,15 +1185,13 @@ function renderDashActionWidget(plan) {
         var benchFee = BENCH_MAP[inv.type] || 0.5;
         if ((inv.feeAnnual || 0) > benchFee) {
             var saving = ((inv.feeAnnual || 0) - benchFee) * (inv.amount || 0) / 100;
-            if (saving > worstSaving) {
-                worstSaving = saving;
-                worstName = inv.name;
-            }
+            if (saving > worstSaving) { worstSaving = saving; worstName = inv.name; }
         }
     });
 
     if (worstSaving > 100) {
-        widget.innerHTML = '<div class="dash-widget-inner"><div class="dash-widget-icon">⚠️</div><div class="dash-widget-body"><div class="dash-widget-title">נמצא חיסכון פוטנציאלי של ~' + formatCurrency(Math.round(worstSaving / 12)) + ' ₪ בחודש בדמי ניהול</div><div class="dash-widget-detail">המסלול ' + worstName + ' יקר מהבנצ\'מרק. לחץ לפרטים →</div></div></div>';
+        var monthly = Math.round(worstSaving / 12);
+        widget.innerHTML = '<div class="dcard-insight-inner"><div class="dcard-insight-badge">⚠️ תובנה אסטרטגית דחופה</div><div class="dcard-insight-text">נמצא חיסכון פוטנציאלי של ' + formatCurrency(monthly) + '₪ בחודש בדמי ניהול ב' + worstName + '. <span style="font-weight:700;">[לפרטים] ›</span></div></div>';
         widget.style.display = 'block';
     } else {
         widget.style.display = 'none';

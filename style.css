@@ -1484,169 +1484,196 @@ canvas { max-width: 100%; }
 }
 
 /* ============================================================
-   DASHBOARD — Gauge, KPIs, History
+   DASHBOARD — Premium Card Layout
    ============================================================ */
 
-.dash-overview {
-    display: grid;
-    grid-template-columns: 220px 1fr;
-    gap: 24px;
-    margin-bottom: 24px;
-    align-items: start;
-}
-
-.dash-gauge-card {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
-    padding: 24px 20px;
-    text-align: center;
-    box-shadow: var(--shadow);
-}
-
-.dash-gauge-title {
-    font-size: 0.88em;
-    font-weight: 600;
-    color: var(--text-secondary);
-    margin-bottom: 12px;
-}
-
-.dash-gauge-ring {
+/* Dashboard cards shared */
+.dcard {
+    background: #FFFFFF;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    padding: 22px 24px;
+    margin-bottom: 14px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     position: relative;
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 12px;
+    overflow: hidden;
 }
 
-.gauge-svg { width: 100%; height: 100%; }
+.dcard:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
 
-.gauge-svg circle { transition: stroke-dashoffset 0.8s ease, stroke 0.4s ease; }
-
-.gauge-pct {
+.dcard-chevron {
     position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 1.8em;
+    top: 50%; left: 14px;
+    transform: translateY(-50%);
+    font-size: 1.4em;
+    color: #D1D5DB;
+    font-weight: 300;
+}
+
+/* Card 1: Hero — liquid assets */
+.dcard-hero { padding: 28px 28px 24px; }
+
+.dcard-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dcard-label {
+    font-size: 0.92em;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+}
+
+.dcard-big-value {
+    font-size: 2.2em;
     font-weight: 800;
     color: var(--text-primary);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
 }
 
-.dash-gauge-label {
+.dcard-sub {
     font-size: 0.82em;
     color: var(--text-secondary);
-    line-height: 1.5;
+    margin-top: 8px;
 }
 
-.dash-kpi-col {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.dash-kpi {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 18px 20px;
-    cursor: pointer;
-    transition: var(--transition);
-    box-shadow: var(--shadow-sm);
-}
-
-.dash-kpi:hover {
-    border-color: var(--brand-pale);
-    box-shadow: var(--shadow-md);
-    transform: translateX(-4px);
-}
-
-.dash-kpi-icon {
-    width: 44px; height: 44px;
-    border-radius: var(--radius);
+.dcard-icon-wrap {
+    width: 52px; height: 52px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
 }
 
-.dash-kpi-value {
-    font-size: 1.5em;
+.dcard-icon-blue { background: #EFF6FF; }
+.dcard-icon-green { background: #ECFDF5; }
+
+/* Cards 2-3: Duo */
+.dcard-duo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.dcard-half {
+    margin-bottom: 0;
+    text-align: center;
+    padding: 20px 16px 18px;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.dcard-half .dcard-label { margin-bottom: 10px; }
+
+.dcard-icon-center {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: #F3F4F6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.dcard-goal-text { font-size: 0.88em; color: var(--text-secondary); margin-top: 4px; }
+
+.dcard-mid-value {
+    font-size: 1.45em;
     font-weight: 800;
     color: var(--text-primary);
-    line-height: 1.2;
+    margin-bottom: 8px;
 }
 
-.dash-kpi-label {
-    font-size: 0.82em;
-    color: var(--text-secondary);
-    margin-top: 2px;
+/* Mini gauge in pension card */
+.dcard-gauge-mini {
+    position: relative;
+    width: 68px; height: 68px;
+    margin: 0 auto 4px;
 }
 
-.dash-kpi-sub {
-    font-size: 0.75em;
-    color: var(--text-muted, #9CA3AF);
-    margin-top: 4px;
-    display: none;
+.gauge-mini-svg { width: 100%; height: 100%; }
+.gauge-mini-svg circle { transition: stroke-dashoffset 0.8s ease, stroke 0.4s ease; }
+
+.gauge-mini-pct {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.95em;
+    font-weight: 800;
+    color: var(--text-primary);
 }
 
-.dash-gauge-sub {
-    font-size: 0.82em;
-    font-weight: 600;
-    color: var(--brand-primary);
+/* Card 4: Total */
+.dcard-total { padding: 22px 28px; }
+.dcard-total-val { font-size: 1.8em; }
+
+/* Card 5: Insight */
+.dcard-insight {
+    background: linear-gradient(135deg, #FEF3C7, #FFFBEB);
+    border: 2px solid #FDE68A;
+    padding: 0;
+}
+
+.dcard-insight:hover { border-color: #F59E0B; }
+
+.dcard-insight-inner { padding: 18px 22px; }
+
+.dcard-insight-badge {
+    font-size: 0.88em;
+    font-weight: 800;
+    color: #92400E;
     margin-bottom: 6px;
-    display: none;
 }
 
-/* Dashboard actions row */
-.dash-actions {
+.dcard-insight-text {
+    font-size: 0.88em;
+    color: #78350F;
+    line-height: 1.6;
+}
+
+/* Report button */
+.dcard-report-row { margin-bottom: 14px; }
+
+.dcard-report-btn {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    background: #FFFFFF;
+    border: 2px solid var(--brand-primary);
+    border-radius: 16px;
+    color: var(--brand-primary);
+    font-size: 1.05em;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-align: center;
+}
+
+.dcard-report-btn:hover {
+    background: var(--brand-primary);
+    color: white;
+    box-shadow: 0 4px 16px rgba(30, 64, 175, 0.2);
+}
+
+/* Snap row */
+.dash-snap-row {
     display: flex;
-    gap: 12px;
-    margin-bottom: 24px;
+    justify-content: center;
+    margin-bottom: 20px;
 }
 
 /* Dashboard history */
 .dash-history { margin-bottom: 20px; }
-
-/* Action widget */
-.dash-action-widget {
-    background: #FFFBEB;
-    border: 2px solid #FDE68A;
-    border-radius: var(--radius-xl);
-    padding: 0;
-    margin-bottom: 20px;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.dash-action-widget:hover {
-    border-color: #F59E0B;
-    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.15);
-    transform: translateY(-2px);
-}
-
-.dash-widget-inner {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 18px 22px;
-}
-
-.dash-widget-icon { font-size: 2em; flex-shrink: 0; }
-
-.dash-widget-title {
-    font-size: 0.95em;
-    font-weight: 700;
-    color: var(--text-primary);
-    line-height: 1.4;
-}
-
-.dash-widget-detail {
-    font-size: 0.82em;
-    color: var(--text-secondary);
-    margin-top: 4px;
-}
 
 /* ============================================================
    STRATEGY — Rows
@@ -1886,9 +1913,6 @@ canvas { max-width: 100%; }
 @media (max-width: 900px) {
     .launchpad-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
     .hero-tagline h2 { font-size: 1.6em; }
-    .dash-overview { grid-template-columns: 1fr; }
-    .dash-kpi-col { flex-direction: row; flex-wrap: wrap; }
-    .dash-kpi { flex: 1; min-width: 160px; }
 }
 
 @media (max-width: 768px) {
@@ -1912,10 +1936,13 @@ canvas { max-width: 100%; }
     .home-fab { bottom: 18px; left: 18px; width: 48px; height: 48px; }
     .home-fab svg { width: 20px; height: 20px; }
 
+    .dcard-big-value { font-size: 1.7em; }
+    .dcard-duo { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .dcard-half { min-height: 160px; padding: 16px 12px; }
+    .dcard-mid-value { font-size: 1.2em; }
+    .dcard-total-val { font-size: 1.5em; }
+
     .dash-overview { grid-template-columns: 1fr; gap: 16px; }
-    .dash-gauge-card { max-width: 200px; margin: 0 auto; }
-    .dash-kpi-col { flex-direction: column; }
-    .dash-kpi { padding: 14px 16px; }
     .dash-actions { flex-direction: column; }
 
     .inv-actions-row { flex-direction: column; gap: 12px; }
