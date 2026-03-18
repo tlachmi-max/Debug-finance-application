@@ -1584,6 +1584,21 @@ canvas { max-width: 100%; }
     margin-top: 2px;
 }
 
+.dash-kpi-sub {
+    font-size: 0.75em;
+    color: var(--text-muted, #9CA3AF);
+    margin-top: 4px;
+    display: none;
+}
+
+.dash-gauge-sub {
+    font-size: 0.82em;
+    font-weight: 600;
+    color: var(--brand-primary);
+    margin-bottom: 6px;
+    display: none;
+}
+
 /* Dashboard actions row */
 .dash-actions {
     display: flex;
@@ -1593,6 +1608,45 @@ canvas { max-width: 100%; }
 
 /* Dashboard history */
 .dash-history { margin-bottom: 20px; }
+
+/* Action widget */
+.dash-action-widget {
+    background: #FFFBEB;
+    border: 2px solid #FDE68A;
+    border-radius: var(--radius-xl);
+    padding: 0;
+    margin-bottom: 20px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.dash-action-widget:hover {
+    border-color: #F59E0B;
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.15);
+    transform: translateY(-2px);
+}
+
+.dash-widget-inner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 22px;
+}
+
+.dash-widget-icon { font-size: 2em; flex-shrink: 0; }
+
+.dash-widget-title {
+    font-size: 0.95em;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.dash-widget-detail {
+    font-size: 0.82em;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
 
 /* ============================================================
    STRATEGY — Rows

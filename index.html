@@ -106,23 +106,27 @@
                 </svg>
                 <div class="gauge-pct" id="gaugePct">—</div>
             </div>
+            <div class="dash-gauge-sub" id="dashGaugeSub"></div>
             <div class="dash-gauge-label" id="dashGaugeLabel">הגדר יעדים כדי לראות את המדד</div>
         </div>
         <div class="dash-kpi-col">
             <div class="dash-kpi" onclick="openModule('investments')">
                 <div class="dash-kpi-icon" style="background:#EFF6FF;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></div>
-                <div class="dash-kpi-data"><div class="dash-kpi-value" id="dashLiquid">₪0</div><div class="dash-kpi-label">הון נזיל</div></div>
+                <div class="dash-kpi-data"><div class="dash-kpi-value" id="dashLiquid">₪0</div><div class="dash-kpi-label">הון נזיל</div><div class="dash-kpi-sub" id="dashLiquidSub"></div></div>
             </div>
             <div class="dash-kpi" onclick="openModule('pension')">
                 <div class="dash-kpi-icon" style="background:#FFFBEB;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg></div>
-                <div class="dash-kpi-data"><div class="dash-kpi-value" id="dashPension">₪0</div><div class="dash-kpi-label">פנסיה</div></div>
+                <div class="dash-kpi-data"><div class="dash-kpi-value" id="dashPension">₪0</div><div class="dash-kpi-label">פנסיה</div><div class="dash-kpi-sub" id="dashPensionSub"></div></div>
             </div>
             <div class="dash-kpi" onclick="openModule('projections')">
                 <div class="dash-kpi-icon" style="background:#ECFDF5;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-                <div class="dash-kpi-data"><div class="dash-kpi-value" id="dashTotal">₪0</div><div class="dash-kpi-label">סה״כ הון</div></div>
+                <div class="dash-kpi-data"><div class="dash-kpi-value" id="dashTotal">₪0</div><div class="dash-kpi-label">סה״כ הון</div><div class="dash-kpi-sub" id="dashTotalSub"></div></div>
             </div>
         </div>
     </div>
+
+    <!-- Urgent Action Widget -->
+    <div class="dash-action-widget" id="dashActionWidget" style="display:none;" onclick="openModule('strategy')"></div>
 
     <!-- Report + Snapshot buttons -->
     <div class="dash-actions">
@@ -148,27 +152,27 @@
             <div class="launch-card-arrow">← כניסה</div>
         </div>
 
-        <div class="launch-card" onclick="openModule('pension')">
-            <div class="launch-card-icon lci-amber"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg></div>
-            <div class="launch-card-body"><h3>סימולטור פנסיה</h3><p>קצבה חודשית, מס, סימולטור משיכה ופרישה</p></div>
-            <div class="launch-card-arrow">← כניסה</div>
-        </div>
-
-        <div class="launch-card" onclick="openModule('strategy')">
-            <div class="launch-card-icon lci-purple"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
-            <div class="launch-card-body"><h3>המלצות ואסטרטגיה</h3><p>בדיקת יעדים, בקרת עלויות, אופטימיזציית מס וסדר משיכה</p></div>
-            <div class="launch-card-arrow">← כניסה</div>
-        </div>
-
         <div class="launch-card" onclick="openModule('goals')">
             <div class="launch-card-icon lci-red"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
-            <div class="launch-card-body"><h3>יעדים וחלומות</h3><p>הגדר יעדי פנסיה, הון עצמי ויעדי חיים</p></div>
+            <div class="launch-card-body"><h3>יעדים וחלומות</h3><p>יעדי חיים — חתונות, טיולים, רכישות</p></div>
             <div class="launch-card-arrow">← כניסה</div>
         </div>
 
         <div class="launch-card" onclick="openModule('summary')">
             <div class="launch-card-icon lci-green"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
             <div class="launch-card-body"><h3>סיכום ועלויות</h3><p>הון, דמי ניהול, מס ומחשבון השפעה</p></div>
+            <div class="launch-card-arrow">← כניסה</div>
+        </div>
+
+        <div class="launch-card" onclick="openModule('strategy')">
+            <div class="launch-card-icon lci-purple"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+            <div class="launch-card-body"><h3>המלצות ואסטרטגיה</h3><p>בקרת עלויות, אופטימיזציית מס וסדר משיכה</p></div>
+            <div class="launch-card-arrow">← כניסה</div>
+        </div>
+
+        <div class="launch-card" onclick="openModule('pension')">
+            <div class="launch-card-icon lci-amber"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg></div>
+            <div class="launch-card-body"><h3>סימולטור פנסיה</h3><p>יעדי פרישה, קצבה חודשית, מס וסימולטור</p></div>
             <div class="launch-card-arrow">← כניסה</div>
         </div>
 
@@ -315,8 +319,6 @@
 
 <!-- ===== Goals ===== -->
 <div id="goals" class="panel">
-    <div class="card mb-4"><div class="card-title">💰 יעדי פנסיה</div><div style="margin-top:16px;"><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"><div class="form-group"><label class="form-label">גיל פרישה מתוכנן (משתמש)</label><input type="number" class="form-input" id="goalRetirementAgeUser" min="50" max="80" placeholder="67"></div><div class="form-group" id="goalSpouseRetirementGroup"><label class="form-label">גיל פרישה מתוכנן (בן/בת זוג)</label><input type="number" class="form-input" id="goalRetirementAgeSpouse" min="50" max="80" placeholder="62"></div></div><div class="form-group"><label class="form-label">קצבה חודשית רצויה (₪)</label><input type="number" class="form-input" id="goalMonthlyPension" min="0" placeholder="15000"></div><div style="display:flex;align-items:center;gap:8px;margin-top:12px;"><input type="checkbox" id="goalPensionIsReal" checked style="width:20px;height:20px;"><label for="goalPensionIsReal">בערכי היום (ריאלי)</label></div></div></div>
-    <div class="card mb-4"><div class="card-title">💎 יעד הון עצמי בפרישה</div><div style="margin-top:16px;"><div class="form-grid"><div class="form-group"><label class="form-label">סכום יעד (₪)</label><input type="number" class="form-input" id="goalEquityAmount" min="0" placeholder="2000000"></div><div class="form-group"><label class="form-label">שנת יעד</label><input type="number" class="form-input" id="goalEquityYear" min="2026" max="2100" placeholder="2054"></div></div><div style="display:flex;align-items:center;gap:8px;margin-top:12px;"><input type="checkbox" id="goalEquityIsReal" checked style="width:20px;height:20px;"><label for="goalEquityIsReal">בערכי היום (ריאלי)</label></div></div></div>
     <div class="card mb-4"><div class="card-title">🎯 יעדי חיים</div><div id="lifeGoalsList" style="margin-top:16px;"></div><button class="btn btn-primary" onclick="addLifeGoal()" style="margin-top:12px;"><span>+</span><span>הוסף יעד</span></button></div>
     <div style="display:flex;gap:12px;justify-content:flex-end;"><button class="btn btn-primary" onclick="saveGoals()"><span>💾</span><span>שמור יעדים</span></button></div>
 </div>
@@ -374,6 +376,9 @@
 <div id="pension" class="panel">
     <div class="flex justify-between items-center mb-4" style="flex-wrap:wrap;gap:12px;"><h2>💰 תוכנית פנסיה</h2><div class="flex gap-2 items-center"><label style="white-space:nowrap;">בעוד:</label><input type="number" class="form-input" id="pensionYears" value="20" min="1" max="50" style="width:70px;"><label style="white-space:nowrap;">שנים</label><button class="btn btn-primary btn-sm" onclick="renderPensionTab()">עדכן</button></div></div>
 
+    <!-- Pension Goals -->
+    <div class="card mb-4"><div class="card-title">🎯 יעדי פרישה</div><div style="margin-top:16px;"><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"><div class="form-group"><label class="form-label">גיל פרישה מתוכנן (משתמש)</label><input type="number" class="form-input" id="goalRetirementAgeUser" min="50" max="80" placeholder="67"></div><div class="form-group" id="goalSpouseRetirementGroup"><label class="form-label">גיל פרישה מתוכנן (בן/בת זוג)</label><input type="number" class="form-input" id="goalRetirementAgeSpouse" min="50" max="80" placeholder="62"></div></div><div class="form-group"><label class="form-label">קצבה חודשית רצויה (₪)</label><input type="number" class="form-input" id="goalMonthlyPension" min="0" placeholder="15000"></div><div style="display:flex;align-items:center;gap:8px;margin-top:12px;"><input type="checkbox" id="goalPensionIsReal" checked style="width:20px;height:20px;"><label for="goalPensionIsReal">בערכי היום (ריאלי)</label></div></div><hr style="border:none;border-top:1px solid var(--border);margin:20px 0;"><div class="card-title" style="margin-bottom:16px;">💎 יעד הון עצמי בפרישה</div><div><div class="form-grid"><div class="form-group"><label class="form-label">סכום יעד (₪)</label><input type="number" class="form-input" id="goalEquityAmount" min="0" placeholder="2000000"></div><div class="form-group"><label class="form-label">שנת יעד</label><input type="number" class="form-input" id="goalEquityYear" min="2026" max="2100" placeholder="2054"></div></div><div style="display:flex;align-items:center;gap:8px;margin-top:12px;"><input type="checkbox" id="goalEquityIsReal" checked style="width:20px;height:20px;"><label for="goalEquityIsReal">בערכי היום (ריאלי)</label></div></div><div style="display:flex;justify-content:flex-end;margin-top:16px;"><button class="btn btn-primary btn-sm" onclick="saveGoals()">💾 שמור יעדי פרישה</button></div></div>
+
     <!-- Quick add pension button + collapsible form -->
     <div class="pension-add-area">
         <button class="inv-add-btn" id="pensionAddBtn" onclick="togglePensionForm(true)" style="margin-bottom:20px;">
@@ -408,6 +413,7 @@
                     <div class="form-group"><label class="form-label">הפקדה חודשית (₪)</label><input type="text" inputmode="numeric" class="form-input" id="penAddMonthly" value="0" placeholder="0"></div>
                     <div class="form-group"><label class="form-label">תשואה צפויה (%)</label><input type="number" class="form-input" id="penAddReturn" value="5" min="0" max="15" step="0.1"></div>
                     <div class="form-group"><label class="form-label">דמי ניהול צבירה (%)</label><input type="number" class="form-input" id="penAddFeeAnnual" value="0" min="0" max="2" step="0.01"></div>
+                    <div class="form-group"><label class="form-label">דמי ניהול הפקדה (%)</label><input type="number" class="form-input" id="penAddFeeDeposit" value="0" min="0" max="8" step="0.1"></div>
                 </div>
                 <div class="form-actions">
                     <button class="btn btn-success btn-full" onclick="savePensionQuick()">💾 שמור קרן פנסיה</button>
@@ -416,6 +422,10 @@
             </div>
         </div>
     </div>
+
+    <!-- Pension tracks dashboard (JS-rendered) -->
+    <div id="pensionTracksDash" style="margin-bottom:20px;"></div>
+
     <div class="card mb-4"><div class="card-title">קופות פנסיה</div><div style="display:grid;gap:20px;margin-top:20px;"><div class="card" style="background:var(--brand-bg) !important;border:2px solid var(--brand-light) !important;"><div class="card-title" style="color:var(--brand-primary) !important;">👨 בעל</div><div id="pensionHusband" class="items-list"></div></div><div class="card" style="background:#FDF2F8 !important;border:2px solid #EC4899 !important;"><div class="card-title" style="color:#EC4899 !important;">👩 אשה</div><div id="pensionWife" class="items-list"></div></div></div></div>
     <div class="card mb-4"><div class="card-title">קצבה חודשית צפויה</div><p style="font-size:0.85em;color:var(--text-secondary);margin-top:8px;">💡 <strong>נומינלי</strong> = סכום בפועל | <strong>ריאלי</strong> = כוח קנייה של היום</p><div style="display:grid;gap:16px;margin-top:20px;"><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"><div class="stat-card green"><div class="stat-label">קצבה משפחתית - נומינלי</div><div class="stat-value" id="pensionCombinedNominal">₪0</div></div><div class="stat-card orange"><div class="stat-label">קצבה משפחתית - ריאלי</div><div class="stat-value" id="pensionCombinedReal">₪0</div></div></div><div class="stat-card blue"><div class="stat-label">💎 קצבה משפחתית - נטו (אחרי מס)</div><div class="stat-value" id="pensionCombinedNet">₪0</div><div class="stat-detail" id="pensionCombinedTax"></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"><div class="card" style="background:var(--brand-bg) !important;border:2px solid var(--brand-light) !important;padding:16px !important;"><div style="font-weight:bold;color:var(--brand-primary);margin-bottom:12px;">👨 בעל (גיל 67)</div><div style="display:grid;gap:8px;"><div><div style="font-size:0.8em;color:var(--text-secondary);">נומינלי:</div><div style="font-size:1.2em;font-weight:bold;color:var(--text-primary);" id="pensionHusbandNominal">₪0</div></div><div><div style="font-size:0.8em;color:var(--text-secondary);">ריאלי:</div><div style="font-size:1.2em;font-weight:bold;color:var(--warning);" id="pensionHusbandReal">₪0</div></div><div style="border-top:1px solid var(--border);padding-top:8px;"><div style="font-size:0.8em;color:var(--text-secondary);">💎 נטו:</div><div style="font-size:1.4em;font-weight:bold;color:var(--brand-primary);" id="pensionHusbandNet">₪0</div><div style="font-size:0.75em;color:var(--text-secondary);" id="pensionHusbandTax"></div></div></div></div><div class="card" style="background:#FDF2F8 !important;border:2px solid #EC4899 !important;padding:16px !important;"><div style="font-weight:bold;color:#EC4899;margin-bottom:12px;">👩 אשה (גיל 62)</div><div style="display:grid;gap:8px;"><div><div style="font-size:0.8em;color:var(--text-secondary);">נומינלי:</div><div style="font-size:1.2em;font-weight:bold;color:var(--text-primary);" id="pensionWifeNominal">₪0</div></div><div><div style="font-size:0.8em;color:var(--text-secondary);">ריאלי:</div><div style="font-size:1.2em;font-weight:bold;color:var(--warning);" id="pensionWifeReal">₪0</div></div><div style="border-top:1px solid var(--border);padding-top:8px;"><div style="font-size:0.8em;color:var(--text-secondary);">💎 נטו:</div><div style="font-size:1.4em;font-weight:bold;color:#EC4899;" id="pensionWifeNet">₪0</div><div style="font-size:0.75em;color:var(--text-secondary);" id="pensionWifeTax"></div></div></div></div></div></div></div>
     <div class="card"><div class="card-title">סימולטור משיכה מפנסיה</div><p style="color:var(--text-secondary);font-size:0.9em;margin-bottom:20px;">חשב קצבה חודשית ומס לפי גיל משיכה</p><div class="form-group"><label class="form-label">בחר קופת פנסיה</label><select class="form-select" id="pensionSimSelect"><option value="">בחר קופה...</option></select></div><div class="form-group"><label class="form-label">גיל משיכה</label><input type="number" class="form-input" id="pensionSimAge" placeholder="62-70" min="50" max="75"></div><button class="btn btn-primary" onclick="simulatePensionWithdrawal()">חשב קצבה</button><div id="pensionSimResult" style="margin-top:20px;"></div></div>
@@ -547,7 +557,7 @@ function renderActivePanel(panelId) {
     if (panelId === 'summary' && typeof renderSummary === 'function') renderSummary();
     if (panelId === 'projections' && typeof renderProjections === 'function') renderProjections();
     if (panelId === 'charts') setTimeout(function() { if (typeof renderCharts === 'function') renderCharts(); }, 120);
-    if (panelId === 'pension' && typeof renderPensionTab === 'function') renderPensionTab();
+    if (panelId === 'pension' && typeof renderPensionTab === 'function') { renderPensionTab(); renderPensionTracksList(); }
     if (panelId === 'roadmap' && typeof renderWithdrawals === 'function') renderWithdrawals();
     if (panelId === 'investments' && typeof renderInvestments === 'function') renderInvestments();
     if (panelId === 'strategy') renderStrategy();
@@ -800,7 +810,13 @@ function togglePensionForm(show) {
     var w = document.getElementById('pensionFormWrapper');
     var b = document.getElementById('pensionAddBtn');
     if (show) { w.classList.add('open'); b.style.display = 'none'; }
-    else { w.classList.remove('open'); b.style.display = 'inline-flex'; }
+    else {
+        w.classList.remove('open'); b.style.display = 'inline-flex';
+        _penEditIndex = -1;
+        // Reset button text
+        var saveBtn = document.querySelector('.pension-add-area .btn-success');
+        if (saveBtn) saveBtn.innerHTML = '💾 שמור קרן פנסיה';
+    }
 }
 
 function selectPenGender(el, spouse, gender) {
@@ -814,6 +830,8 @@ function selectPenGender(el, spouse, gender) {
     el.style.borderColor = 'var(--brand-primary)';
     el.style.background = 'var(--brand-bg)';
 }
+
+var _penEditIndex = -1; // -1 = adding, >= 0 = editing
 
 function savePensionQuick() {
     var name = document.getElementById('penAddName').value.trim();
@@ -831,7 +849,7 @@ function savePensionQuick() {
         initialPrincipal: sanitizeNumber(document.getElementById('penAddAmount').value),
         monthly: sanitizeNumber(document.getElementById('penAddMonthly').value),
         returnRate: parseFloat(document.getElementById('penAddReturn').value) || 5,
-        feeDeposit: 0,
+        feeDeposit: parseFloat(document.getElementById('penAddFeeDeposit') ? document.getElementById('penAddFeeDeposit').value : 0) || 0,
         feeAnnual: parseFloat(document.getElementById('penAddFeeAnnual').value) || 0,
         forDream: false,
         include: true,
@@ -841,8 +859,16 @@ function savePensionQuick() {
         subTracks: []
     };
 
-    plan.investments.push(inv);
+    if (_penEditIndex >= 0 && plan.investments[_penEditIndex]) {
+        // Update existing
+        inv.subTracks = plan.investments[_penEditIndex].subTracks || [];
+        inv.initialPrincipal = plan.investments[_penEditIndex].initialPrincipal || inv.amount;
+        plan.investments[_penEditIndex] = inv;
+    } else {
+        plan.investments.push(inv);
+    }
     saveData();
+    _penEditIndex = -1;
 
     // Reset form
     document.getElementById('penAddName').value = '';
@@ -851,12 +877,56 @@ function savePensionQuick() {
     document.getElementById('penAddMonthly').value = '0';
     document.getElementById('penAddReturn').value = '5';
     document.getElementById('penAddFeeAnnual').value = '0';
+    if (document.getElementById('penAddFeeDeposit')) document.getElementById('penAddFeeDeposit').value = '0';
     togglePensionForm(false);
 
-    // Refresh pension display
+    // Refresh
     if (typeof renderPensionTab === 'function') renderPensionTab();
+    renderPensionTracksList();
     if (typeof renderInvestments === 'function') renderInvestments();
-    if (typeof showSaveNotification === 'function') showSaveNotification('✅ קרן הפנסיה נוספה בהצלחה');
+    if (typeof showSaveNotification === 'function') showSaveNotification(_penEditIndex >= 0 ? '✅ הקרן עודכנה' : '✅ קרן פנסיה נוספה');
+}
+
+function editPensionTrack(index) {
+    var plan = getCurrentPlan();
+    var inv = plan.investments[index];
+    if (!inv) return;
+    _penEditIndex = index;
+
+    // Open form and fill
+    togglePensionForm(true);
+    document.getElementById('penAddName').value = inv.name || '';
+    document.getElementById('penAddHouse').value = inv.house || '';
+    document.getElementById('penAddAge').value = inv.age || '';
+    document.getElementById('penAddAmount').value = inv.amount || 0;
+    document.getElementById('penAddMonthly').value = inv.monthly || 0;
+    document.getElementById('penAddReturn').value = inv.returnRate || 5;
+    document.getElementById('penAddFeeAnnual').value = inv.feeAnnual || 0;
+    if (document.getElementById('penAddFeeDeposit')) document.getElementById('penAddFeeDeposit').value = inv.feeDeposit || 0;
+    document.getElementById('penAddSpouse').value = inv.spouse || 'husband';
+    document.getElementById('penAddGender').value = inv.gender || 'male';
+
+    // Highlight gender selection
+    document.querySelectorAll('.pen-gender-opt').forEach(function(o) {
+        o.style.borderColor = 'var(--border)'; o.style.background = 'transparent';
+    });
+    var genderOpts = document.querySelectorAll('.pen-gender-opt');
+    if (inv.spouse === 'wife' && genderOpts[1]) { genderOpts[1].style.borderColor = 'var(--brand-primary)'; genderOpts[1].style.background = 'var(--brand-bg)'; }
+    else if (genderOpts[0]) { genderOpts[0].style.borderColor = 'var(--brand-primary)'; genderOpts[0].style.background = 'var(--brand-bg)'; }
+
+    // Update button text
+    var saveBtn = document.querySelector('.pension-add-area .btn-success');
+    if (saveBtn) saveBtn.innerHTML = '💾 עדכן קרן פנסיה';
+}
+
+function deletePensionTrack(index) {
+    if (!confirm('למחוק קרן פנסיה זו?')) return;
+    var plan = getCurrentPlan();
+    plan.investments.splice(index, 1);
+    saveData();
+    if (typeof renderPensionTab === 'function') renderPensionTab();
+    renderPensionTracksList();
+    if (typeof renderInvestments === 'function') renderInvestments();
 }
 
 // ============================================================
@@ -937,11 +1007,29 @@ function renderDashboard() {
         var plan = getCurrentPlan();
         if (!plan || !plan.investments) return;
 
-        var liquid = 0, pension = 0;
+        var liquid = 0, pension = 0, pensionFeeSum = 0, pensionCount = 0;
+        var stockPctTotal = 0, liquidTotal = 0;
+
         plan.investments.forEach(function(inv) {
             if (!inv.include) return;
-            if (inv.type === 'פנסיה') pension += (inv.amount || 0);
-            else liquid += (inv.amount || 0);
+            if (inv.type === 'פנסיה') {
+                pension += (inv.amount || 0);
+                pensionFeeSum += (inv.feeAnnual || 0);
+                pensionCount++;
+            } else {
+                liquid += (inv.amount || 0);
+                liquidTotal += (inv.amount || 0);
+                // Estimate stock exposure
+                if (inv.subTracks && inv.subTracks.length > 0) {
+                    inv.subTracks.forEach(function(st) {
+                        if (st.type && st.type.match(/מניות|S&P|סנופי/i)) {
+                            stockPctTotal += (inv.amount || 0) * (st.percent || 0) / 100;
+                        }
+                    });
+                } else if (inv.returnRate >= 6) {
+                    stockPctTotal += (inv.amount || 0) * 0.7; // Assume ~70% equity
+                }
+            }
         });
 
         var total = liquid + pension;
@@ -950,8 +1038,36 @@ function renderDashboard() {
         el = document.getElementById('dashPension'); if (el) el.textContent = formatCurrency(pension);
         el = document.getElementById('dashTotal'); if (el) el.textContent = formatCurrency(total);
 
+        // Sub-labels
+        // Liquid: stock exposure %
+        el = document.getElementById('dashLiquidSub');
+        if (el && liquidTotal > 0) {
+            var stockPct = Math.round(stockPctTotal / liquidTotal * 100);
+            el.textContent = 'חשיפה מנייתית: ' + stockPct + '%';
+            el.style.display = 'block';
+        } else if (el) { el.style.display = 'none'; }
+
+        // Pension: avg fee
+        el = document.getElementById('dashPensionSub');
+        if (el && pensionCount > 0) {
+            var avgFee = (pensionFeeSum / pensionCount).toFixed(2);
+            el.textContent = 'דמ"נ ממוצע: ' + avgFee + '%';
+            el.style.display = 'block';
+        } else if (el) { el.style.display = 'none'; }
+
+        // Total: number of tracks
+        el = document.getElementById('dashTotalSub');
+        if (el) {
+            var count = plan.investments.filter(function(i) { return i.include; }).length;
+            el.textContent = count + ' מסלולים פעילים';
+            el.style.display = 'block';
+        }
+
         // Retirement readiness gauge
         renderRetirementGauge(plan);
+
+        // Action widget
+        renderDashActionWidget(plan);
 
         // History table
         renderHistoryTable();
@@ -962,6 +1078,7 @@ function renderRetirementGauge(plan) {
     var arc = document.getElementById('gaugeArc');
     var pctEl = document.getElementById('gaugePct');
     var labelEl = document.getElementById('dashGaugeLabel');
+    var subEl = document.getElementById('dashGaugeSub');
     if (!arc || !pctEl) return;
 
     var goals = plan.goals;
@@ -970,27 +1087,147 @@ function renderRetirementGauge(plan) {
         arc.style.strokeDashoffset = '327';
         pctEl.textContent = '—';
         labelEl.textContent = 'הגדר פרופיל ויעדים כדי לראות את המדד';
+        if (subEl) subEl.textContent = '';
         return;
     }
 
-    // Use analyzeGoals if available
     var pct = 0;
+    var projectedPension = 0;
     if (typeof analyzeGoals === 'function') {
         var analysis = analyzeGoals();
         if (analysis && analysis.pension) {
             pct = Math.min(Math.round(analysis.pension.percentage), 100);
+            projectedPension = analysis.pension.projected || 0;
         }
     }
 
-    var circumference = 327; // 2 * PI * 52
+    // Check if there are costly fees (modify color)
+    var hasCostIssues = false;
+    plan.investments.forEach(function(inv) {
+        if (!inv.include) return;
+        if (inv.type === 'פנסיה' && inv.feeAnnual >= 0.3) hasCostIssues = true;
+        if (inv.type === 'קרן השתלמות' && inv.feeAnnual >= 0.7) hasCostIssues = true;
+    });
+
+    var circumference = 327;
     var offset = circumference - (circumference * pct / 100);
     arc.style.strokeDashoffset = offset;
-    arc.style.stroke = pct >= 90 ? '#059669' : pct >= 60 ? '#D97706' : '#DC2626';
+
+    if (hasCostIssues) {
+        arc.style.stroke = '#D97706'; // Orange — costs need attention
+    } else {
+        arc.style.stroke = pct >= 90 ? '#059669' : pct >= 60 ? '#D97706' : '#DC2626';
+    }
+
     pctEl.textContent = pct + '%';
 
-    if (pct >= 90) labelEl.textContent = '✅ מצוין! אתה במסלול הנכון';
-    else if (pct >= 60) labelEl.textContent = '🟡 במסלול, אך יש מקום לשיפור';
-    else labelEl.textContent = '🔴 דרוש שיפור — עדכן יעדים או הגדל הפקדות';
+    // Sub-line: projected pension
+    if (subEl && projectedPension > 0) {
+        subEl.textContent = 'צפי לקצבה חודשית: ' + formatCurrency(Math.round(projectedPension)) + ' ₪';
+        subEl.style.display = 'block';
+    } else if (subEl) { subEl.style.display = 'none'; }
+
+    if (hasCostIssues) {
+        labelEl.textContent = '⚠️ דמי ניהול גבוהים — שפר לחסוך יותר';
+    } else if (pct >= 90) {
+        labelEl.textContent = '✅ מצוין! אתה במסלול הנכון';
+    } else if (pct >= 60) {
+        labelEl.textContent = '🟡 במסלול, אך יש מקום לשיפור';
+    } else {
+        labelEl.textContent = '🔴 דרוש שיפור — עדכן יעדים או הגדל הפקדות';
+    }
+}
+
+function renderDashActionWidget(plan) {
+    var widget = document.getElementById('dashActionWidget');
+    if (!widget) return;
+
+    // Find most urgent action: high fees
+    var worstSaving = 0;
+    var worstName = '';
+    var BENCH_MAP = { 'קרן השתלמות': 0.4, 'גמל להשקעה': 0.45, 'פוליסת חסכון': 0.8, 'פנסיה': 0.15 };
+
+    plan.investments.forEach(function(inv) {
+        if (!inv.include) return;
+        var benchFee = BENCH_MAP[inv.type] || 0.5;
+        if ((inv.feeAnnual || 0) > benchFee) {
+            var saving = ((inv.feeAnnual || 0) - benchFee) * (inv.amount || 0) / 100;
+            if (saving > worstSaving) {
+                worstSaving = saving;
+                worstName = inv.name;
+            }
+        }
+    });
+
+    if (worstSaving > 100) {
+        widget.innerHTML = '<div class="dash-widget-inner"><div class="dash-widget-icon">⚠️</div><div class="dash-widget-body"><div class="dash-widget-title">נמצא חיסכון פוטנציאלי של ~' + formatCurrency(Math.round(worstSaving / 12)) + ' ₪ בחודש בדמי ניהול</div><div class="dash-widget-detail">המסלול ' + worstName + ' יקר מהבנצ\'מרק. לחץ לפרטים →</div></div></div>';
+        widget.style.display = 'block';
+    } else {
+        widget.style.display = 'none';
+    }
+}
+
+// ============================================================
+// PENSION TRACKS LIST — Explicit dashboard in pension tab
+// ============================================================
+
+function renderPensionTracksList() {
+    var el = document.getElementById('pensionTracksDash');
+    if (!el) return;
+    var plan = getCurrentPlan();
+    var pensions = [];
+    plan.investments.forEach(function(inv, i) {
+        if (inv.type === 'פנסיה') pensions.push({ inv: inv, idx: i });
+    });
+
+    if (pensions.length === 0) {
+        el.innerHTML = '<div class="card" style="text-align:center;padding:30px 20px;color:var(--text-secondary);"><p style="font-size:1.1em;margin-bottom:8px;">אין קרנות פנסיה מוגדרות</p><p style="font-size:0.88em;">לחץ \'הוסף קרן פנסיה\' למעלה כדי להתחיל</p></div>';
+        return;
+    }
+
+    // Group by house
+    var byHouse = {};
+    pensions.forEach(function(item) {
+        var h = item.inv.house || 'לא מוגדר';
+        if (!byHouse[h]) byHouse[h] = [];
+        byHouse[h].push(item);
+    });
+
+    var html = '';
+    Object.keys(byHouse).forEach(function(house) {
+        var items = byHouse[house];
+        var houseTotal = items.reduce(function(s, it) { return s + (it.inv.amount || 0); }, 0);
+
+        html += '<div class="body-card" style="margin-bottom:16px;">';
+        html += '<div class="body-card-header"><div class="body-card-info"><div class="body-card-name">' + house + '</div><div class="body-card-count">' + items.length + ' קרנות</div></div><div class="body-card-total">' + formatCurrency(houseTotal) + '</div></div>';
+        html += '<div class="body-card-table"><table><thead><tr><th>קרן</th><th>שייך ל</th><th>צבירה</th><th>חודשי</th><th>דמ"נ</th><th>תשואה</th><th></th></tr></thead><tbody>';
+
+        items.forEach(function(item) {
+            var inv = item.inv;
+            var idx = item.idx;
+            var spouse = inv.spouse === 'wife' ? '👩 אשה' : '👨 בעל';
+            var fee = (inv.feeAnnual || 0) + '%';
+            if (inv.feeDeposit > 0) fee += ' + ' + inv.feeDeposit + '%';
+
+            html += '<tr>';
+            html += '<td><div class="track-name">' + inv.name + '</div></td>';
+            html += '<td>' + spouse + '</td>';
+            html += '<td class="num">' + formatCurrency(inv.amount) + '</td>';
+            html += '<td class="num">' + formatCurrency(inv.monthly) + '</td>';
+            html += '<td class="num">' + fee + '</td>';
+            html += '<td class="num">' + inv.returnRate + '%</td>';
+            html += '<td class="actions-cell">';
+            html += '<button class="tbl-btn" onclick="editPensionTrack(' + idx + ')" title="ערוך">✏️</button>';
+            html += '<button class="tbl-btn" onclick="duplicateInvestment(' + idx + ');renderPensionTracksList();" title="שכפל">📋</button>';
+            html += '<button class="tbl-btn danger" onclick="deletePensionTrack(' + idx + ')" title="מחק">🗑️</button>';
+            html += '</td>';
+            html += '</tr>';
+        });
+
+        html += '</tbody></table></div></div>';
+    });
+
+    el.innerHTML = html;
 }
 
 // ============================================================
@@ -1088,26 +1325,61 @@ function renderStrategyCosts() {
     var el = document.getElementById('strategyCosts');
     if (!el) return;
     var plan = getCurrentPlan();
-    var BENCH_ANNUAL = 0.5; // Benchmark: 0.5% annual fee
-    var BENCH_DEPOSIT = 2.0; // Benchmark: 2% deposit fee
+
+    // Detailed benchmarks per product type
+    var BENCH = {
+        'קרן השתלמות':   { annual: { green: 0.4, yellow: 0.6, red: 0.7 }, deposit: { green: 0, yellow: 0, red: 0 } },
+        'גמל להשקעה':    { annual: { green: 0.45, yellow: 0.65, red: 0.7 }, deposit: { green: 0, yellow: 0, red: 0 } },
+        'פוליסת חסכון':   { annual: { green: 0.8, yellow: 1.0, red: 1.1 }, deposit: { green: 0, yellow: 0, red: 0 } },
+        'פנסיה':          { annual: { green: 0.15, yellow: 0.25, red: 0.3 }, deposit: { green: 1.5, yellow: 2.2, red: 2.5 } },
+        'תיק עצמאי':     { annual: { green: 0.5, yellow: 0.8, red: 1.0 }, deposit: { green: 0, yellow: 0, red: 0 } },
+        'פקדון':          { annual: { green: 0, yellow: 0, red: 0 }, deposit: { green: 0, yellow: 0, red: 0 } }
+    };
+    var DEFAULT_BENCH = { annual: { green: 0.5, yellow: 0.8, red: 1.0 }, deposit: { green: 2.0, yellow: 3.0, red: 4.0 } };
 
     var html = '';
-    plan.investments.forEach(function(inv, i) {
+    var totalSavings = 0;
+
+    plan.investments.forEach(function(inv) {
         if (!inv.include) return;
-        var highAnnual = (inv.feeAnnual || 0) > BENCH_ANNUAL;
-        var highDeposit = (inv.feeDeposit || 0) > BENCH_DEPOSIT;
-        if (!highAnnual && !highDeposit) return;
+        var bench = BENCH[inv.type] || DEFAULT_BENCH;
+        var feeA = inv.feeAnnual || 0;
+        var feeD = inv.feeDeposit || 0;
 
-        var light = highAnnual && highDeposit ? 'strat-bad' : 'strat-warn';
-        var icon = highAnnual && highDeposit ? '🔴' : '🟡';
+        // Determine status for annual fee
+        var annualStatus = 'green';
+        if (feeA >= bench.annual.red) annualStatus = 'red';
+        else if (feeA > bench.annual.green) annualStatus = 'yellow';
+
+        // Determine status for deposit fee (only for pension)
+        var depositStatus = 'green';
+        if (bench.deposit.red > 0 && feeD >= bench.deposit.red) depositStatus = 'red';
+        else if (bench.deposit.yellow > 0 && feeD > bench.deposit.green) depositStatus = 'yellow';
+
+        var worst = (annualStatus === 'red' || depositStatus === 'red') ? 'red' : (annualStatus === 'yellow' || depositStatus === 'yellow') ? 'yellow' : 'green';
+        if (worst === 'green') return; // Don't show green items
+
+        // Estimate savings
+        var savingsPerYear = 0;
+        if (annualStatus !== 'green') savingsPerYear += (feeA - bench.annual.green) * (inv.amount || 0) / 100;
+        if (depositStatus !== 'green') savingsPerYear += (feeD - bench.deposit.green) * (inv.monthly || 0) * 12 / 100;
+        totalSavings += savingsPerYear;
+
+        var cls = worst === 'red' ? 'strat-bad' : 'strat-warn';
+        var icon = worst === 'red' ? '🔴' : '🟡';
         var details = [];
-        if (highAnnual) details.push('דמ"נ צבירה: ' + inv.feeAnnual + '% (בנצ\'מרק: ' + BENCH_ANNUAL + '%)');
-        if (highDeposit) details.push('דמ"נ הפקדה: ' + inv.feeDeposit + '% (בנצ\'מרק: ' + BENCH_DEPOSIT + '%)');
+        if (annualStatus !== 'green') details.push('דמ"נ צבירה: ' + feeA + '% (בנצ\'מרק ' + inv.type + ': ' + bench.annual.green + '%)');
+        if (depositStatus !== 'green') details.push('דמ"נ הפקדה: ' + feeD + '% (בנצ\'מרק: ' + bench.deposit.green + '%)');
+        var savingsText = savingsPerYear > 100 ? ' · חיסכון פוטנציאלי: ~' + formatCurrency(Math.round(savingsPerYear)) + '/שנה' : '';
 
-        html += '<div class="strat-row ' + light + '"><div class="strat-row-icon">' + icon + '</div><div class="strat-row-body"><div class="strat-row-title">' + inv.name + ' <span style="color:var(--text-secondary);font-weight:400;">(' + inv.house + ')</span></div><div class="strat-row-detail">' + details.join(' · ') + '</div><div class="strat-row-status">שקול משא ומתן להוזלת דמי ניהול</div></div></div>';
+        html += '<div class="strat-row ' + cls + '"><div class="strat-row-icon">' + icon + '</div><div class="strat-row-body"><div class="strat-row-title">' + inv.name + ' <span style="color:var(--text-secondary);font-weight:400;">(' + (inv.house || inv.type) + ')</span></div><div class="strat-row-detail">' + details.join(' · ') + savingsText + '</div><div class="strat-row-status">שקול משא ומתן להוזלת דמי ניהול</div></div></div>';
     });
 
-    if (!html) html = '<div class="strat-row strat-ok"><div class="strat-row-icon">✅</div><div class="strat-row-body"><div class="strat-row-title">דמי הניהול שלך בטווח סביר</div><div class="strat-row-detail">כל המסלולים מתחת לרף הבנצ\'מרק</div></div></div>';
+    if (totalSavings > 0) {
+        html = '<div class="strat-row strat-warn" style="margin-bottom:16px;border:2px solid #FDE68A;"><div class="strat-row-icon" style="font-size:1.8em;">💰</div><div class="strat-row-body"><div class="strat-row-title" style="font-size:1.05em;">חיסכון פוטנציאלי כולל: ~' + formatCurrency(Math.round(totalSavings)) + ' בשנה</div><div class="strat-row-detail">~' + formatCurrency(Math.round(totalSavings / 12)) + ' בחודש — ע"י הוזלת דמי ניהול לרמת הבנצ\'מרק</div></div></div>' + html;
+    }
+
+    if (!html) html = '<div class="strat-row strat-ok"><div class="strat-row-icon">✅</div><div class="strat-row-body"><div class="strat-row-title">דמי הניהול שלך בטווח סביר</div><div class="strat-row-detail">כל המסלולים ברמת הבנצ\'מרק או מתחתיו</div></div></div>';
     el.innerHTML = html;
 }
 
@@ -1117,18 +1389,38 @@ function renderStrategyTax() {
     var plan = getCurrentPlan();
     var html = '';
 
-    // Find taxable tracks with stock-like returns that could be in tax-exempt vehicles
+    // Logic: high-risk/equity in taxable = bad, should be in exempt
+    // Low-risk/bonds in exempt = suboptimal, could free up exempt space
     plan.investments.forEach(function(inv) {
         if (!inv.include) return;
-        if (inv.type === 'פנסיה' || inv.type === 'קרן השתלמות') return; // Already exempt
-        if (inv.tax <= 0) return;
-        if (inv.returnRate < 5) return; // Low return, not worth moving
+        var isExempt = (inv.type === 'פנסיה' || inv.type === 'קרן השתלמות');
+        var isTaxable = !isExempt && inv.tax > 0;
+        var isHighRisk = inv.returnRate >= 6 || hasStockSubTracks(inv);
+        var isLowRisk = inv.returnRate < 4 && !hasStockSubTracks(inv);
 
-        html += '<div class="strat-row strat-warn"><div class="strat-row-icon">💡</div><div class="strat-row-body"><div class="strat-row-title">' + inv.name + '</div><div class="strat-row-detail">סוג: ' + inv.type + ' · מס: ' + inv.tax + '% · תשואה: ' + inv.returnRate + '%</div><div class="strat-row-status">שקול להעביר לקרן השתלמות או גמל להשקעה לחיסכון במס</div></div></div>';
+        // High-risk assets in TAXABLE vehicles = inefficient
+        if (isTaxable && isHighRisk) {
+            html += '<div class="strat-row strat-warn"><div class="strat-row-icon">⚠️</div><div class="strat-row-body"><div class="strat-row-title">' + inv.name + ' — חשיפה מנייתית במסלול חייב במס</div><div class="strat-row-detail">סוג: ' + inv.type + ' · מס: ' + inv.tax + '% · תשואה: ' + inv.returnRate + '%</div><div class="strat-row-status">רווח מנייתי חייב ב-' + inv.tax + '% מס. שקול להעביר את החלק המנייתי לקרן השתלמות / גמל (אם יש מקום)</div></div></div>';
+        }
+
+        // Low-risk/bond assets in EXEMPT vehicles = waste of exemption
+        if (isExempt && isLowRisk && inv.amount > 50000) {
+            html += '<div class="strat-row strat-warn"><div class="strat-row-icon">💡</div><div class="strat-row-body"><div class="strat-row-title">' + inv.name + ' — נכס סולידי במסלול פטור</div><div class="strat-row-detail">סוג: ' + inv.type + ' · תשואה: ' + inv.returnRate + '% (נמוכה)</div><div class="strat-row-status">מסלול פטור ממס כדאי לנצל להשקעות בתשואה גבוהה. שקול להעביר לאפיק מנייתי</div></div></div>';
+        }
     });
 
-    if (!html) html = '<div class="strat-row strat-ok"><div class="strat-row-icon">✅</div><div class="strat-row-body"><div class="strat-row-title">אין המלצות לאופטימיזציית מס כרגע</div><div class="strat-row-detail">מסלולים מנייתיים נמצאים כבר במכשירים פטורים</div></div></div>';
+    if (!html) html = '<div class="strat-row strat-ok"><div class="strat-row-icon">✅</div><div class="strat-row-body"><div class="strat-row-title">הקצאת המס תקינה</div><div class="strat-row-detail">חשיפה מנייתית נמצאת במסלולים פטורים ומסלולים סולידיים בחייבים במס</div></div></div>';
     el.innerHTML = html;
+}
+
+// Helper: check if investment has stock sub-tracks
+function hasStockSubTracks(inv) {
+    if (!inv.subTracks || inv.subTracks.length === 0) return false;
+    var stockPct = 0;
+    inv.subTracks.forEach(function(st) {
+        if (st.type && st.type.match(/מניות|S&P|סנופי/i)) stockPct += (st.percent || 0);
+    });
+    return stockPct >= 40;
 }
 
 function renderStrategyWithdrawal() {
