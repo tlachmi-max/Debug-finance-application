@@ -186,47 +186,90 @@
         </button>
     </div>
 
-    <!-- Module hero explanation -->
+    <!-- Module hero -->
     <div class="inv-hero">
         <div class="inv-hero-icon">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
         </div>
-        <p>כאן מגדירים את מקורות הכסף שלך. הוסף את קופות הגמל, קרנות ההשתלמות והפנסיה כדי לבדוק באיזה מסלולי השקעה הן נמצאות ומה דמי הניהול שאתה משלם.</p>
-        <!-- Hidden: auto-import status (for JS compatibility) -->
+        <p>נכסים נזילים וחצי-נזילים: קרנות השתלמות, גמל להשקעה, פוליסות חיסכון ותיקים עצמאיים. <strong>פנסיה מנוהלת בסימולטור הפנסיה.</strong></p>
         <div id="extensionStatus" style="display:none;"></div>
     </div>
 
-    <!-- Big ADD button (visible by default) -->
-    <div class="inv-add-trigger" id="invAddTrigger">
-        <button class="inv-add-btn" onclick="toggleInvestmentForm(true)">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            הוסף מסלול השקעה
-        </button>
+    <!-- Total equity summary bar -->
+    <div class="inv-equity-bar" id="invEquityBar"></div>
+
+    <!-- Action buttons -->
+    <div class="inv-actions-row">
+        <div class="inv-add-trigger" id="invAddTrigger">
+            <button class="inv-add-btn" onclick="toggleInvestmentForm(true)">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                הוסף מסלול השקעה
+            </button>
+        </div>
+        <div class="inv-import-trigger">
+            <button class="inv-import-btn" onclick="document.getElementById('xmlImportInput').click()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+                ייבוא ממסלקה (XML)
+            </button>
+            <input type="file" id="xmlImportInput" accept=".xml,.XML" style="display:none" onchange="handleXMLImport(event)">
+        </div>
     </div>
 
-    <!-- Collapsible form (hidden by default) -->
+    <div id="xmlImportResult" class="xml-import-result" style="display:none;"></div>
+
+    <!-- Collapsible form (all IDs preserved) -->
     <div class="inv-form-wrapper" id="invFormWrapper">
         <div class="card">
             <div class="card-header">
                 <div class="card-title"><span>➕</span><span id="investmentFormTitle">הוסף מסלול השקעה</span></div>
-                <button class="inv-form-close" onclick="toggleInvestmentForm(false)" title="סגור טופס">
+                <button class="inv-form-close" onclick="toggleInvestmentForm(false)" title="סגור">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
             <form id="investmentForm" onsubmit="saveInvestment(event)">
-                <div class="form-grid"><div class="form-group"><label class="form-label"><span class="required">*</span> שם המסלול</label><input type="text" class="form-input" id="invName" placeholder="קרן פנסיה מיטב דש" required></div><div class="form-group"><label class="form-label">בית השקעות / תיק</label><input type="text" class="form-input" id="invHouse" placeholder="מיטב / תיק אישי"></div><div class="form-group"><label class="form-label"><span class="required">*</span> סוג המסלול</label><select class="form-select" id="invType" onchange="updateTaxRate()" required><option value="פנסיה">פנסיה (פטור ממס)</option><option value="קרן השתלמות">קרן השתלמות (פטור ממס)</option><option value="גמל להשקעה">גמל להשקעה (מס 25%)</option><option value="תיק עצמאי">תיק עצמאי (מס 25%)</option><option value="פוליסת חסכון">פוליסת חסכון (מס 25%)</option><option value="פקדון">פקדון (מס 15%)</option><option value="אחר">אחר</option></select></div><div class="form-group"><label class="form-label">שיעור מס על רווחים (%)</label><input type="number" class="form-input" id="invTax" value="0" min="0" max="100" step="0.1"></div></div>
+                <div class="form-grid">
+                    <div class="form-group"><label class="form-label"><span class="required">*</span> שם המסלול</label><input type="text" class="form-input" id="invName" placeholder="קרן השתלמות צורי" required></div>
+                    <div class="form-group"><label class="form-label">בית השקעות / תיק</label>
+                        <select class="form-select" id="invHouseSelect" onchange="onHouseSelectChange()">
+                            <option value="">בחר גוף מנהל...</option>
+                            <option value="הראל">הראל</option>
+                            <option value="מיטב דש">מיטב דש</option>
+                            <option value="אלטשולר שחם">אלטשולר שחם</option>
+                            <option value="מנורה מבטחים">מנורה מבטחים</option>
+                            <option value="הפניקס">הפניקס</option>
+                            <option value="כלל">כלל</option>
+                            <option value="מגדל">מגדל</option>
+                            <option value="אנליסט">אנליסט</option>
+                            <option value="ילין לפידות">ילין לפידות</option>
+                            <option value="אי.בי.אי">אי.בי.אי</option>
+                            <option value="פסגות">פסגות</option>
+                            <option value="מור">מור</option>
+                            <option value="__brokerage__">תיק עצמאי / ברוקראז׳</option>
+                            <option value="__other__">אחר — הקלד שם</option>
+                        </select>
+                        <input type="text" class="form-input" id="invHouseCustom" placeholder="שם הגוף / הברוקר" style="display:none;margin-top:8px;">
+                        <!-- Hidden field that the JS reads -->
+                        <input type="hidden" id="invHouse" value="">
+                    </div>
+                    <div class="form-group"><label class="form-label"><span class="required">*</span> סוג המסלול</label><select class="form-select" id="invType" onchange="updateTaxRate()" required><option value="קרן השתלמות">קרן השתלמות (פטור ממס)</option><option value="גמל להשקעה">גמל להשקעה (מס 25%)</option><option value="תיק עצמאי">תיק עצמאי (מס 25%)</option><option value="פוליסת חסכון">פוליסת חסכון (מס 25%)</option><option value="פקדון">פקדון (מס 15%)</option><option value="פנסיה">פנסיה (פטור ממס)</option><option value="אחר">אחר</option></select></div>
+                    <div class="form-group"><label class="form-label">שיעור מס על רווחים (%)</label><input type="number" class="form-input" id="invTax" value="0" min="0" max="100" step="0.1"></div>
+                </div>
                 <div id="genderSection" style="display:none;"><div class="form-group" style="margin-bottom:16px;"><label class="form-label"><span class="required">*</span> שייך ל</label><select class="form-select" id="invSpouse"><option value="husband">👨 בעל</option><option value="wife">👩 אשה</option></select></div><div class="form-grid" style="grid-template-columns:1fr 1fr;"><div class="form-group"><label class="form-label"><span class="required">*</span> מגדר (לחישוב פנסיה)</label><select class="form-select" id="invGender"><option value="male">זכר (פרישה 67)</option><option value="female">נקבה (פרישה 62)</option></select></div><div class="form-group"><label class="form-label"><span class="required">*</span> גיל נוכחי</label><input type="number" class="form-input" id="invAge" min="18" max="120" placeholder="35"></div></div></div>
                 <div class="form-grid"><div class="form-group"><label class="form-label">סכום נוכחי (₪)</label><input type="text" inputmode="numeric" pattern="[0-9,\.]*" class="form-input" id="invAmount" value="0" placeholder="0"></div><div class="form-group"><label class="form-label">הפקדה חודשית (₪)</label><input type="text" inputmode="numeric" pattern="[0-9,\.]*" class="form-input" id="invMonthly" value="0" placeholder="0"></div><div class="form-group"><label class="form-label">תשואה צפויה (% שנתי)</label><input type="number" class="form-input" id="invReturn" value="6" min="0" max="30" step="0.1"></div><div class="form-group"><label class="form-label">דמי ניהול מהפקדה (%)</label><input type="number" class="form-input" id="invFeeDeposit" value="0" min="0" max="10" step="0.1"></div></div>
                 <div id="principalSection" style="display:none;margin:12px 0;padding:16px;border-radius:10px;"><div style="font-weight:bold;margin-bottom:10px;color:#92400e;">💰 פיצול קרן / רווח קיים</div><p style="font-size:0.85em;color:var(--text-secondary);margin-bottom:12px;">הגדר כמה מהסכום הנוכחי הוא קרן מקורית.</p><div class="form-grid" style="grid-template-columns:1fr 1fr 1fr;"><div class="form-group"><label class="form-label">קרן מקורית (₪)</label><input type="text" inputmode="numeric" pattern="[0-9,\.]*" class="form-input" id="invInitialPrincipal" placeholder="הכל קרן" oninput="updateProfitDisplay()"></div><div class="form-group"><label class="form-label">רווח קיים (₪)</label><div id="invExistingProfit" style="padding:10px;background:var(--success-bg);border-radius:6px;font-weight:bold;color:var(--success);min-height:42px;display:flex;align-items:center;">₪0</div></div><div class="form-group"><label class="form-label">מס על רווח קיים</label><div id="invExistingTax" style="padding:10px;background:var(--danger-bg);border-radius:6px;font-weight:bold;color:var(--danger);min-height:42px;display:flex;align-items:center;">₪0</div></div></div></div>
                 <div class="form-grid"><div class="form-group"><label class="form-label">דמי ניהול מצבירה (% שנתי)</label><input type="number" class="form-input" id="invFeeAnnual" value="0" min="0" max="5" step="0.01"></div><div class="form-group"><label class="checkbox-group"><input type="checkbox" class="checkbox" id="invForDream"><span>מיועד למימוש חלומות</span></label></div><div class="form-group"><label class="checkbox-group"><input type="checkbox" class="checkbox" id="invInclude" checked><span>כלול בחישוב הון עצמי</span></label></div></div>
-                <div id="subTracksSection" style="display:none;"><div class="sub-tracks-header"><h3>תתי-מסלולים (פיצול השקעות)</h3><p class="sub-tracks-note">חובה: סך כל האחוזים חייב להיות 100%</p></div><div id="subTracksList" class="sub-tracks-list"></div><div class="sub-track-add"><div class="form-group" style="margin-bottom:16px;"><label class="form-label">סוג תת-מסלול</label><select class="form-select" id="subTrackType" style="width:100%;"><option value="מדדי מניות חו״ל">מדדי מניות חו״ל (7%)</option><option value="מדדי מניות בארץ">מדדי מניות בארץ (7%)</option><option value="מניות סחיר חו״ל">מניות סחיר חו״ל (7%)</option><option value="מניות סחיר בארץ">מניות סחיר בארץ (7%)</option><option value="אג״ח ממשלתי">אג״ח ממשלתי (3%)</option><option value="אג״ח קונצרני">אג״ח קונצרני (5%)</option><option value="S&P 500">S&P 500 (7%)</option><option value="נדל״ן">נדל״ן (6%)</option><option value="עו״ש">עו״ש (0%)</option><option value="קרן כספית">קרן כספית/פקדון (3%)</option><option value="כללי">כללי (5%)</option><option value="אחר">אחר - הזן שם מותאם</option></select></div><div class="form-group" id="customNameField" style="margin-bottom:16px;display:none;"><label class="form-label">שם תת-מסלול מותאם</label><input type="text" class="form-input" id="subTrackCustomName" placeholder="לדוגמה: קרן נאמנות טכנולוגיה" style="width:100%;"></div><div class="form-group" id="manualRiskField" style="margin-bottom:16px;display:none;"><label class="form-label">רמת סיכון</label><select class="form-select" id="subTrackRiskLevel" style="width:100%;"><option value="">בחר רמת סיכון...</option><option value="low">נמוך 🟢</option><option value="medium">בינוני 🟡</option><option value="high">גבוה 🔴</option></select></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;"><div class="form-group"><label class="form-label">אחוז %</label><input type="text" inputmode="decimal" pattern="[0-9,\.]*" class="form-input" id="subTrackPercent" placeholder="60" style="width:100%;"></div><div class="form-group"><label class="form-label">תשואה %</label><input type="number" class="form-input" id="subTrackReturn" placeholder="7" step="0.1" style="width:100%;"></div></div><button type="button" class="btn btn-success" onclick="addSubTrack()" style="width:100%;min-height:54px;font-size:1.2em;margin-bottom:12px;">➕ הוסף תת-מסלול</button><div id="subTrackError" class="error-message"></div><div id="subTrackTotal" class="sub-track-total"></div></div></div>
+                <div id="subTracksSection" style="display:none;"><div class="sub-tracks-header"><h3>תתי-מסלולים (פיצול השקעות)</h3><p class="sub-tracks-note">חובה: סך כל האחוזים חייב להיות 100%</p></div><div id="subTracksList" class="sub-tracks-list"></div><div class="sub-track-add"><div class="form-group" style="margin-bottom:16px;"><label class="form-label">סוג תת-מסלול</label><select class="form-select" id="subTrackType" style="width:100%;"><option value="מדדי מניות חו״ל">מדדי מניות חו״ל (7%)</option><option value="מדדי מניות בארץ">מדדי מניות בארץ (7%)</option><option value="מניות סחיר חו״ל">מניות סחיר חו״ל (7%)</option><option value="מניות סחיר בארץ">מניות סחיר בארץ (7%)</option><option value="אג״ח ממשלתי">אג״ח ממשלתי (3%)</option><option value="אג״ח קונצרני">אג״ח קונצרני (5%)</option><option value="S&P 500">S&P 500 (7%)</option><option value="נדל״ן">נדל״ן (6%)</option><option value="עו״ש">עו״ש (0%)</option><option value="קרן כספית">קרן כספית/פקדון (3%)</option><option value="כללי">כללי (5%)</option><option value="אחר">אחר - הזן שם מותאם</option></select></div><div class="form-group" id="customNameField" style="margin-bottom:16px;display:none;"><label class="form-label">שם תת-מסלול מותאם</label><input type="text" class="form-input" id="subTrackCustomName" placeholder="קרן נאמנות טכנולוגיה" style="width:100%;"></div><div class="form-group" id="manualRiskField" style="margin-bottom:16px;display:none;"><label class="form-label">רמת סיכון</label><select class="form-select" id="subTrackRiskLevel" style="width:100%;"><option value="">בחר...</option><option value="low">נמוך 🟢</option><option value="medium">בינוני 🟡</option><option value="high">גבוה 🔴</option></select></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;"><div class="form-group"><label class="form-label">אחוז %</label><input type="text" inputmode="decimal" pattern="[0-9,\.]*" class="form-input" id="subTrackPercent" placeholder="60" style="width:100%;"></div><div class="form-group"><label class="form-label">תשואה %</label><input type="number" class="form-input" id="subTrackReturn" placeholder="7" step="0.1" style="width:100%;"></div></div><button type="button" class="btn btn-success" onclick="addSubTrack()" style="width:100%;min-height:54px;font-size:1.2em;margin-bottom:12px;">➕ הוסף תת-מסלול</button><div id="subTrackError" class="error-message"></div><div id="subTrackTotal" class="sub-track-total"></div></div></div>
                 <div class="form-actions"><button type="submit" class="btn btn-success btn-full"><span>💾</span><span id="btnSaveText">שמור מסלול</span></button><button type="button" class="btn btn-secondary btn-full" id="btnCancelEdit" onclick="cancelEditInvestment()" style="display:none;"><span>❌</span><span>בטל עריכה</span></button></div>
             </form>
         </div>
     </div>
 
-    <!-- Existing investments list (always visible) -->
-    <div class="card"><div class="card-header"><div class="card-title"><span>📋</span><span>מסלולים קיימים (<span id="invCount">0</span>)</span></div></div><div id="investmentsList" class="items-list"></div></div>
+    <!-- Dashboard: Grouped body cards (rendered by JS) -->
+    <div id="investmentsDashboard"></div>
+
+    <!-- Hidden container for legacy JS compatibility -->
+    <div id="investmentsList" class="items-list" style="display:none;"></div>
+    <span id="invCount" style="display:none;">0</span>
 </div>
 
 <!-- ===== Goals ===== -->
@@ -452,9 +495,387 @@ editInvestment = function(index) {
 var _hookedClearForm = clearInvestmentForm;
 clearInvestmentForm = function() {
     _hookedClearForm();
-    // Close form after save (small delay so UI updates first)
     setTimeout(function() { toggleInvestmentForm(false); }, 50);
+    // Reset house dropdown
+    var sel = document.getElementById('invHouseSelect');
+    var cust = document.getElementById('invHouseCustom');
+    if (sel) sel.value = '';
+    if (cust) { cust.value = ''; cust.style.display = 'none'; }
 };
+
+// ============================================================
+// HOUSE DROPDOWN LOGIC
+// ============================================================
+
+function onHouseSelectChange() {
+    var sel = document.getElementById('invHouseSelect');
+    var cust = document.getElementById('invHouseCustom');
+    var hidden = document.getElementById('invHouse');
+    var v = sel.value;
+    if (v === '__other__' || v === '__brokerage__') {
+        cust.style.display = 'block';
+        cust.placeholder = v === '__brokerage__' ? 'שם הברוקר / פלטפורמה' : 'שם הגוף';
+        cust.focus();
+        hidden.value = cust.value || '';
+        cust.oninput = function() { hidden.value = cust.value; };
+    } else {
+        cust.style.display = 'none';
+        cust.value = '';
+        hidden.value = v;
+    }
+}
+
+// Sync hidden invHouse when editing
+function syncHouseToDropdown(houseName) {
+    var sel = document.getElementById('invHouseSelect');
+    var cust = document.getElementById('invHouseCustom');
+    var hidden = document.getElementById('invHouse');
+    hidden.value = houseName || '';
+    // Try to find in dropdown
+    var found = false;
+    for (var i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value === houseName) { sel.value = houseName; found = true; break; }
+    }
+    if (!found && houseName) {
+        sel.value = '__other__';
+        cust.style.display = 'block';
+        cust.value = houseName;
+        cust.oninput = function() { hidden.value = cust.value; };
+    }
+}
+
+// Override editInvestment to also sync house dropdown
+var _hookedEditInv2 = editInvestment;
+editInvestment = function(index) {
+    _hookedEditInv2(index);
+    var plan = getCurrentPlan();
+    var inv = plan.investments[index];
+    if (inv) syncHouseToDropdown(inv.house || '');
+};
+
+// ============================================================
+// DASHBOARD RENDERER — Grouped body cards (overrides renderInvestments)
+// ============================================================
+
+var _baseRenderInvestments = renderInvestments;
+renderInvestments = function() {
+    // Still call base for hidden investmentsList (legacy compat)
+    _baseRenderInvestments();
+
+    var plan = getCurrentPlan();
+    var dashboard = document.getElementById('investmentsDashboard');
+    var eqBar = document.getElementById('invEquityBar');
+    if (!dashboard) return;
+
+    // Filter: exclude pension from this view
+    var nonPension = [];
+    var pensionCount = 0;
+    plan.investments.forEach(function(inv, i) {
+        if (inv.type === 'פנסיה') { pensionCount++; return; }
+        nonPension.push({ inv: inv, idx: i });
+    });
+
+    // Update invCount (visible total minus pension)
+    var countEl = document.getElementById('invCount');
+    if (countEl) countEl.textContent = nonPension.length;
+
+    // Calculate total equity
+    var totalEquity = 0;
+    nonPension.forEach(function(item) { if (item.inv.include) totalEquity += (item.inv.amount || 0); });
+
+    // Equity summary bar
+    if (eqBar) {
+        if (nonPension.length > 0) {
+            eqBar.innerHTML = '<div class="eq-bar"><div class="eq-bar-label">סך נכסים נזילים</div><div class="eq-bar-value">' + formatCurrency(totalEquity) + '</div><div class="eq-bar-detail">' + nonPension.length + ' מסלולים' + (pensionCount > 0 ? ' (+ ' + pensionCount + ' קרנות פנסיה בסימולטור)' : '') + '</div></div>';
+            eqBar.style.display = 'block';
+        } else {
+            eqBar.style.display = 'none';
+        }
+    }
+
+    // Group by house
+    var byHouse = {};
+    nonPension.forEach(function(item) {
+        var house = item.inv.house || 'לא מוגדר';
+        if (!byHouse[house]) byHouse[house] = [];
+        byHouse[house].push(item);
+    });
+
+    if (nonPension.length === 0) {
+        dashboard.innerHTML = '<div class="empty-state" style="padding:40px 20px;"><div class="empty-icon">📊</div><div class="empty-title">אין מסלולים עדיין</div><div class="empty-text">לחץ על \'הוסף מסלול\' כדי להתחיל</div></div>';
+        return;
+    }
+
+    var html = '';
+    Object.keys(byHouse).forEach(function(house) {
+        var items = byHouse[house];
+        var houseTotal = items.reduce(function(s, it) { return s + (it.inv.include ? (it.inv.amount || 0) : 0); }, 0);
+
+        html += '<div class="body-card">';
+        html += '<div class="body-card-header">';
+        html += '<div class="body-card-info"><div class="body-card-name">' + house + '</div><div class="body-card-count">' + items.length + ' מסלולים</div></div>';
+        html += '<div class="body-card-total">' + formatCurrency(houseTotal) + '</div>';
+        html += '</div>';
+
+        // Table of tracks
+        html += '<div class="body-card-table"><table><thead><tr><th>מסלול</th><th>סוג</th><th>צבירה</th><th>חודשי</th><th>דמ"נ</th><th>תשואה</th><th></th></tr></thead><tbody>';
+
+        items.forEach(function(item) {
+            var inv = item.inv;
+            var idx = item.idx;
+            var fee = (inv.feeAnnual || 0) + '%';
+            if (inv.feeDeposit > 0) fee += ' + ' + inv.feeDeposit + '%';
+            var badges = '';
+            if (!inv.include) badges += '<span class="badge-sm red">לא בהון</span> ';
+            if (inv.forDream) badges += '<span class="badge-sm amber">💫</span> ';
+
+            html += '<tr>';
+            html += '<td><div class="track-name">' + inv.name + '</div>' + (badges ? '<div style="margin-top:2px;">' + badges + '</div>' : '') + '</td>';
+            html += '<td><span class="type-tag">' + inv.type + '</span></td>';
+            html += '<td class="num">' + formatCurrency(inv.amount) + '</td>';
+            html += '<td class="num">' + formatCurrency(inv.monthly) + '</td>';
+            html += '<td class="num">' + fee + '</td>';
+            html += '<td class="num">' + inv.returnRate + '%</td>';
+            html += '<td class="actions-cell">';
+            html += '<button class="tbl-btn" onclick="editInvestment(' + idx + ')" title="ערוך">✏️</button>';
+            html += '<button class="tbl-btn" onclick="duplicateInvestment(' + idx + ')" title="שכפל">📋</button>';
+            html += '<button class="tbl-btn danger" onclick="deleteInvestment(' + idx + ')" title="מחק">🗑️</button>';
+            html += '</td>';
+            html += '</tr>';
+
+            // Show sub-tracks if any
+            if (inv.subTracks && inv.subTracks.length > 0) {
+                html += '<tr class="sub-row"><td colspan="7"><div class="sub-tracks-inline">';
+                inv.subTracks.forEach(function(st) {
+                    html += '<span class="st-chip">' + st.type + ' ' + st.percent + '% (' + st.returnRate + '%)</span>';
+                });
+                html += '</div></td></tr>';
+            }
+        });
+
+        html += '</tbody></table></div>';
+
+        // Add to this body button
+        html += '<button class="body-add-btn" onclick="addToBody(\'' + house.replace(/'/g, "\\'") + '\')">';
+        html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> הוסף מסלול נוסף ב' + house + '</button>';
+
+        html += '</div>';
+    });
+
+    dashboard.innerHTML = html;
+};
+
+// ============================================================
+// DUPLICATE & ADD-TO-BODY
+// ============================================================
+
+function duplicateInvestment(index) {
+    var plan = getCurrentPlan();
+    var orig = plan.investments[index];
+    if (!orig) return;
+    var clone = JSON.parse(JSON.stringify(orig));
+    clone.name = orig.name + ' (עותק)';
+    plan.investments.push(clone);
+    saveData();
+    renderInvestments();
+    if (typeof showSaveNotification === 'function') showSaveNotification('✅ מסלול שוכפל בהצלחה');
+}
+
+function addToBody(houseName) {
+    toggleInvestmentForm(true);
+    // Pre-fill house
+    syncHouseToDropdown(houseName);
+    document.getElementById('invHouse').value = houseName;
+    // Focus on name field
+    setTimeout(function() { document.getElementById('invName').focus(); }, 200);
+}
+
+// ============================================================
+// XML IMPORT — Israeli Pension Clearing House (מסלקה פנסיונית)
+// ============================================================
+
+function handleXMLImport(event) {
+    var file = event.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            var result = importPensionXML(e.target.result);
+            showXMLImportResult(result);
+        } catch (err) {
+            console.error('XML Import Error:', err);
+            showXMLImportResult({ success: false, error: err.message });
+        }
+    };
+    reader.readAsText(file, 'UTF-8');
+    event.target.value = '';
+}
+
+function importPensionXML(xmlString) {
+    var parser = new DOMParser();
+    var xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+    if (xmlDoc.querySelector('parsererror')) {
+        return { success: false, error: 'הקובץ אינו XML תקין' };
+    }
+
+    var plan = getCurrentPlan();
+    var importedCount = 0;
+    var managingBodies = {};
+
+    // Find product nodes
+    var products = _xmlFindProducts(xmlDoc);
+    if (products.length === 0) {
+        return { success: false, error: 'לא נמצאו מוצרים בקובץ. וודא שזהו קובץ מסלקה תקין.' };
+    }
+
+    products.forEach(function(product) {
+        var managingCorp = _xmlField(product, ['ManagingCorporation','YeshutMenayelet','ShemYeshutMenayelet','CompanyName','ShemHevra','GufMenahel']) || 'לא ידוע';
+        var productName = _xmlField(product, ['ProductName','ShemMutzar','ShemTochnit','PlanName']) || '';
+        var trackName = _xmlField(product, ['TrackName','ShemMaslul','MaslulName','InvestmentTrackName','ShemMaslulHashkaa']) || '';
+        var totalBalance = _xmlNum(product, ['TotalBalance','YitraZvira','TotalSavings','Yitra','SachHaYitra','Balance']);
+        var feeAccum = _xmlNum(product, ['ManagementFeeFromAccumulation','DmeiNihulMiZvira','DmeiNihulTzvira','FeeFromSavings']);
+        var feeDeposit = _xmlNum(product, ['ManagementFeeFromDeposit','DmeiNihulMiHafkada','FeeFromDeposit']);
+        var monthlyDep = _xmlNum(product, ['MonthlyDeposit','HafkadaHodsheet','Deposit','TotalMonthlyDeposit']);
+        var productType = _xmlField(product, ['ProductType','SugMutzar','SugKupa','FundType','SugTochnit']) || '';
+        var empDep = _xmlNum(product, ['EmployerDeposit','HafkadatMaavid']);
+        var workerDep = _xmlNum(product, ['EmployeeDeposit','HafkadatOved']);
+
+        if (totalBalance <= 0 && !trackName) return;
+
+        var invType = _xmlMapType(productType, productName, trackName);
+        var taxRate = TAX_RATES[invType] || 0;
+        var subTracks = _xmlBuildSubTracks(trackName, productName);
+        var weightedReturn = subTracks.length > 0
+            ? subTracks.reduce(function(s, st) { return s + (st.returnRate * st.percent / 100); }, 0)
+            : _xmlGuessReturn(trackName, productName);
+
+        var totalMonthly = monthlyDep || (empDep + workerDep) || 0;
+        var invName = productName || trackName || managingCorp;
+        if (trackName && productName && trackName !== productName) invName = productName + ' - ' + trackName;
+
+        var inv = {
+            name: invName, house: managingCorp, type: invType, tax: taxRate,
+            amount: totalBalance, initialPrincipal: totalBalance,
+            monthly: totalMonthly, returnRate: parseFloat(weightedReturn.toFixed(2)),
+            feeDeposit: feeDeposit || 0, feeAnnual: feeAccum || 0,
+            forDream: false, include: true,
+            gender: (plan.profile && plan.profile.user && plan.profile.user.gender) || 'male',
+            age: (invType === 'פנסיה' && plan.profile && plan.profile.user) ? plan.profile.user.age : null,
+            spouse: 'husband', subTracks: subTracks
+        };
+
+        // Deduplicate
+        var isDup = plan.investments.some(function(ex) { return ex.name === inv.name && ex.house === inv.house; });
+        if (!isDup) {
+            plan.investments.push(inv);
+            importedCount++;
+            if (!managingBodies[managingCorp]) managingBodies[managingCorp] = 0;
+            managingBodies[managingCorp]++;
+        }
+    });
+
+    if (importedCount > 0) {
+        saveData();
+        renderInvestments();
+        if (typeof renderPensionTab === 'function') renderPensionTab();
+    }
+    return { success: true, count: importedCount, bodies: managingBodies, bodyCount: Object.keys(managingBodies).length, totalProducts: products.length };
+}
+
+function _xmlFindProducts(doc) {
+    var tags = ['ProductDetails','Product','Mutzar','PirteiMutzar','KupaDetails','PirteiKupa','PolicyDetails','Row','Item','Record'];
+    for (var i = 0; i < tags.length; i++) {
+        var n = doc.getElementsByTagName(tags[i]);
+        if (n.length > 0) return Array.from(n);
+    }
+    // Fallback: find nodes with balance children
+    var all = doc.getElementsByTagName('*'), out = [];
+    for (var j = 0; j < all.length; j++) {
+        if (all[j].querySelector('TotalBalance,YitraZvira,Yitra,Balance') &&
+            all[j].querySelector('ManagingCorporation,YeshutMenayelet,ShemMaslul,TrackName,ProductName,ShemMutzar')) {
+            out.push(all[j]);
+        }
+    }
+    return out;
+}
+
+function _xmlField(node, tags) {
+    for (var i = 0; i < tags.length; i++) {
+        var el = node.getElementsByTagName(tags[i]);
+        if (el.length > 0 && el[0].textContent.trim()) return el[0].textContent.trim();
+    }
+    return '';
+}
+
+function _xmlNum(node, tags) {
+    var v = _xmlField(node, tags);
+    if (!v) return 0;
+    var n = parseFloat(v.replace(/[^0-9.\-]/g, ''));
+    return isNaN(n) ? 0 : n;
+}
+
+function _xmlMapType(type, name, track) {
+    var c = (type + ' ' + name + ' ' + track).toLowerCase();
+    if (c.match(/פנסי|pension/)) return 'פנסיה';
+    if (c.match(/השתלמות|hishtalmut/)) return 'קרן השתלמות';
+    if (c.match(/גמל להשקעה/)) return 'גמל להשקעה';
+    if (c.match(/פוליס|ביטוח מנהלים/)) return 'פוליסת חסכון';
+    if (c.match(/גמל|gemel/)) return 'גמל להשקעה';
+    if (c.match(/פקדון/)) return 'פקדון';
+    if (c.match(/מנהלים/)) return 'פוליסת חסכון';
+    return 'אחר';
+}
+
+function _xmlBuildSubTracks(track, name) {
+    var c = (track + ' ' + name).toLowerCase(), t = [];
+    if (c.match(/מניות|stocks|equity|s&p|סנופי/i)) {
+        t.push({ type: 'מדדי מניות חו״ל', percent: 70, returnRate: 7 });
+        t.push({ type: 'אג״ח ממשלתי', percent: 30, returnRate: 3 });
+    } else if (c.match(/אג.?ח|bonds/i)) {
+        t.push({ type: 'אג״ח ממשלתי', percent: 80, returnRate: 3 });
+        t.push({ type: 'מדדי מניות בארץ', percent: 20, returnRate: 7 });
+    } else if (c.match(/כללי|general/i)) {
+        t.push({ type: 'מדדי מניות חו״ל', percent: 50, returnRate: 7 });
+        t.push({ type: 'אג״ח ממשלתי', percent: 30, returnRate: 3 });
+        t.push({ type: 'קרן כספית', percent: 20, returnRate: 3 });
+    } else if (c.match(/הלכה|שריעה/i)) {
+        t.push({ type: 'מדדי מניות בארץ', percent: 50, returnRate: 7 });
+        t.push({ type: 'אג״ח ממשלתי', percent: 50, returnRate: 3 });
+    } else if (c.match(/סולידי|שמרני|conservative/i)) {
+        t.push({ type: 'אג״ח ממשלתי', percent: 60, returnRate: 3 });
+        t.push({ type: 'קרן כספית', percent: 40, returnRate: 3 });
+    }
+    return t;
+}
+
+function _xmlGuessReturn(track, name) {
+    var c = (track + ' ' + name).toLowerCase();
+    if (c.match(/מניות|stocks|s&p|אגרסיבי/i)) return 7;
+    if (c.match(/אג.?ח|bonds|סולידי|שמרני/i)) return 3;
+    if (c.match(/כספי|money|פקדון/i)) return 2;
+    return 5;
+}
+
+function showXMLImportResult(result) {
+    var el = document.getElementById('xmlImportResult');
+    if (!el) return;
+    if (!result.success) {
+        el.innerHTML = '<div class="xml-result-error"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><span>' + (result.error || 'שגיאה') + '</span></div>';
+        el.style.display = 'block';
+        setTimeout(function() { el.style.display = 'none'; }, 8000);
+        return;
+    }
+    if (result.count === 0) {
+        el.innerHTML = '<div class="xml-result-warn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>כל המוצרים בקובץ כבר קיימים במערכת.</span></div>';
+        el.style.display = 'block';
+        setTimeout(function() { el.style.display = 'none'; }, 6000);
+        return;
+    }
+    var bodyList = Object.keys(result.bodies).map(function(n) { return n + ' (' + result.bodies[n] + ')'; }).join(', ');
+    el.innerHTML = '<div class="xml-result-success"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><div><strong>הנתונים יובאו בהצלחה!</strong><br>' + result.count + ' מסלולים נוספו תחת ' + result.bodyCount + ' גופים מנהלים: ' + bodyList + '</div></div>';
+    el.style.display = 'block';
+    setTimeout(function() { el.style.display = 'none'; }, 10000);
+}
 </script>
 </body>
 </html>

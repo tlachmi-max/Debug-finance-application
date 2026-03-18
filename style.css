@@ -1212,8 +1212,8 @@ canvas { max-width: 100%; }
 
 /* Big ADD button */
 .inv-add-trigger {
-    margin-bottom: 24px;
     text-align: center;
+    flex: 1;
 }
 
 .inv-add-btn {
@@ -1243,13 +1243,88 @@ canvas { max-width: 100%; }
     transform: translateY(-3px);
 }
 
-.inv-add-btn:hover svg {
-    stroke: #FFFFFF;
+.inv-add-btn:hover svg { stroke: #FFFFFF; }
+.inv-add-btn:active { transform: translateY(-1px); }
+
+/* Actions row: Add + Import side by side */
+.inv-actions-row {
+    display: flex;
+    gap: 16px;
+    align-items: stretch;
+    margin-bottom: 24px;
 }
 
-.inv-add-btn:active {
-    transform: translateY(-1px);
+/* XML Import button */
+.inv-import-trigger { flex: 1; text-align: center; }
+
+.inv-import-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 28px;
+    background: var(--bg-surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-xl);
+    color: var(--text-secondary);
+    font-size: 0.95em;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 420px;
 }
+
+.inv-import-btn:hover {
+    background: var(--brand-bg);
+    border-color: var(--brand-pale);
+    color: var(--brand-primary);
+    box-shadow: 0 4px 16px rgba(30, 64, 175, 0.08);
+    transform: translateY(-2px);
+}
+
+.inv-import-btn:hover svg { stroke: var(--brand-primary); }
+
+/* XML Import result messages */
+.xml-import-result { margin-bottom: 20px; }
+
+.xml-result-success,
+.xml-result-error,
+.xml-result-warn {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px 20px;
+    border-radius: var(--radius);
+    font-size: 0.92em;
+    line-height: 1.6;
+    animation: fadeUp 0.3s ease-out;
+}
+
+.xml-result-success {
+    background: var(--success-bg);
+    border: 1px solid var(--success-border);
+    color: var(--success);
+}
+
+.xml-result-success strong { color: var(--text-primary); }
+
+.xml-result-error {
+    background: var(--danger-bg);
+    border: 1px solid var(--danger-border);
+    color: var(--danger);
+}
+
+.xml-result-warn {
+    background: var(--warning-bg);
+    border: 1px solid var(--warning-border);
+    color: var(--warning);
+}
+
+.xml-result-success svg { flex-shrink: 0; stroke: var(--success); margin-top: 2px; }
+.xml-result-error svg { flex-shrink: 0; stroke: var(--danger); margin-top: 2px; }
+.xml-result-warn svg { flex-shrink: 0; stroke: var(--warning); margin-top: 2px; }
 
 /* Collapsible form wrapper */
 .inv-form-wrapper {
@@ -1288,6 +1363,195 @@ canvas { max-width: 100%; }
 }
 
 /* ============================================================
+   INVESTMENTS DASHBOARD — Body Cards
+   ============================================================ */
+
+/* Equity summary bar */
+.eq-bar {
+    background: linear-gradient(135deg, var(--brand-deep), var(--brand-primary));
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+    color: white;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.eq-bar-label { font-size: 0.88em; opacity: 0.85; }
+.eq-bar-value { font-size: 1.8em; font-weight: 800; letter-spacing: -0.02em; }
+.eq-bar-detail { font-size: 0.82em; opacity: 0.75; margin-right: auto; }
+
+/* Body card */
+.body-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.body-card:hover { box-shadow: var(--shadow-md); }
+
+.body-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.body-card-name {
+    font-size: 1.15em;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.body-card-count {
+    font-size: 0.82em;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+.body-card-total {
+    font-size: 1.5em;
+    font-weight: 800;
+    color: var(--brand-primary);
+}
+
+/* Table inside body card */
+.body-card-table { padding: 0; overflow-x: auto; }
+
+.body-card-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.body-card-table thead th {
+    background: transparent;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.78em;
+    text-transform: none;
+    padding: 12px 14px;
+    text-align: right;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+
+.body-card-table tbody td {
+    padding: 14px 14px;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-primary);
+    font-size: 0.9em;
+    vertical-align: middle;
+}
+
+.body-card-table tbody tr:last-child td { border-bottom: none; }
+.body-card-table tbody tr:hover { background: var(--bg-hover); }
+
+.body-card-table .num {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Track name */
+.track-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95em;
+}
+
+/* Type tag */
+.type-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.75em;
+    font-weight: 600;
+    background: var(--brand-bg);
+    color: var(--brand-primary);
+    white-space: nowrap;
+}
+
+/* Mini badges inside table */
+.badge-sm {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.7em;
+    font-weight: 600;
+}
+
+.badge-sm.red { background: var(--danger-bg); color: var(--danger); }
+.badge-sm.amber { background: var(--warning-bg); color: var(--warning); }
+
+/* Table action buttons */
+.actions-cell { white-space: nowrap; }
+
+.tbl-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    transition: var(--transition);
+    opacity: 0.5;
+}
+
+.tbl-btn:hover { opacity: 1; background: var(--bg-surface); }
+.tbl-btn.danger:hover { background: var(--danger-bg); }
+
+/* Sub-tracks row */
+.sub-row td { padding: 4px 14px 12px !important; background: var(--bg-surface); }
+
+.sub-tracks-inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.st-chip {
+    display: inline-block;
+    padding: 3px 10px;
+    background: var(--brand-bg);
+    color: var(--brand-primary);
+    border-radius: 20px;
+    font-size: 0.75em;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* Add to body button */
+.body-add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    border: none;
+    border-top: 1px dashed var(--border);
+    color: var(--brand-primary);
+    font-size: 0.88em;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.body-add-btn:hover {
+    background: var(--brand-bg);
+}
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 @media (max-width: 900px) {
@@ -1315,6 +1579,19 @@ canvas { max-width: 100%; }
 
     .home-fab { bottom: 18px; left: 18px; width: 48px; height: 48px; }
     .home-fab svg { width: 20px; height: 20px; }
+
+    .inv-actions-row { flex-direction: column; gap: 12px; }
+    .inv-add-btn { max-width: 100%; padding: 16px 20px; font-size: 1em; }
+    .inv-import-btn { max-width: 100%; padding: 14px 16px; font-size: 0.88em; }
+    .inv-hero { flex-direction: column; gap: 12px; padding: 20px; }
+
+    .body-card-header { flex-direction: column; gap: 8px; align-items: flex-start; padding: 16px; }
+    .body-card-total { font-size: 1.3em; }
+    .body-card-table table { font-size: 0.85em; }
+    .body-card-table thead th { padding: 10px 8px; }
+    .body-card-table tbody td { padding: 10px 8px; }
+    .eq-bar { flex-direction: column; gap: 4px; text-align: center; padding: 16px; }
+    .eq-bar-detail { margin-right: 0; }
 
     .card { padding: 18px !important; }
     .form-grid { grid-template-columns: 1fr; }
