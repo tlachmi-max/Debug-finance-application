@@ -743,10 +743,131 @@ h2 { font-size: 1.35em; font-weight: 700; color: var(--text-primary); }
 #withdrawalStrategies .card { padding: 16px !important; margin-left: 0 !important; margin-right: 0 !important; }
 #withdrawalStrategies .card .card { border: none !important; box-shadow: none !important; padding: 12px !important; }
 #perTrackBody td { color: var(--text-primary) !important; }
-#perTrackHead th { color: white !important; }
+#perTrackHead th { color: white !important; background: var(--brand-primary) !important; }
 #yearDetailsContainer .card { background: var(--brand-bg) !important; border: 2px solid var(--brand-light) !important; }
 #glidePathAdvisor .card { border: 2px solid #7C3AED !important; }
 canvas { max-width: 100%; }
+
+/* ============================================================
+   FORCE ALL TEXT IN PANELS TO BE READABLE ON WHITE
+   Catch-all: override every dark-mode color used by script.js/patch.js/glide.js
+   ============================================================ */
+
+/* Light gray text that's invisible on white */
+.panel div[style*="color: #f0f6fc"],
+.panel span[style*="color: #f0f6fc"],
+.panel div[style*="color:#f0f6fc"],
+.panel span[style*="color:#f0f6fc"],
+.panel td[style*="color: #f0f6fc"],
+.panel td[style*="color:#f0f6fc"] {
+    color: var(--text-primary) !important;
+}
+
+/* Muted dark-mode grays */
+.panel div[style*="color: #8b949e"],
+.panel span[style*="color: #8b949e"],
+.panel div[style*="color:#8b949e"],
+.panel span[style*="color:#8b949e"],
+.panel td[style*="color: #8b949e"],
+.panel td[style*="color:#8b949e"] {
+    color: var(--text-secondary) !important;
+}
+
+.panel div[style*="color: #c9d1d9"],
+.panel span[style*="color: #c9d1d9"],
+.panel div[style*="color:#c9d1d9"],
+.panel span[style*="color:#c9d1d9"],
+.panel td[style*="color: #c9d1d9"],
+.panel td[style*="color:#c9d1d9"] {
+    color: var(--text-primary) !important;
+}
+
+/* Dark-mode greens → readable green */
+.panel div[style*="color: #3fb950"],
+.panel span[style*="color: #3fb950"],
+.panel td[style*="color: #3fb950"],
+.panel div[style*="color:#3fb950"],
+.panel span[style*="color:#3fb950"],
+.panel td[style*="color:#3fb950"] {
+    color: var(--success) !important;
+}
+
+/* Dark-mode blues → brand blue */
+.panel div[style*="color: #58a6ff"],
+.panel span[style*="color: #58a6ff"],
+.panel td[style*="color: #58a6ff"],
+.panel div[style*="color:#58a6ff"],
+.panel span[style*="color:#58a6ff"],
+.panel td[style*="color:#58a6ff"] {
+    color: var(--brand-primary) !important;
+}
+
+/* Dark-mode reds → readable red */
+.panel div[style*="color: #f85149"],
+.panel span[style*="color: #f85149"],
+.panel td[style*="color: #f85149"],
+.panel div[style*="color:#f85149"],
+.panel span[style*="color:#f85149"],
+.panel td[style*="color:#f85149"] {
+    color: var(--danger) !important;
+}
+
+/* Dark-mode warnings */
+.panel div[style*="color: #d29922"],
+.panel span[style*="color: #d29922"],
+.panel div[style*="color:#d29922"],
+.panel span[style*="color:#d29922"] {
+    color: var(--warning) !important;
+}
+
+/* Transparent dark backgrounds → light surface */
+.panel div[style*="background: rgba(255,255,255,0.06)"],
+.panel div[style*="background:rgba(255,255,255,0.06)"],
+.panel div[style*="background: rgba(255,255,255,0.04)"],
+.panel div[style*="background:rgba(255,255,255,0.04)"],
+.panel div[style*="background: rgba(255,255,255,0.05)"],
+.panel div[style*="background:rgba(255,255,255,0.05)"] {
+    background: var(--bg-surface) !important;
+}
+
+/* Transparent dark borders → normal borders */
+.panel div[style*="border: 1px solid rgba(255,255,255,0.1)"],
+.panel div[style*="border:1px solid rgba(255,255,255,0.1)"] {
+    border-color: var(--border) !important;
+}
+
+.panel div[style*="border-top: 1px solid rgba(255,255,255,0.1)"],
+.panel div[style*="border-top:1px solid rgba(255,255,255,0.1)"] {
+    border-top-color: var(--border) !important;
+}
+
+/* Per-track table: extra specificity */
+#perTrackBody td,
+#perTrackBody td * {
+    color: var(--text-primary) !important;
+}
+
+#perTrackBody td[style*="color: #3fb950"],
+#perTrackBody td[style*="color:#3fb950"] {
+    color: var(--success) !important;
+}
+
+/* Projections body */
+#projectionsBody td {
+    color: var(--text-primary) !important;
+}
+
+#projectionsBody td[style*="color: var(--primary)"] {
+    color: var(--brand-primary) !important;
+}
+
+#projectionsBody td[style*="color: var(--success)"] {
+    color: var(--success) !important;
+}
+
+#projectionsBody td[style*="color: var(--danger)"] {
+    color: var(--danger) !important;
+}
 
 /* ============================================================
    CRITICAL: Override ALL dark-mode inline colors from script.js
