@@ -292,7 +292,7 @@
 
 <!-- ===== Pension (CHANGED: profile info, net real, goal progress) ===== -->
 <div id="pension" class="panel">
-    <div class="flex justify-between items-center mb-4" style="flex-wrap:wrap;gap:12px;"><h2>💰 תוכנית פנסיה</h2><div class="flex gap-2 items-center"><label style="white-space:nowrap;">בעוד:</label><input type="number" class="form-input" id="pensionYears" value="20" min="1" max="50" style="width:70px;"><label style="white-space:nowrap;">שנים</label><button class="btn btn-primary btn-sm" onclick="renderPensionTab()">עדכן</button></div></div>
+    <div class="flex justify-between items-center mb-4" style="flex-wrap:wrap;gap:12px;"><h2>💰 תוכנית פנסיה</h2><div class="flex gap-2 items-center"><input type="hidden" id="pensionYears" value="20"><div id="pensionYearsAutoInfo" style="font-size:0.85em;color:var(--text-secondary);"></div><button class="btn btn-primary btn-sm" onclick="renderPensionTab()">עדכן</button></div></div>
 
     <!-- Profile info pulled from profile tab -->
     <div id="pensionProfileInfo"></div>
@@ -309,7 +309,7 @@
         </div>
         <hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">
         <div class="card-title" style="margin-bottom:16px;">💎 יעד הון עצמי בפרישה</div>
-        <div><div class="form-grid"><div class="form-group"><label class="form-label">סכום יעד (₪)</label><input type="number" class="form-input" id="goalEquityAmount" min="0" placeholder="2000000"></div><div class="form-group"><label class="form-label">שנת יעד</label><input type="number" class="form-input" id="goalEquityYear" min="2026" max="2100" placeholder="2054"></div></div><div style="display:flex;align-items:center;gap:8px;margin-top:12px;"><input type="checkbox" id="goalEquityIsReal" checked style="width:20px;height:20px;"><label for="goalEquityIsReal">בערכי היום (ריאלי)</label></div></div>
+        <div><div class="form-grid" style="grid-template-columns:1fr;"><div class="form-group"><label class="form-label">סכום יעד (₪)</label><input type="number" class="form-input" id="goalEquityAmount" min="0" placeholder="2000000"></div></div><input type="hidden" id="goalEquityYear"><div style="font-size:0.82em;color:var(--text-secondary);margin-top:8px;">שנת יעד מחושבת אוטומטית מגיל הפרישה שהגדרת למעלה.</div><div style="display:flex;align-items:center;gap:8px;margin-top:12px;"><input type="checkbox" id="goalEquityIsReal" checked style="width:20px;height:20px;"><label for="goalEquityIsReal">בערכי היום (ריאלי)</label></div></div>
         <div style="display:flex;justify-content:flex-end;margin-top:16px;"><button class="btn btn-primary btn-sm" onclick="saveGoals()">💾 שמור יעדי פרישה</button></div>
     </div>
 
@@ -460,7 +460,7 @@
 <script src="script.js?v=FORCE_RESET_999999"></script>
 <script src="patch.js?v=5"></script>
 <script src="glide.js?v=4"></script>
-<script src="pension-profile-fix.js?v=2"></script>
+<script src="pension-profile-fix.js?v=3"></script>
 
 <!-- NAVIGATION: Hero + Launchpad — Module -->
 <script>
