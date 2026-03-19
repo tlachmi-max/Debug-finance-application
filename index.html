@@ -301,8 +301,8 @@
     <div class="card mb-4"><div class="card-title">🎯 יעדי פרישה</div>
         <p style="font-size:0.85em;color:var(--text-secondary);margin:8px 0 16px;">מגדר וגיל נמשכים אוטומטית מטאב הפרופיל.</p>
         <div style="margin-top:16px;"><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-            <div class="form-group"><label class="form-label">גיל פרישה מתוכנן (משתמש)</label><input type="number" class="form-input" id="goalRetirementAgeUser" min="50" max="80" placeholder="67"></div>
-            <div class="form-group" id="goalSpouseRetirementGroup"><label class="form-label">גיל פרישה מתוכנן (בן/בת זוג)</label><input type="number" class="form-input" id="goalRetirementAgeSpouse" min="50" max="80" placeholder="62"></div>
+            <div class="form-group"><label class="form-label">גיל פרישה מתוכנן (משתמש)</label><input type="number" class="form-input" id="goalRetirementAgeUser" min="50" max="80" placeholder="67" oninput="updateRetirementCalcDisplay()"><div id="retirementUserCalc" style="font-size:0.82em;margin-top:6px;"></div></div>
+            <div class="form-group" id="goalSpouseRetirementGroup"><label class="form-label">גיל פרישה מתוכנן (בן/בת זוג)</label><input type="number" class="form-input" id="goalRetirementAgeSpouse" min="50" max="80" placeholder="62" oninput="updateRetirementCalcDisplay()"><div id="retirementSpouseCalc" style="font-size:0.82em;margin-top:6px;"></div></div>
         </div>
         <div class="form-group"><label class="form-label">קצבה חודשית רצויה (₪)</label><input type="number" class="form-input" id="goalMonthlyPension" min="0" placeholder="15000"></div>
         <div style="display:flex;align-items:center;gap:8px;margin-top:12px;"><input type="checkbox" id="goalPensionIsReal" checked style="width:20px;height:20px;"><label for="goalPensionIsReal">בערכי היום (ריאלי)</label></div>
@@ -460,7 +460,7 @@
 <script src="script.js?v=FORCE_RESET_999999"></script>
 <script src="patch.js?v=5"></script>
 <script src="glide.js?v=4"></script>
-<script src="pension-profile-fix.js?v=1"></script>
+<script src="pension-profile-fix.js?v=2"></script>
 
 <!-- NAVIGATION: Hero + Launchpad — Module -->
 <script>
