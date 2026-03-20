@@ -257,16 +257,24 @@ analyzeGoals = function() {
         var years = info.fYrs;
         var inflFactor = Math.pow(1.02, years);
         
-        var pensions = pl.investments.filter(function(inv) { return inv.include && inv.type === 'פנסיה'; });
-        var projNom = 0;
-        pensions.forEach(function(inv) {
+        // Separate by spouse — same as pension display does
+        var hNom = 0, wNom = 0;
+        pl.investments.forEach(function(inv) {
+            if (!inv.include || inv.type !== 'פנסיה') return;
             var fv = calculateFV(inv.amount, inv.monthly, inv.returnRate, years,
                                 inv.feeDeposit||0, inv.feeAnnual||0, inv.subTracks);
-            projNom += calculateMonthlyPension(fv, inv.gender || 'male');
+            if (inv.spouse === 'wife' || (!inv.spouse && inv.gender === 'female')) {
+                wNom += calculateMonthlyPension(fv, 'female');
+            } else {
+                hNom += calculateMonthlyPension(fv, 'male');
+            }
         });
         
-        var netObj = calculateNetPension(projNom);
-        var projNetReal = netObj.net / inflFactor;
+        // Tax SEPARATELY per spouse (progressive tax = must be separate)
+        var hNet = calculateNetPension(hNom);
+        var wNet = calculateNetPension(wNom);
+        var projNetReal = (hNet.net + wNet.net) / inflFactor;
+        
         var target = g.retirement.monthlyPension || 0;
         var gap = target - projNetReal;
         var pct = target > 0 ? (projNetReal / target) * 100 : 100;
