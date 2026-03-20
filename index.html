@@ -302,8 +302,8 @@
     <div class="card mb-4"><div class="card-title">🎯 יעדי פרישה</div>
         <p style="font-size:0.85em;color:var(--text-secondary);margin:8px 0 16px;">הגדר את גיל הפרישה הרצוי. מגדר וגיל נמשכים מהפרופיל.</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-            <div class="form-group"><label class="form-label">גיל פרישה (משתמש)</label><input type="number" class="form-input" id="goalRetirementAgeUser" min="50" max="80" placeholder="67" oninput="onRetirementAgeChange()"><div id="retirementUserCalc" style="font-size:0.82em;margin-top:6px;"></div></div>
-            <div class="form-group" id="goalSpouseRetirementGroup"><label class="form-label">גיל פרישה (בן/בת זוג)</label><input type="number" class="form-input" id="goalRetirementAgeSpouse" min="50" max="80" placeholder="62" oninput="onRetirementAgeChange()"><div id="retirementSpouseCalc" style="font-size:0.82em;margin-top:6px;"></div></div>
+            <div class="form-group"><label class="form-label">גיל פרישה (משתמש)</label><input type="number" class="form-input" id="goalRetirementAgeUser" min="50" max="80" placeholder="67 (ברירת מחדל לזכר)" oninput="onRetirementAgeChange()"><div id="retirementUserCalc" style="font-size:0.82em;margin-top:6px;"></div></div>
+            <div class="form-group" id="goalSpouseRetirementGroup"><label class="form-label">גיל פרישה (בן/בת זוג)</label><input type="number" class="form-input" id="goalRetirementAgeSpouse" min="50" max="80" placeholder="62 (ברירת מחדל לנקבה)" oninput="onRetirementAgeChange()"><div id="retirementSpouseCalc" style="font-size:0.82em;margin-top:6px;"></div></div>
         </div>
         <div class="form-group" style="margin-top:16px;"><label class="form-label">קצבה חודשית רצויה (₪)</label><input type="number" class="form-input" id="goalMonthlyPension" min="0" placeholder="15000"></div>
         <div style="display:flex;align-items:center;gap:8px;margin-top:12px;"><input type="checkbox" id="goalPensionIsReal" checked style="width:20px;height:20px;"><label for="goalPensionIsReal">בערכי היום (ריאלי)</label></div>
@@ -434,7 +434,7 @@
 <script src="script.js?v=FORCE_RESET_999999"></script>
 <script src="patch.js?v=5"></script>
 <script src="glide.js?v=4"></script>
-<script src="pension-profile-fix.js?v=6b"></script>
+<script src="pension-profile-fix.js?v=7b"></script>
 
 <!-- NAVIGATION: Hero + Launchpad — Module -->
 <script>
@@ -503,7 +503,7 @@ function renderActivePanel(panelId) {
     if (panelId === 'summary' && typeof renderSummary === 'function') renderSummary();
     if (panelId === 'projections' && typeof renderProjections === 'function') renderProjections();
     if (panelId === 'charts') setTimeout(function() { if (typeof renderCharts === 'function') renderCharts(); }, 120);
-    if (panelId === 'pension' && typeof renderPensionTab === 'function') { renderPensionTab(); if (typeof renderPensionTracksList === 'function') renderPensionTracksList(); if (typeof ppfAfterPensionRender === 'function') ppfAfterPensionRender(); }
+    if (panelId === 'pension') { if (typeof ppfBeforePensionRender === 'function') ppfBeforePensionRender(); if (typeof renderPensionTab === 'function') renderPensionTab(); if (typeof renderPensionTracksList === 'function') renderPensionTracksList(); if (typeof ppfAfterPensionRender === 'function') ppfAfterPensionRender(); }
     if (panelId === 'roadmap' && typeof renderWithdrawals === 'function') renderWithdrawals();
     if (panelId === 'investments' && typeof renderInvestments === 'function') renderInvestments();
     if (panelId === 'strategy' && typeof renderStrategy === 'function') renderStrategy();
@@ -713,6 +713,7 @@ function savePensionQuick() {
     document.getElementById('penAddReturn').value = '5'; document.getElementById('penAddFeeAnnual').value = '0';
     if (document.getElementById('penAddFeeDeposit')) document.getElementById('penAddFeeDeposit').value = '0';
     togglePensionForm(false);
+    if (typeof ppfBeforePensionRender === 'function') ppfBeforePensionRender();
     if (typeof renderPensionTab === 'function') renderPensionTab();
     if (typeof renderPensionTracksList === 'function') renderPensionTracksList();
     if (typeof ppfAfterPensionRender === 'function') ppfAfterPensionRender();
@@ -744,6 +745,7 @@ function editPensionTrack(index) {
 function deletePensionTrack(index) {
     if (!confirm('למחוק קרן פנסיה זו?')) return;
     var plan = getCurrentPlan(); plan.investments.splice(index, 1); saveData();
+    if (typeof ppfBeforePensionRender === 'function') ppfBeforePensionRender();
     if (typeof renderPensionTab === 'function') renderPensionTab();
     if (typeof renderPensionTracksList === 'function') renderPensionTracksList();
     if (typeof ppfAfterPensionRender === 'function') ppfAfterPensionRender();

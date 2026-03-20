@@ -87,6 +87,49 @@ calculateMonthlyPensions = function(husbandPensions, wifePensions) {
 };
 
 // ============================================================
+// ★ KEY FIX: ppfBeforePensionRender — sets pensionYears BEFORE render
+// ============================================================
+
+function ppfBeforePensionRender() {
+    try {
+        var plan = getCurrentPlan(), pr = plan.profile, g = plan.goals;
+        
+        // Set default retirement ages from gender if not set
+        if (!g.retirement.userAge && pr.user.gender) {
+            g.retirement.userAge = pr.user.gender === 'female' ? 62 : 67;
+        }
+        if (!g.retirement.spouseAge && pr.spouse.gender && pr.maritalStatus === 'married') {
+            g.retirement.spouseAge = pr.spouse.gender === 'female' ? 62 : 67;
+        }
+        
+        var info = getFinalRetirementInfo();
+        
+        // Set pensionYears BEFORE renderPensionTab reads it
+        if (info.fYrs && info.fYrs > 0) {
+            var pyEl = document.getElementById('pensionYears');
+            if (pyEl) {
+                pyEl.value = info.fYrs;
+                console.log('★ ppfBEFORE: pensionYears set to ' + info.fYrs);
+            }
+        }
+        
+        // Sync ages from profile into pension investments
+        plan.investments.forEach(function(inv) {
+            if (inv.type !== 'פנסיה') return;
+            if (inv.spouse === 'husband' || (!inv.spouse && inv.gender === 'male')) {
+                var a = getProfileAge('user'); if (a) inv.age = a;
+                if (pr.user.gender) inv.gender = pr.user.gender;
+            } else if (inv.spouse === 'wife' || (!inv.spouse && inv.gender === 'female')) {
+                var a2 = getProfileAge('spouse'); if (a2) inv.age = a2;
+                if (pr.spouse.gender) inv.gender = pr.spouse.gender;
+            }
+        });
+    } catch(err) {
+        console.error('ppfBeforePensionRender error:', err);
+    }
+}
+
+// ============================================================
 // ★ KEY FIX 2: ppfAfterPensionRender — called from inline script
 // This runs AFTER renderPensionTab + renderPensionTracksList
 // ============================================================
@@ -144,6 +187,15 @@ saveProfile=function(){var pl=getCurrentPlan(),pr=pl.profile;pr.user.name=(docum
 
 function loadPensionGoals(){
     var pl=getCurrentPlan(),g=pl.goals,pr=pl.profile;var el;
+    // Default retirement ages from gender if not set
+    if(!g.retirement.userAge && pr.user.gender){
+        g.retirement.userAge = pr.user.gender === 'female' ? 62 : 67;
+        saveData();
+    }
+    if(!g.retirement.spouseAge && pr.spouse.gender && pr.maritalStatus === 'married'){
+        g.retirement.spouseAge = pr.spouse.gender === 'female' ? 62 : 67;
+        saveData();
+    }
     el=document.getElementById('goalRetirementAgeUser');if(el)el.value=g.retirement.userAge||'';
     el=document.getElementById('goalRetirementAgeSpouse');if(el)el.value=g.retirement.spouseAge||'';
     el=document.getElementById('goalMonthlyPension');if(el)el.value=g.retirement.monthlyPension||'';
