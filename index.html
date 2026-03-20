@@ -290,30 +290,32 @@
     <div id="riskAnalysis"></div>
 </div>
 
-<!-- ===== Pension (CHANGED: profile info, net real, goal progress) ===== -->
+<!-- ===== Pension v4 ===== -->
 <div id="pension" class="panel">
-    <div class="flex justify-between items-center mb-4" style="flex-wrap:wrap;gap:12px;"><h2>💰 תוכנית פנסיה</h2><div class="flex gap-2 items-center"><input type="hidden" id="pensionYears" value="20"><div id="pensionYearsAutoInfo" style="font-size:0.85em;color:var(--text-secondary);"></div><button class="btn btn-primary btn-sm" onclick="renderPensionTab()">עדכן</button></div></div>
+    <h2 style="margin-bottom:20px;">💰 תוכנית פנסיה</h2>
+    <input type="hidden" id="pensionYears" value="20">
 
-    <!-- Profile info pulled from profile tab -->
+    <!-- Profile info from profile tab -->
     <div id="pensionProfileInfo"></div>
 
-    <!-- Pension Goals -->
+    <!-- Pension Goals: only retirement age + monthly target -->
     <div class="card mb-4"><div class="card-title">🎯 יעדי פרישה</div>
-        <p style="font-size:0.85em;color:var(--text-secondary);margin:8px 0 16px;">מגדר וגיל נמשכים אוטומטית מטאב הפרופיל.</p>
-        <div style="margin-top:16px;"><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-            <div class="form-group"><label class="form-label">גיל פרישה מתוכנן (משתמש)</label><input type="number" class="form-input" id="goalRetirementAgeUser" min="50" max="80" placeholder="67" oninput="updateRetirementCalcDisplay()"><div id="retirementUserCalc" style="font-size:0.82em;margin-top:6px;"></div></div>
-            <div class="form-group" id="goalSpouseRetirementGroup"><label class="form-label">גיל פרישה מתוכנן (בן/בת זוג)</label><input type="number" class="form-input" id="goalRetirementAgeSpouse" min="50" max="80" placeholder="62" oninput="updateRetirementCalcDisplay()"><div id="retirementSpouseCalc" style="font-size:0.82em;margin-top:6px;"></div></div>
+        <p style="font-size:0.85em;color:var(--text-secondary);margin:8px 0 16px;">הגדר את גיל הפרישה הרצוי. מגדר וגיל נמשכים מהפרופיל.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="form-group"><label class="form-label">גיל פרישה (משתמש)</label><input type="number" class="form-input" id="goalRetirementAgeUser" min="50" max="80" placeholder="67" oninput="onRetirementAgeChange()"><div id="retirementUserCalc" style="font-size:0.82em;margin-top:6px;"></div></div>
+            <div class="form-group" id="goalSpouseRetirementGroup"><label class="form-label">גיל פרישה (בן/בת זוג)</label><input type="number" class="form-input" id="goalRetirementAgeSpouse" min="50" max="80" placeholder="62" oninput="onRetirementAgeChange()"><div id="retirementSpouseCalc" style="font-size:0.82em;margin-top:6px;"></div></div>
         </div>
-        <div class="form-group"><label class="form-label">קצבה חודשית רצויה (₪)</label><input type="number" class="form-input" id="goalMonthlyPension" min="0" placeholder="15000"></div>
+        <div class="form-group" style="margin-top:16px;"><label class="form-label">קצבה חודשית רצויה (₪)</label><input type="number" class="form-input" id="goalMonthlyPension" min="0" placeholder="15000"></div>
         <div style="display:flex;align-items:center;gap:8px;margin-top:12px;"><input type="checkbox" id="goalPensionIsReal" checked style="width:20px;height:20px;"><label for="goalPensionIsReal">בערכי היום (ריאלי)</label></div>
-        </div>
         <hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">
         <div class="card-title" style="margin-bottom:16px;">💎 יעד הון עצמי בפרישה</div>
-        <div><div class="form-grid" style="grid-template-columns:1fr;"><div class="form-group"><label class="form-label">סכום יעד (₪)</label><input type="number" class="form-input" id="goalEquityAmount" min="0" placeholder="2000000"></div></div><input type="hidden" id="goalEquityYear"><div style="font-size:0.82em;color:var(--text-secondary);margin-top:8px;">שנת יעד מחושבת אוטומטית מגיל הפרישה שהגדרת למעלה.</div><div style="display:flex;align-items:center;gap:8px;margin-top:12px;"><input type="checkbox" id="goalEquityIsReal" checked style="width:20px;height:20px;"><label for="goalEquityIsReal">בערכי היום (ריאלי)</label></div></div>
-        <div style="display:flex;justify-content:flex-end;margin-top:16px;"><button class="btn btn-primary btn-sm" onclick="saveGoals()">💾 שמור יעדי פרישה</button></div>
+        <div class="form-group"><label class="form-label">סכום יעד (₪)</label><input type="number" class="form-input" id="goalEquityAmount" min="0" placeholder="2000000"></div>
+        <input type="hidden" id="goalEquityYear"><input type="hidden" id="goalEquityIsReal" value="true">
+        <div style="font-size:0.82em;color:var(--text-secondary);margin-top:8px;">שנת היעד מחושבת אוטומטית מגיל הפרישה.</div>
+        <div style="display:flex;justify-content:flex-end;margin-top:16px;"><button class="btn btn-primary btn-sm" onclick="saveGoals()">💾 שמור יעדים</button></div>
     </div>
 
-    <!-- Pension Goal Progress (rendered by JS) -->
+    <!-- Pension Goal Progress (JS) -->
     <div id="pensionGoalProgress"></div>
 
     <!-- Quick add pension -->
@@ -324,90 +326,62 @@
         </button>
         <div class="inv-form-wrapper" id="pensionFormWrapper">
             <div class="card">
-                <div class="card-header">
-                    <div class="card-title">➕ הוסף קרן פנסיה</div>
-                    <button class="inv-form-close" onclick="togglePensionForm(false)" title="סגור"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-                </div>
+                <div class="card-header"><div class="card-title">➕ הוסף קרן פנסיה</div><button class="inv-form-close" onclick="togglePensionForm(false)" title="סגור"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
                 <div class="form-grid">
                     <div class="form-group"><label class="form-label"><span class="required">*</span> שם הקרן</label><input type="text" class="form-input" id="penAddName" placeholder="פנסיה מקיפה הראל" required></div>
-                    <div class="form-group"><label class="form-label">חברה מנהלת</label>
-                        <select class="form-select" id="penAddHouse"><option value="">בחר...</option><option value="הראל">הראל</option><option value="מיטב דש">מיטב דש</option><option value="אלטשולר שחם">אלטשולר שחם</option><option value="מנורה מבטחים">מנורה מבטחים</option><option value="הפניקס">הפניקס</option><option value="כלל">כלל</option><option value="מגדל">מגדל</option><option value="מור">מור</option><option value="אחר">אחר</option></select>
-                    </div>
-                    <div class="form-group"><label class="form-label"><span class="required">*</span> שייך ל</label>
-                        <div style="display:flex;gap:12px;margin-top:4px;">
-                            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:10px 20px;border:2px solid var(--border);border-radius:12px;font-weight:600;transition:0.2s;" class="pen-gender-opt" onclick="selectPenGender(this,'husband','male')">👨 בעל</label>
-                            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:10px 20px;border:2px solid var(--border);border-radius:12px;font-weight:600;transition:0.2s;" class="pen-gender-opt" onclick="selectPenGender(this,'wife','female')">👩 אשה</label>
-                        </div>
-                        <input type="hidden" id="penAddSpouse" value="husband">
-                        <input type="hidden" id="penAddGender" value="male">
-                    </div>
-                    <div class="form-group"><label class="form-label">גיל נוכחי <span style="font-weight:400;color:var(--text-secondary);">(מהפרופיל)</span></label><input type="number" class="form-input" id="penAddAge" min="18" max="120" placeholder="ימולא אוטומטית" style="background:var(--bg-surface);"></div>
+                    <div class="form-group"><label class="form-label">חברה מנהלת</label><select class="form-select" id="penAddHouse"><option value="">בחר...</option><option value="הראל">הראל</option><option value="מיטב דש">מיטב דש</option><option value="אלטשולר שחם">אלטשולר שחם</option><option value="מנורה מבטחים">מנורה מבטחים</option><option value="הפניקס">הפניקס</option><option value="כלל">כלל</option><option value="מגדל">מגדל</option><option value="מור">מור</option><option value="אחר">אחר</option></select></div>
+                    <div class="form-group"><label class="form-label"><span class="required">*</span> שייך ל</label><div style="display:flex;gap:12px;margin-top:4px;"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:10px 20px;border:2px solid var(--border);border-radius:12px;font-weight:600;transition:0.2s;" class="pen-gender-opt" onclick="selectPenGender(this,'husband','male')">👨 בעל</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:10px 20px;border:2px solid var(--border);border-radius:12px;font-weight:600;transition:0.2s;" class="pen-gender-opt" onclick="selectPenGender(this,'wife','female')">👩 אשה</label></div><input type="hidden" id="penAddSpouse" value="husband"><input type="hidden" id="penAddGender" value="male"></div>
+                    <div class="form-group"><label class="form-label">גיל (מהפרופיל)</label><input type="number" class="form-input" id="penAddAge" min="18" max="120" placeholder="אוטומטי" style="background:var(--bg-surface);"></div>
                 </div>
                 <div class="form-grid">
-                    <div class="form-group"><label class="form-label">יתרה נוכחית (₪)</label><input type="text" inputmode="numeric" class="form-input" id="penAddAmount" value="0" placeholder="0"></div>
-                    <div class="form-group"><label class="form-label">הפקדה חודשית (₪)</label><input type="text" inputmode="numeric" class="form-input" id="penAddMonthly" value="0" placeholder="0"></div>
-                    <div class="form-group"><label class="form-label">תשואה צפויה (%)</label><input type="number" class="form-input" id="penAddReturn" value="5" min="0" max="15" step="0.1"></div>
-                    <div class="form-group"><label class="form-label">דמי ניהול צבירה (%)</label><input type="number" class="form-input" id="penAddFeeAnnual" value="0" min="0" max="2" step="0.01"></div>
-                    <div class="form-group"><label class="form-label">דמי ניהול הפקדה (%)</label><input type="number" class="form-input" id="penAddFeeDeposit" value="0" min="0" max="8" step="0.1"></div>
+                    <div class="form-group"><label class="form-label">יתרה נוכחית (₪)</label><input type="text" inputmode="numeric" class="form-input" id="penAddAmount" value="0"></div>
+                    <div class="form-group"><label class="form-label">הפקדה חודשית (₪)</label><input type="text" inputmode="numeric" class="form-input" id="penAddMonthly" value="0"></div>
+                    <div class="form-group"><label class="form-label">תשואה (%)</label><input type="number" class="form-input" id="penAddReturn" value="5" min="0" max="15" step="0.1"></div>
+                    <div class="form-group"><label class="form-label">דמ"נ צבירה (%)</label><input type="number" class="form-input" id="penAddFeeAnnual" value="0" min="0" max="2" step="0.01"></div>
+                    <div class="form-group"><label class="form-label">דמ"נ הפקדה (%)</label><input type="number" class="form-input" id="penAddFeeDeposit" value="0" min="0" max="8" step="0.1"></div>
                 </div>
-                <div class="form-actions">
-                    <button class="btn btn-success btn-full" onclick="savePensionQuick()">💾 שמור קרן פנסיה</button>
-                    <button class="btn btn-secondary" onclick="togglePensionForm(false)">ביטול</button>
-                </div>
+                <div class="form-actions"><button class="btn btn-success btn-full" onclick="savePensionQuick()">💾 שמור קרן פנסיה</button><button class="btn btn-secondary" onclick="togglePensionForm(false)">ביטול</button></div>
             </div>
         </div>
     </div>
 
-    <!-- Pension tracks dashboard (JS-rendered) -->
     <div id="pensionTracksDash" style="margin-bottom:20px;"></div>
 
     <div class="card mb-4"><div class="card-title">קופות פנסיה</div><div style="display:grid;gap:20px;margin-top:20px;"><div class="card" style="background:var(--brand-bg) !important;border:2px solid var(--brand-light) !important;"><div class="card-title" style="color:var(--brand-primary) !important;">👨 בעל</div><div id="pensionHusband" class="items-list"></div></div><div class="card" style="background:#FDF2F8 !important;border:2px solid #EC4899 !important;"><div class="card-title" style="color:#EC4899 !important;">👩 אשה</div><div id="pensionWife" class="items-list"></div></div></div></div>
 
-    <!-- Monthly pension display (CHANGED: added net real) -->
+    <!-- ★ RETIREMENT YEAR HERO — filled by JS ★ -->
+    <div id="retirementYearHero"></div>
+
+    <!-- Monthly pension with net real -->
     <div class="card mb-4"><div class="card-title">קצבה חודשית צפויה</div>
-        <p style="font-size:0.85em;color:var(--text-secondary);margin-top:8px;">💡 <strong>נומינלי</strong> = סכום בפועל | <strong>ריאלי</strong> = כוח קנייה של היום | <strong>נטו ריאלי</strong> = אחרי מס, בכוח קנייה של היום</p>
-        <div style="display:grid;gap:16px;margin-top:20px;">
+        <div id="pensionCalcBasis" style="font-size:0.85em;color:var(--brand-primary);margin:8px 0 12px;font-weight:600;"></div>
+        <p style="font-size:0.82em;color:var(--text-secondary);margin-bottom:16px;">💡 <strong>נומינלי</strong> = סכום בפועל | <strong>ריאלי</strong> = כוח קנייה של היום | <strong>נטו ריאלי</strong> = אחרי מס בכוח קנייה</p>
+        <div style="display:grid;gap:16px;">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                 <div class="stat-card green"><div class="stat-label">קצבה משפחתית - נומינלי</div><div class="stat-value" id="pensionCombinedNominal">₪0</div></div>
                 <div class="stat-card orange"><div class="stat-label">קצבה משפחתית - ריאלי</div><div class="stat-value" id="pensionCombinedReal">₪0</div></div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                 <div class="stat-card blue"><div class="stat-label">💎 נטו אחרי מס (נומינלי)</div><div class="stat-value" id="pensionCombinedNet">₪0</div><div class="stat-detail" id="pensionCombinedTax"></div></div>
-                <div class="stat-card purple"><div class="stat-label">💎 נטו ריאלי (כוח קנייה)</div><div class="stat-value" id="pensionCombinedNetReal">₪0</div><div class="stat-detail">אחרי מס + אינפלציה</div></div>
+                <div class="stat-card purple"><div class="stat-label">💎 נטו ריאלי (כוח קנייה)</div><div class="stat-value" id="ppfCombinedNetReal">—</div><div class="stat-detail">אחרי מס + אינפלציה</div></div>
             </div>
-
-            <!-- Per-spouse breakdown -->
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
                 <div class="card" style="background:var(--brand-bg) !important;border:2px solid var(--brand-light) !important;padding:16px !important;">
                     <div style="font-weight:bold;color:var(--brand-primary);margin-bottom:12px;">👨 בעל</div>
                     <div style="display:grid;gap:8px;">
-                        <div><div style="font-size:0.8em;color:var(--text-secondary);">נומינלי:</div><div style="font-size:1.2em;font-weight:bold;color:var(--text-primary);" id="pensionHusbandNominal">₪0</div></div>
+                        <div><div style="font-size:0.8em;color:var(--text-secondary);">נומינלי:</div><div style="font-size:1.2em;font-weight:bold;" id="pensionHusbandNominal">₪0</div></div>
                         <div><div style="font-size:0.8em;color:var(--text-secondary);">ריאלי:</div><div style="font-size:1.2em;font-weight:bold;color:var(--warning);" id="pensionHusbandReal">₪0</div></div>
-                        <div style="border-top:1px solid var(--border);padding-top:8px;">
-                            <div style="font-size:0.8em;color:var(--text-secondary);">💎 נטו:</div>
-                            <div style="font-size:1.4em;font-weight:bold;color:var(--brand-primary);" id="pensionHusbandNet">₪0</div>
-                            <div style="font-size:0.75em;color:var(--text-secondary);" id="pensionHusbandTax"></div>
-                        </div>
-                        <div style="border-top:1px solid var(--border);padding-top:8px;">
-                            <div style="font-size:0.8em;color:var(--text-secondary);">💎 נטו ריאלי:</div>
-                            <div style="font-size:1.3em;font-weight:bold;color:#7C3AED;" id="pensionHusbandNetReal">₪0</div>
-                        </div>
+                        <div style="border-top:1px solid var(--border);padding-top:8px;"><div style="font-size:0.8em;color:var(--text-secondary);">💎 נטו:</div><div style="font-size:1.4em;font-weight:bold;color:var(--brand-primary);" id="pensionHusbandNet">₪0</div><div style="font-size:0.75em;color:var(--text-secondary);" id="pensionHusbandTax"></div></div>
+                        <div style="border-top:1px solid var(--border);padding-top:8px;"><div style="font-size:0.8em;color:var(--text-secondary);">💎 נטו ריאלי:</div><div style="font-size:1.3em;font-weight:bold;color:#7C3AED;" id="ppfHusbandNetReal">—</div></div>
                     </div>
                 </div>
                 <div class="card" style="background:#FDF2F8 !important;border:2px solid #EC4899 !important;padding:16px !important;">
                     <div style="font-weight:bold;color:#EC4899;margin-bottom:12px;">👩 אשה</div>
                     <div style="display:grid;gap:8px;">
-                        <div><div style="font-size:0.8em;color:var(--text-secondary);">נומינלי:</div><div style="font-size:1.2em;font-weight:bold;color:var(--text-primary);" id="pensionWifeNominal">₪0</div></div>
+                        <div><div style="font-size:0.8em;color:var(--text-secondary);">נומינלי:</div><div style="font-size:1.2em;font-weight:bold;" id="pensionWifeNominal">₪0</div></div>
                         <div><div style="font-size:0.8em;color:var(--text-secondary);">ריאלי:</div><div style="font-size:1.2em;font-weight:bold;color:var(--warning);" id="pensionWifeReal">₪0</div></div>
-                        <div style="border-top:1px solid var(--border);padding-top:8px;">
-                            <div style="font-size:0.8em;color:var(--text-secondary);">💎 נטו:</div>
-                            <div style="font-size:1.4em;font-weight:bold;color:#EC4899;" id="pensionWifeNet">₪0</div>
-                            <div style="font-size:0.75em;color:var(--text-secondary);" id="pensionWifeTax"></div>
-                        </div>
-                        <div style="border-top:1px solid var(--border);padding-top:8px;">
-                            <div style="font-size:0.8em;color:var(--text-secondary);">💎 נטו ריאלי:</div>
-                            <div style="font-size:1.3em;font-weight:bold;color:#7C3AED;" id="pensionWifeNetReal">₪0</div>
-                        </div>
+                        <div style="border-top:1px solid var(--border);padding-top:8px;"><div style="font-size:0.8em;color:var(--text-secondary);">💎 נטו:</div><div style="font-size:1.4em;font-weight:bold;color:#EC4899;" id="pensionWifeNet">₪0</div><div style="font-size:0.75em;color:var(--text-secondary);" id="pensionWifeTax"></div></div>
+                        <div style="border-top:1px solid var(--border);padding-top:8px;"><div style="font-size:0.8em;color:var(--text-secondary);">💎 נטו ריאלי:</div><div style="font-size:1.3em;font-weight:bold;color:#7C3AED;" id="ppfWifeNetReal">—</div></div>
                     </div>
                 </div>
             </div>
@@ -460,7 +434,7 @@
 <script src="script.js?v=FORCE_RESET_999999"></script>
 <script src="patch.js?v=5"></script>
 <script src="glide.js?v=4"></script>
-<script src="pension-profile-fix.js?v=3"></script>
+<script src="pension-profile-fix.js?v=4"></script>
 
 <!-- NAVIGATION: Hero + Launchpad — Module -->
 <script>
