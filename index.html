@@ -434,7 +434,7 @@
 <script src="script.js?v=FORCE_RESET_999999"></script>
 <script src="patch.js?v=5"></script>
 <script src="glide.js?v=4"></script>
-<script src="pension-profile-fix.js?v=5"></script>
+<script src="pension-profile-fix.js?v=6"></script>
 
 <!-- NAVIGATION: Hero + Launchpad — Module -->
 <script>
@@ -498,12 +498,12 @@ switchPanel = function(panelId) {
 };
 
 function renderActivePanel(panelId) {
-    if (panelId === 'profile' && typeof renderChildren === 'function') renderChildren();
+    if (panelId === 'profile') { if (typeof loadProfile === 'function') loadProfile(); if (typeof renderChildren === 'function') renderChildren(); }
     if (panelId === 'goals' && typeof renderLifeGoals === 'function') renderLifeGoals();
     if (panelId === 'summary' && typeof renderSummary === 'function') renderSummary();
     if (panelId === 'projections' && typeof renderProjections === 'function') renderProjections();
     if (panelId === 'charts') setTimeout(function() { if (typeof renderCharts === 'function') renderCharts(); }, 120);
-    if (panelId === 'pension' && typeof renderPensionTab === 'function') { renderPensionTab(); if (typeof renderPensionTracksList === 'function') renderPensionTracksList(); }
+    if (panelId === 'pension' && typeof renderPensionTab === 'function') { renderPensionTab(); if (typeof renderPensionTracksList === 'function') renderPensionTracksList(); if (typeof ppfAfterPensionRender === 'function') ppfAfterPensionRender(); }
     if (panelId === 'roadmap' && typeof renderWithdrawals === 'function') renderWithdrawals();
     if (panelId === 'investments' && typeof renderInvestments === 'function') renderInvestments();
     if (panelId === 'strategy' && typeof renderStrategy === 'function') renderStrategy();
@@ -715,6 +715,7 @@ function savePensionQuick() {
     togglePensionForm(false);
     if (typeof renderPensionTab === 'function') renderPensionTab();
     if (typeof renderPensionTracksList === 'function') renderPensionTracksList();
+    if (typeof ppfAfterPensionRender === 'function') ppfAfterPensionRender();
     if (typeof renderInvestments === 'function') renderInvestments();
     if (typeof showSaveNotification === 'function') showSaveNotification(_penEditIndex >= 0 ? '✅ הקרן עודכנה' : '✅ קרן פנסיה נוספה');
 }
@@ -745,6 +746,7 @@ function deletePensionTrack(index) {
     var plan = getCurrentPlan(); plan.investments.splice(index, 1); saveData();
     if (typeof renderPensionTab === 'function') renderPensionTab();
     if (typeof renderPensionTracksList === 'function') renderPensionTracksList();
+    if (typeof ppfAfterPensionRender === 'function') ppfAfterPensionRender();
     if (typeof renderInvestments === 'function') renderInvestments();
 }
 
