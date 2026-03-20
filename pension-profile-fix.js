@@ -1,10 +1,11 @@
-// pension-profile-fix.js v6 — NO OVERRIDE CHAINS
+// pension-profile-fix.js v7 — SINGLE SOURCE OF TRUTH for net pension
 // Architecture: 
 // - ppfAfterPensionRender() called DIRECTLY from inline script
-// - calculateMonthlyPensions overridden to add net real
-// - analyzeGoals overridden to use final retirement year
+// - calculateNetPension: UNIFIED gender-aware tax function (replaces script.js version)
+// - calculateMonthlyPensions overridden to use unified net calc
+// - analyzeGoals overridden to call the SAME pension calc path
 // - NO renderPensionTab override (that's what kept breaking)
-console.log('✅ pension-profile-fix.js v6 loading...');
+console.log('✅ pension-profile-fix.js v7 loading...');
 
 // === HELPERS ===
 function calculateAgeFromDate(bd){if(!bd)return null;var b=new Date(bd);if(isNaN(b))return null;var t=new Date(),a=t.getFullYear()-b.getFullYear(),m=t.getMonth()-b.getMonth();if(m<0||(m===0&&t.getDate()<b.getDate()))a--;return a>=0?a:null;}
@@ -34,72 +35,176 @@ function getPersonRetirementYears(who) {
 }
 
 // ============================================================
-// ★ KEY FIX 1: Override calculateMonthlyPensions to add net real
-// This function IS called successfully (proven by screenshots).
-// So we piggyback on it.
+// ★ UNIFIED NET PENSION CALCULATOR — Single Source of Truth
+// ============================================================
+// Israeli pension tax rules (simplified but consistent):
+//   - Credit points: male 2.25, female 2.75
+//   - Credit point value: ~2,904 NIS/year → ~242 NIS/month
+//   - Exempt ceiling: male ~5,480/mo, female ~6,655/mo (from credit points alone)
+//   - Above ceiling: marginal rate 10%-15% depending on bracket
+//   - Simplified model: exempt up to ceiling, 15% on remainder
+//   - This replaces the old script.js calculateNetPension to avoid double-dipping
 // ============================================================
 
-var _v6_origCMP = calculateMonthlyPensions;
-calculateMonthlyPensions = function(husbandPensions, wifePensions) {
-    // Call original — this sets nominal, real, net
-    _v6_origCMP(husbandPensions, wifePensions);
+var PPF_TAX_CREDIT_MONTHLY_MALE = 242;   // ₪ per credit point per month
+var PPF_TAX_CREDIT_MONTHLY_FEMALE = 242;
+var PPF_CREDIT_POINTS_MALE = 2.25;
+var PPF_CREDIT_POINTS_FEMALE = 2.75;
+var PPF_PENSION_TAX_RATE = 0.15;  // effective marginal rate above exempt ceiling
+
+// Central function — EVERY pension net calculation goes through here
+function calculateNetPension(grossMonthly, gender) {
+    if (!grossMonthly || grossMonthly <= 0) {
+        return { gross: 0, net: 0, tax: 0, effectiveRate: 0, exempt: 0 };
+    }
     
-    // Now RECALCULATE with per-person years and set net real
+    var creditPoints = (gender === 'female') ? PPF_CREDIT_POINTS_FEMALE : PPF_CREDIT_POINTS_MALE;
+    var creditValue = (gender === 'female') ? PPF_TAX_CREDIT_MONTHLY_FEMALE : PPF_TAX_CREDIT_MONTHLY_MALE;
+    
+    // Monthly tax credit = credit points × value per point
+    var monthlyCredit = creditPoints * creditValue;  // male: ~545, female: ~666
+    
+    // Exempt ceiling: the gross amount where tax = credit (i.e. net tax = 0)
+    // tax_before_credit = gross × rate
+    // net_tax = max(0, tax_before_credit - credit)
+    // exempt ceiling = credit / rate
+    var exemptCeiling = monthlyCredit / PPF_PENSION_TAX_RATE;  // male: ~3,630, female: ~4,440
+    
+    // But Israel also has a partial pension exemption (35% of pension up to a ceiling is exempt)
+    // Simplified: we model a higher effective exempt ceiling
+    // Realistic exempt zone for pension income ≈ male ~8,000, female ~9,000
+    // We use a blended model: 
+    //   - First 8,000 (male) / 9,000 (female): exempt
+    //   - Above that: 15% tax
+    var BLENDED_EXEMPT_MALE = 8000;
+    var BLENDED_EXEMPT_FEMALE = 9000;
+    var exemptAmount = (gender === 'female') ? BLENDED_EXEMPT_FEMALE : BLENDED_EXEMPT_MALE;
+    
+    var taxableAmount = Math.max(0, grossMonthly - exemptAmount);
+    var tax = taxableAmount * PPF_PENSION_TAX_RATE;
+    var net = grossMonthly - tax;
+    var effectiveRate = grossMonthly > 0 ? (tax / grossMonthly) * 100 : 0;
+    
+    return {
+        gross: grossMonthly,
+        net: net,
+        tax: tax,
+        effectiveRate: effectiveRate,
+        exempt: exemptAmount
+    };
+}
+
+// ============================================================
+// ★ UNIFIED PENSION PROJECTION — calculates everything per-person
+//   Returns a complete result object used by BOTH tabs
+// ============================================================
+
+function calculateFullPensionProjection() {
+    var plan = getCurrentPlan();
+    var info = getFinalRetirementInfo();
+    var hYears = getPersonRetirementYears('husband');
+    var wYears = getPersonRetirementYears('wife');
+    var hInfl = Math.pow(1.02, hYears);
+    var wInfl = Math.pow(1.02, wYears);
+    
+    // Separate pension investments by person
+    var husbandPensions = [];
+    var wifePensions = [];
+    plan.investments.forEach(function(inv) {
+        if (!inv.include || inv.type !== 'פנסיה') return;
+        if (inv.spouse === 'wife' || (!inv.spouse && inv.gender === 'female')) {
+            wifePensions.push(inv);
+        } else {
+            husbandPensions.push(inv);
+        }
+    });
+    
+    // Husband: calculate with HIS years
+    var hNom = 0;
+    husbandPensions.forEach(function(inv) {
+        var fv = calculateFV(inv.amount, inv.monthly, inv.returnRate, hYears,
+                            inv.feeDeposit||0, inv.feeAnnual||0, inv.subTracks);
+        hNom += calculateMonthlyPension(fv, inv.gender || 'male');
+    });
+    
+    // Wife: calculate with HER years
+    var wNom = 0;
+    wifePensions.forEach(function(inv) {
+        var fv = calculateFV(inv.amount, inv.monthly, inv.returnRate, wYears,
+                            inv.feeDeposit||0, inv.feeAnnual||0, inv.subTracks);
+        wNom += calculateMonthlyPension(fv, inv.gender || 'female');
+    });
+    
+    // Real values (per-person inflation)
+    var hReal = hNom / hInfl;
+    var wReal = wNom / wInfl;
+    
+    // Net per person — UNIFIED calculateNetPension
+    var hNet = calculateNetPension(hNom, 'male');
+    var wNet = calculateNetPension(wNom, 'female');
+    
+    // Net real per person (each with own inflation)
+    var hNR = hNet.net / hInfl;
+    var wNR = wNet.net / wInfl;
+    
+    // Combined
+    var cNom = hNom + wNom;
+    var cReal = hReal + wReal;
+    var cNet = hNet.net + wNet.net;
+    var cTax = hNet.tax + wNet.tax;
+    var cNR = hNR + wNR;
+    var cEffRate = cNom > 0 ? ((cTax / cNom) * 100) : 0;
+    
+    return {
+        husband: {
+            nominal: hNom, real: hReal,
+            net: hNet.net, tax: hNet.tax, effectiveRate: hNet.effectiveRate,
+            netReal: hNR, years: hYears, inflation: hInfl,
+            pensions: husbandPensions
+        },
+        wife: {
+            nominal: wNom, real: wReal,
+            net: wNet.net, tax: wNet.tax, effectiveRate: wNet.effectiveRate,
+            netReal: wNR, years: wYears, inflation: wInfl,
+            pensions: wifePensions
+        },
+        combined: {
+            nominal: cNom, real: cReal,
+            net: cNet, tax: cTax, effectiveRate: cEffRate,
+            netReal: cNR
+        },
+        info: info
+    };
+}
+
+// ============================================================
+// ★ Override calculateMonthlyPensions — uses unified projection
+// ============================================================
+
+var _v7_origCMP = calculateMonthlyPensions;
+calculateMonthlyPensions = function(husbandPensions, wifePensions) {
+    // Call original first (for any side effects / DOM it sets up)
+    _v7_origCMP(husbandPensions, wifePensions);
+    
+    // Now RECALCULATE with unified projection
     try {
-        var hYears = getPersonRetirementYears('husband');
-        var wYears = getPersonRetirementYears('wife');
-        var hInfl = Math.pow(1.02, hYears);
-        var wInfl = Math.pow(1.02, wYears);
+        var proj = calculateFullPensionProjection();
+        var h = proj.husband, w = proj.wife, c = proj.combined;
         
-        // Husband: calculate with HIS years
-        var hNom = 0;
-        husbandPensions.forEach(function(inv) {
-            var fv = calculateFV(inv.amount, inv.monthly, inv.returnRate, hYears,
-                                inv.feeDeposit||0, inv.feeAnnual||0, inv.subTracks);
-            hNom += calculateMonthlyPension(fv, inv.gender || 'male');
-        });
-        // Wife: calculate with HER years
-        var wNom = 0;
-        wifePensions.forEach(function(inv) {
-            var fv = calculateFV(inv.amount, inv.monthly, inv.returnRate, wYears,
-                                inv.feeDeposit||0, inv.feeAnnual||0, inv.subTracks);
-            wNom += calculateMonthlyPension(fv, inv.gender || 'female');
-        });
+        console.log('★ v7 UNIFIED CALC: H=' + h.years + 'yrs W=' + w.years + 'yrs');
+        console.log('  H: nom=' + Math.round(h.nominal) + ' real=' + Math.round(h.real) + ' net=' + Math.round(h.net) + ' netReal=' + Math.round(h.netReal));
+        console.log('  W: nom=' + Math.round(w.nominal) + ' real=' + Math.round(w.real) + ' net=' + Math.round(w.net) + ' netReal=' + Math.round(w.netReal));
+        console.log('  C: nom=' + Math.round(c.nominal) + ' real=' + Math.round(c.real) + ' net=' + Math.round(c.net) + ' netReal=' + Math.round(c.netReal));
         
-        // Recalculate real with per-person inflation
-        var hReal = hNom / hInfl;
-        var wReal = wNom / wInfl;
-        
-        // Net per person
-        var hNet = calculateNetPension(hNom);
-        var wNet = calculateNetPension(wNom);
-        
-        // Net real per person (each with own inflation)
-        var hNR = hNet.net / hInfl;
-        var wNR = wNet.net / wInfl;
-        var cNR = hNR + wNR;
-        
-        // Combined nominal/real/net (recalculated correctly)
-        var cNom = hNom + wNom;
-        var cReal = hReal + wReal;
-        var cNet = hNet.net + wNet.net;
-        var cTax = hNet.tax + wNet.tax;
-        var cEffRate = cNom > 0 ? ((cTax / cNom) * 100) : 0;
-        
-        console.log('★ PER-PERSON CALC: H=' + hYears + 'yrs W=' + wYears + 'yrs');
-        console.log('  H: nom=' + Math.round(hNom) + ' real=' + Math.round(hReal) + ' net=' + Math.round(hNet.net) + ' netReal=' + Math.round(hNR));
-        console.log('  W: nom=' + Math.round(wNom) + ' real=' + Math.round(wReal) + ' net=' + Math.round(wNet.net) + ' netReal=' + Math.round(wNR));
-        console.log('  C: nom=' + Math.round(cNom) + ' real=' + Math.round(cReal) + ' net=' + Math.round(cNet) + ' netReal=' + Math.round(cNR));
-        
-        // Override ALL display values (fix the base function's wrong numbers)
+        // Override ALL display values
         var sets = {
-            'pensionHusbandNominal': hNom, 'pensionHusbandReal': hReal,
-            'pensionHusbandNet': hNet.net, 'pensionWifeNominal': wNom,
-            'pensionWifeReal': wReal, 'pensionWifeNet': wNet.net,
-            'pensionCombinedNominal': cNom, 'pensionCombinedReal': cReal,
-            'pensionCombinedNet': cNet,
-            'ppfHusbandNetReal': hNR, 'ppfWifeNetReal': wNR, 'ppfCombinedNetReal': cNR,
-            'pensionHusbandNetReal': hNR, 'pensionWifeNetReal': wNR, 'pensionCombinedNetReal': cNR
+            'pensionHusbandNominal': h.nominal, 'pensionHusbandReal': h.real,
+            'pensionHusbandNet': h.net, 'pensionWifeNominal': w.nominal,
+            'pensionWifeReal': w.real, 'pensionWifeNet': w.net,
+            'pensionCombinedNominal': c.nominal, 'pensionCombinedReal': c.real,
+            'pensionCombinedNet': c.net,
+            'ppfHusbandNetReal': h.netReal, 'ppfWifeNetReal': w.netReal, 'ppfCombinedNetReal': c.netReal,
+            'pensionHusbandNetReal': h.netReal, 'pensionWifeNetReal': w.netReal, 'pensionCombinedNetReal': c.netReal
         };
         Object.keys(sets).forEach(function(id) {
             var el = document.getElementById(id);
@@ -108,14 +213,14 @@ calculateMonthlyPensions = function(husbandPensions, wifePensions) {
         
         // Tax display
         var hTaxEl = document.getElementById('pensionHusbandTax');
-        if (hTaxEl) hTaxEl.textContent = hNet.tax > 0 ? 'מס: ' + formatCurrency(hNet.tax) + ' (' + hNet.effectiveRate.toFixed(1) + '%)' : '✅ פטור';
+        if (hTaxEl) hTaxEl.textContent = h.tax > 0 ? 'מס: ' + formatCurrency(h.tax) + ' (' + h.effectiveRate.toFixed(1) + '%)' : '✅ פטור';
         var wTaxEl = document.getElementById('pensionWifeTax');
-        if (wTaxEl) wTaxEl.textContent = wNet.tax > 0 ? 'מס: ' + formatCurrency(wNet.tax) + ' (' + wNet.effectiveRate.toFixed(1) + '%)' : '✅ פטור';
+        if (wTaxEl) wTaxEl.textContent = w.tax > 0 ? 'מס: ' + formatCurrency(w.tax) + ' (' + w.effectiveRate.toFixed(1) + '%)' : '✅ פטור';
         var cTaxEl = document.getElementById('pensionCombinedTax');
-        if (cTaxEl) cTaxEl.textContent = cTax > 0 ? 'מס: ' + formatCurrency(cTax) + '/חודש (' + cEffRate.toFixed(1) + '%)' : '✅ פטור מלא';
+        if (cTaxEl) cTaxEl.textContent = c.tax > 0 ? 'מס: ' + formatCurrency(c.tax) + '/חודש (' + c.effectiveRate.toFixed(1) + '%)' : '✅ פטור מלא';
         
     } catch(err) {
-        console.error('v8 PER-PERSON error:', err);
+        console.error('v7 calculateMonthlyPensions error:', err);
     }
 };
 
@@ -123,14 +228,13 @@ calculateMonthlyPensions = function(husbandPensions, wifePensions) {
 // Override renderPensionList: use per-person retirement years
 // ============================================================
 
-var _v8_origRPL = renderPensionList;
+var _v7_origRPL = renderPensionList;
 renderPensionList = function(containerId, pensions, gender) {
     var container = document.getElementById(containerId);
     if (pensions.length === 0) {
         container.innerHTML = '<div class="empty-state"><div class="empty-text">אין קופות פנסיה</div></div>';
         return;
     }
-    // Determine which person this list is for
     var who = (gender === 'female') ? 'wife' : 'husband';
     var years = getPersonRetirementYears(who);
     var info = getFinalRetirementInfo();
@@ -160,14 +264,13 @@ renderPensionList = function(containerId, pensions, gender) {
 };
 
 // ============================================================
-// ★ KEY FIX: ppfBeforePensionRender — sets pensionYears BEFORE render
+// ★ ppfBeforePensionRender — sets pensionYears BEFORE render
 // ============================================================
 
 function ppfBeforePensionRender() {
     try {
         var plan = getCurrentPlan(), pr = plan.profile, g = plan.goals;
         
-        // Set default retirement ages from gender if not set
         if (!g.retirement.userAge && pr.user.gender) {
             g.retirement.userAge = pr.user.gender === 'female' ? 62 : 67;
         }
@@ -177,7 +280,6 @@ function ppfBeforePensionRender() {
         
         var info = getFinalRetirementInfo();
         
-        // Set pensionYears BEFORE renderPensionTab reads it
         if (info.fYrs && info.fYrs > 0) {
             var pyEl = document.getElementById('pensionYears');
             if (pyEl) {
@@ -203,8 +305,7 @@ function ppfBeforePensionRender() {
 }
 
 // ============================================================
-// ★ KEY FIX 2: ppfAfterPensionRender — called from inline script
-// This runs AFTER renderPensionTab + renderPensionTracksList
+// ★ ppfAfterPensionRender — called from inline script
 // ============================================================
 
 function ppfAfterPensionRender() {
@@ -214,7 +315,6 @@ function ppfAfterPensionRender() {
         var plan = getCurrentPlan(), pr = plan.profile;
         var info = getFinalRetirementInfo();
         
-        // Sync pensionYears from retirement age
         if (info.fYrs && info.fYrs > 0) {
             var pyEl = document.getElementById('pensionYears');
             if (pyEl) pyEl.value = info.fYrs;
@@ -232,13 +332,8 @@ function ppfAfterPensionRender() {
             }
         });
         
-        // Load goals form
         loadPensionGoals();
-        
-        // Retirement year hero
         renderRetirementYearHero();
-        
-        // Pension goal progress
         renderPensionGoalProgress();
         
     } catch(err) {
@@ -260,7 +355,6 @@ saveProfile=function(){var pl=getCurrentPlan(),pr=pl.profile;pr.user.name=(docum
 
 function loadPensionGoals(){
     var pl=getCurrentPlan(),g=pl.goals,pr=pl.profile;var el;
-    // Default retirement ages from gender if not set
     if(!g.retirement.userAge && pr.user.gender){
         g.retirement.userAge = pr.user.gender === 'female' ? 62 : 67;
         saveData();
@@ -289,7 +383,6 @@ function onRetirementAgeChange(){
     saveData();
     updateRetirementCalcDisplay();
     renderRetirementYearHero();
-    // Re-render pension tab with new years
     if(typeof renderPensionTab==='function')renderPensionTab();
     if(typeof renderPensionTracksList==='function')renderPensionTracksList();
     renderPensionGoalProgress();
@@ -336,13 +429,12 @@ function renderRetirementYearHero(){
         '<div style="font-size:1.1em;margin-top:6px;opacity:0.9;">בעוד '+info.fYrs+' שנים</div>'+
         '<div style="display:flex;justify-content:center;gap:24px;margin-top:16px;font-size:0.88em;opacity:0.85;">'+parts.join('')+'</div>'+
         '</div>';
-    // Also set calc basis text
     var basis=document.getElementById('pensionCalcBasis');
     if(basis) {
-        var parts = [];
-        if(info.uYr) parts.push('👨 בעל: ' + info.uYr + ' (בעוד ' + info.uYrs + ' שנים)');
-        if(info.sYr) parts.push('👩 אשה: ' + info.sYr + ' (בעוד ' + info.sYrs + ' שנים)');
-        basis.innerHTML = '📅 הקצבה מחושבת לכל אחד לפי שנת הפרישה שלו: ' + parts.join(' · ');
+        var bParts = [];
+        if(info.uYr) bParts.push('👨 בעל: ' + info.uYr + ' (בעוד ' + info.uYrs + ' שנים)');
+        if(info.sYr) bParts.push('👩 אשה: ' + info.sYr + ' (בעוד ' + info.sYrs + ' שנים)');
+        basis.innerHTML = '📅 הקצבה מחושבת לכל אחד לפי שנת הפרישה שלו: ' + bParts.join(' · ');
     }
 }
 
@@ -360,9 +452,9 @@ function updatePensionProfileInfo(){
 // selectPenGender — auto-fill age
 // ============================================================
 
-var _v6_origSPG = selectPenGender;
+var _v7_origSPG = selectPenGender;
 selectPenGender = function(el,sp,gn) {
-    _v6_origSPG(el,sp,gn);
+    _v7_origSPG(el,sp,gn);
     var ai = document.getElementById('penAddAge'); if(!ai) return;
     var pa = (sp==='husband') ? getProfileAge('user') : getProfileAge('spouse');
     if(pa) { ai.value = pa; ai.style.backgroundColor = 'var(--success-bg)'; }
@@ -372,42 +464,23 @@ selectPenGender = function(el,sp,gn) {
 };
 
 // ============================================================
-// ★ KEY FIX 3: Override analyzeGoals for consistent numbers
+// ★ KEY FIX: Override analyzeGoals — uses SAME unified projection
 // ============================================================
 
-var _v6_origAG = analyzeGoals;
+var _v7_origAG = analyzeGoals;
 analyzeGoals = function() {
-    var results = _v6_origAG();
+    var results = _v7_origAG();
     if (!results) return results;
     
     var info = getFinalRetirementInfo();
     var pl = getCurrentPlan(), g = pl.goals;
     
     if (results.pension && info.fYrs && info.fYrs > 0) {
-        var hYears = getPersonRetirementYears('husband');
-        var wYears = getPersonRetirementYears('wife');
-        var hInfl = Math.pow(1.02, hYears);
-        var wInfl = Math.pow(1.02, wYears);
+        // ★ USE THE SAME unified projection as pension tab
+        var proj = calculateFullPensionProjection();
+        var projNetReal = proj.combined.netReal;
         
-        // Calculate per-person with their own years
-        var hNom = 0, wNom = 0;
-        pl.investments.forEach(function(inv) {
-            if (!inv.include || inv.type !== 'פנסיה') return;
-            if (inv.spouse === 'wife' || (!inv.spouse && inv.gender === 'female')) {
-                var fv = calculateFV(inv.amount, inv.monthly, inv.returnRate, wYears,
-                                    inv.feeDeposit||0, inv.feeAnnual||0, inv.subTracks);
-                wNom += calculateMonthlyPension(fv, 'female');
-            } else {
-                var fv = calculateFV(inv.amount, inv.monthly, inv.returnRate, hYears,
-                                    inv.feeDeposit||0, inv.feeAnnual||0, inv.subTracks);
-                hNom += calculateMonthlyPension(fv, 'male');
-            }
-        });
-        
-        // Tax separately, real separately
-        var hNet = calculateNetPension(hNom);
-        var wNet = calculateNetPension(wNom);
-        var projNetReal = (hNet.net / hInfl) + (wNet.net / wInfl);
+        console.log('★ v7 analyzeGoals: using unified projection, netReal=' + Math.round(projNetReal));
         
         var target = g.retirement.monthlyPension || 0;
         var gap = target - projNetReal;
@@ -418,7 +491,7 @@ analyzeGoals = function() {
             projected: projNetReal,
             gap: gap,
             percentage: Math.min(pct, 100),
-            yearsUntil: years,
+            yearsUntil: info.fYrs,
             retirementYear: info.fY,
             status: pct >= 100 ? 'success' : pct >= 80 ? 'warning' : 'danger'
         };
@@ -447,11 +520,11 @@ renderGoalProgress = function() {
     h+='</div></div>';ct.innerHTML=h;
 };
 
-var _v6_origGR = generateRecommendations;
-generateRecommendations = function(a) { return _v6_origGR(a).filter(function(r) { return r.type !== 'pension'; }); };
+var _v7_origGR = generateRecommendations;
+generateRecommendations = function(a) { return _v7_origGR(a).filter(function(r) { return r.type !== 'pension'; }); };
 
 // ============================================================
-// Pension goal progress (in pension tab)
+// Pension goal progress (in pension tab) — uses unified projection
 // ============================================================
 
 function renderPensionGoalProgress() {
@@ -463,7 +536,30 @@ function renderPensionGoalProgress() {
     var ic = p.status==='success'?'✅':p.status==='warning'?'🟡':'🔴';
     var gt = p.gap>0?'חסר '+formatCurrency(p.gap)+'/חודש':'עודף '+formatCurrency(Math.abs(p.gap))+'/חודש';
     var yn = p.retirementYear?' (שנת '+p.retirementYear+')':'';
-    ct.innerHTML='<div class="card" style="border:2px solid '+cl+';margin-top:20px;"><div class="card-title" style="margin-bottom:16px;">'+ic+' ניתוח פערים — יעד קצבה'+yn+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;"><div style="padding:14px;background:var(--bg-surface);border-radius:8px;text-align:center;"><div style="font-size:0.85em;color:var(--text-secondary);margin-bottom:4px;">יעד (ריאלי אחרי מס)</div><div style="font-size:1.4em;font-weight:700;">'+formatCurrency(p.target)+'/חודש</div></div><div style="padding:14px;background:var(--bg-surface);border-radius:8px;text-align:center;"><div style="font-size:0.85em;color:var(--text-secondary);margin-bottom:4px;">צפי (ריאלי אחרי מס)</div><div style="font-size:1.4em;font-weight:700;color:'+cl+';">'+formatCurrency(p.projected)+'/חודש</div></div></div><div style="background:var(--border);height:28px;border-radius:14px;overflow:hidden;margin-bottom:12px;"><div style="background:'+cl+';height:100%;width:'+Math.min(p.percentage,100)+'%;display:flex;align-items:center;justify-content:center;font-size:0.85em;font-weight:700;color:white;">'+p.percentage.toFixed(0)+'%</div></div><div style="text-align:center;font-size:0.95em;font-weight:600;color:'+cl+';">'+gt+'</div></div>';
+    
+    // Show breakdown of the unified calculation for transparency
+    var proj = calculateFullPensionProjection();
+    var breakdownHtml = '';
+    if (proj.husband.nominal > 0 || proj.wife.nominal > 0) {
+        breakdownHtml = '<div style="margin-top:16px;padding:14px;background:var(--bg-surface);border-radius:8px;font-size:0.85em;">' +
+            '<div style="font-weight:600;margin-bottom:8px;color:var(--text-primary);">פירוט החישוב:</div>';
+        if (proj.husband.nominal > 0) {
+            breakdownHtml += '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">' +
+                '<span>👨 בעל: נטו ריאלי</span>' +
+                '<span style="font-weight:600;">' + formatCurrency(proj.husband.netReal) + '</span></div>';
+        }
+        if (proj.wife.nominal > 0) {
+            breakdownHtml += '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">' +
+                '<span>👩 אשה: נטו ריאלי</span>' +
+                '<span style="font-weight:600;">' + formatCurrency(proj.wife.netReal) + '</span></div>';
+        }
+        breakdownHtml += '<div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:6px;margin-top:6px;">' +
+            '<span style="font-weight:700;">סה״כ נטו ריאלי</span>' +
+            '<span style="font-weight:700;color:' + cl + ';">' + formatCurrency(proj.combined.netReal) + '</span></div>';
+        breakdownHtml += '</div>';
+    }
+    
+    ct.innerHTML='<div class="card" style="border:2px solid '+cl+';margin-top:20px;"><div class="card-title" style="margin-bottom:16px;">'+ic+' ניתוח פערים — יעד קצבה'+yn+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;"><div style="padding:14px;background:var(--bg-surface);border-radius:8px;text-align:center;"><div style="font-size:0.85em;color:var(--text-secondary);margin-bottom:4px;">יעד (ריאלי אחרי מס)</div><div style="font-size:1.4em;font-weight:700;">'+formatCurrency(p.target)+'/חודש</div></div><div style="padding:14px;background:var(--bg-surface);border-radius:8px;text-align:center;"><div style="font-size:0.85em;color:var(--text-secondary);margin-bottom:4px;">צפי (ריאלי אחרי מס)</div><div style="font-size:1.4em;font-weight:700;color:'+cl+';">'+formatCurrency(p.projected)+'/חודש</div></div></div><div style="background:var(--border);height:28px;border-radius:14px;overflow:hidden;margin-bottom:12px;"><div style="background:'+cl+';height:100%;width:'+Math.min(p.percentage,100)+'%;display:flex;align-items:center;justify-content:center;font-size:0.85em;font-weight:700;color:white;">'+p.percentage.toFixed(0)+'%</div></div><div style="text-align:center;font-size:0.95em;font-weight:600;color:'+cl+';">'+gt+'</div>' + breakdownHtml + '</div>';
 }
 
 // ============================================================
@@ -472,4 +568,4 @@ function renderPensionGoalProgress() {
 
 (function(){try{var s=localStorage.getItem('financialPlannerProV3');if(!s)return;var d=JSON.parse(s),c=false;d.plans.forEach(function(p){if(!p.profile)return;if(p.profile.user&&p.profile.user.age&&!p.profile.user.birthDate){p.profile.user.birthDate=(new Date().getFullYear()-p.profile.user.age)+'-01-01';c=true;}if(p.profile.spouse&&p.profile.spouse.age&&!p.profile.spouse.birthDate){p.profile.spouse.birthDate=(new Date().getFullYear()-p.profile.spouse.age)+'-01-01';c=true;}});if(c)localStorage.setItem('financialPlannerProV3',JSON.stringify(d));}catch(e){}})();
 
-console.log('✅ pension-profile-fix.js v6 loaded');
+console.log('✅ pension-profile-fix.js v7 loaded');
