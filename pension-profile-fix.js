@@ -235,8 +235,15 @@ function calculateFullPensionProjection() {
 
 var _v7_origCMP = calculateMonthlyPensions;
 calculateMonthlyPensions = function(husbandPensions, wifePensions) {
+    // Save pensionYears before original may modify it
+    var pyEl = document.getElementById('pensionYears');
+    var savedPY = pyEl ? pyEl.value : null;
+
     // Call original for base side effects
     _v7_origCMP(husbandPensions, wifePensions);
+
+    // Restore pensionYears
+    if (pyEl && savedPY) pyEl.value = savedPY;
 
     try {
         var proj = calculateFullPensionProjection();
@@ -659,8 +666,15 @@ selectPenGender = function(el,sp,gn) {
 
 var _v7_origAG = analyzeGoals;
 analyzeGoals = function() {
+    // Save pensionYears before original may modify it
+    var pyEl = document.getElementById('pensionYears');
+    var savedPY = pyEl ? pyEl.value : null;
+
     var results = _v7_origAG();
     if (!results) return results;
+
+    // Restore pensionYears in case original changed it
+    if (pyEl && savedPY) pyEl.value = savedPY;
 
     var info = getFinalRetirementInfo();
     var pl = getCurrentPlan(), g = pl.goals;
@@ -720,16 +734,33 @@ generateRecommendations = function(a) { return _v7_origGR(a).filter(function(r) 
 
 function renderPensionGoalProgress() {
     var ct = document.getElementById('pensionGoalProgress'); if (!ct) return;
-    var an = analyzeGoals();
-    if (!an || !an.pension) { ct.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-secondary);">הגדר יעדי פרישה למעלה</div>'; return; }
-    var p = an.pension;
-    var cl = p.status==='success'?'var(--success)':p.status==='warning'?'var(--warning)':'var(--danger)';
-    var ic = p.status==='success'?'✅':p.status==='warning'?'🟡':'🔴';
-    var gt = p.gap>0?'חסר '+formatCurrency(p.gap)+'/חודש':'עודף '+formatCurrency(Math.abs(p.gap))+'/חודש';
-    var yn = p.retirementYear?' (שנת '+p.retirementYear+')':'';
+    var pl = getCurrentPlan(), g = pl.goals;
+    var info = getFinalRetirementInfo();
+    var target = g.retirement.monthlyPension || 0;
 
-    // Breakdown from unified projection
+    if (!target || !info.fYrs || info.fYrs <= 0) {
+        ct.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-secondary);">הגדר יעדי פרישה למעלה</div>';
+        return;
+    }
+
+    // ★ SINGLE CALL — one projection drives EVERYTHING: cards, bar, AND breakdown
     var proj = calculateFullPensionProjection();
+    var projNetReal = proj.combined.netReal;
+
+    console.log('★ v7 renderPensionGoalProgress: SINGLE proj.combined.netReal=' + Math.round(projNetReal) +
+                ' (H=' + Math.round(proj.husband.netReal) + ' + W=' + Math.round(proj.wife.netReal) + ')');
+
+    var gap = target - projNetReal;
+    var pct = target > 0 ? (projNetReal / target) * 100 : 100;
+    pct = Math.min(pct, 100);
+    var status = pct >= 100 ? 'success' : pct >= 80 ? 'warning' : 'danger';
+
+    var cl = status==='success'?'var(--success)':status==='warning'?'var(--warning)':'var(--danger)';
+    var ic = status==='success'?'✅':status==='warning'?'🟡':'🔴';
+    var gt = gap>0?'חסר '+formatCurrency(gap)+'/חודש':'עודף '+formatCurrency(Math.abs(gap))+'/חודש';
+    var yn = info.fY?' (שנת '+info.fY+')':'';
+
+    // Breakdown — uses SAME proj object, zero chance of mismatch
     var breakdownHtml = '';
     if (proj.husband.nominal > 0 || proj.wife.nominal > 0) {
         breakdownHtml = '<div style="margin-top:16px;padding:14px;background:var(--bg-surface);border-radius:8px;font-size:0.85em;">';
@@ -752,11 +783,11 @@ function renderPensionGoalProgress() {
         }
         breakdownHtml += '<div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:6px;margin-top:6px;">';
         breakdownHtml += '<span style="font-weight:700;">סה״כ נטו ריאלי</span>';
-        breakdownHtml += '<span style="font-weight:700;color:' + cl + ';">' + formatCurrency(proj.combined.netReal) + '</span></div>';
+        breakdownHtml += '<span style="font-weight:700;color:' + cl + ';">' + formatCurrency(projNetReal) + '</span></div>';
         breakdownHtml += '</div>';
     }
 
-    ct.innerHTML='<div class="card" style="border:2px solid '+cl+';margin-top:20px;"><div class="card-title" style="margin-bottom:16px;">'+ic+' ניתוח פערים — יעד קצבה'+yn+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;"><div style="padding:14px;background:var(--bg-surface);border-radius:8px;text-align:center;"><div style="font-size:0.85em;color:var(--text-secondary);margin-bottom:4px;">יעד (ריאלי אחרי מס)</div><div style="font-size:1.4em;font-weight:700;">'+formatCurrency(p.target)+'/חודש</div></div><div style="padding:14px;background:var(--bg-surface);border-radius:8px;text-align:center;"><div style="font-size:0.85em;color:var(--text-secondary);margin-bottom:4px;">צפי (ריאלי אחרי מס)</div><div style="font-size:1.4em;font-weight:700;color:'+cl+';">'+formatCurrency(p.projected)+'/חודש</div></div></div><div style="background:var(--border);height:28px;border-radius:14px;overflow:hidden;margin-bottom:12px;"><div style="background:'+cl+';height:100%;width:'+Math.min(p.percentage,100)+'%;display:flex;align-items:center;justify-content:center;font-size:0.85em;font-weight:700;color:white;">'+p.percentage.toFixed(0)+'%</div></div><div style="text-align:center;font-size:0.95em;font-weight:600;color:'+cl+';">'+gt+'</div>' + breakdownHtml + '</div>';
+    ct.innerHTML='<div class="card" style="border:2px solid '+cl+';margin-top:20px;"><div class="card-title" style="margin-bottom:16px;">'+ic+' ניתוח פערים — יעד קצבה'+yn+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;"><div style="padding:14px;background:var(--bg-surface);border-radius:8px;text-align:center;"><div style="font-size:0.85em;color:var(--text-secondary);margin-bottom:4px;">יעד (ריאלי אחרי מס)</div><div style="font-size:1.4em;font-weight:700;">'+formatCurrency(target)+'/חודש</div></div><div style="padding:14px;background:var(--bg-surface);border-radius:8px;text-align:center;"><div style="font-size:0.85em;color:var(--text-secondary);margin-bottom:4px;">צפי (ריאלי אחרי מס)</div><div style="font-size:1.4em;font-weight:700;color:'+cl+';">'+formatCurrency(projNetReal)+'/חודש</div></div></div><div style="background:var(--border);height:28px;border-radius:14px;overflow:hidden;margin-bottom:12px;"><div style="background:'+cl+';height:100%;width:'+Math.min(pct,100)+'%;display:flex;align-items:center;justify-content:center;font-size:0.85em;font-weight:700;color:white;">'+pct.toFixed(0)+'%</div></div><div style="text-align:center;font-size:0.95em;font-weight:600;color:'+cl+';">'+gt+'</div>' + breakdownHtml + '</div>';
 }
 
 // ============================================================
