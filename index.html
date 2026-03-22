@@ -45,7 +45,7 @@
     </div>
     <div class="hero-tagline">
         <h2>העתיד הכלכלי שלך מתחיל כאן</h2>
-        <p>תכנון חכם, תחזיות מדויקות, ושקט נפשי פיננסי</p>
+        <p>תכנון חכם של תיק הנכסים המשפחתי</p>
     </div>
 </div>
 
@@ -100,29 +100,13 @@
         </div>
         <div class="dcard-chevron">‹</div>
     </div>
-    <div class="dcard-duo">
-        <div class="dcard dcard-half" onclick="openModule('goals')">
-            <div class="dcard-label">יעדים קרובים</div>
-            <div class="dcard-icon-center" id="dashGoalIcon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
-            <div class="dcard-goal-text" id="dashGoalText">טוען...</div>
-            <div class="dcard-chevron">‹</div>
-        </div>
-        <div class="dcard dcard-half" onclick="openModule('pension')">
-            <div class="dcard-label">פנסיה וקצבה</div>
-            <div class="dcard-mid-value" id="dashPension">₪0</div>
-            <div class="dcard-gauge-mini">
-                <svg viewBox="0 0 80 80" class="gauge-mini-svg">
-                    <circle cx="40" cy="40" r="34" fill="none" stroke="#E5E7EB" stroke-width="7"/>
-                    <circle cx="40" cy="40" r="34" fill="none" stroke="#059669" stroke-width="7" stroke-dasharray="214" stroke-dashoffset="214" stroke-linecap="round" transform="rotate(-90 40 40)" id="gaugeArc"/>
-                </svg>
-                <div class="gauge-mini-pct" id="gaugePct">—</div>
-            </div>
-            <div class="dcard-sub" id="dashGaugeLabel" style="font-size:0.78em;">מדד המוכנות</div>
-            <div class="dcard-chevron">‹</div>
-            <div id="dashGaugeSub" style="display:none;"></div>
-            <div id="dashGaugeRing" style="display:none;"></div>
-        </div>
-    </div>
+    <!-- Hidden elements for JS compatibility -->
+    <div style="display:none;" id="dashGoalText"></div>
+    <div style="display:none;" id="dashPension"></div>
+    <div style="display:none;"><svg viewBox="0 0 80 80"><circle id="gaugeArc" cx="40" cy="40" r="34" stroke-dashoffset="214"/></svg><div id="gaugePct"></div></div>
+    <div style="display:none;" id="dashGaugeLabel"></div>
+    <div style="display:none;" id="dashGaugeSub"></div>
+    <div style="display:none;" id="dashGaugeRing"></div>
     <div class="dcard dcard-total" onclick="openModule('projections')">
         <div class="dcard-row">
             <div class="dcard-main">
