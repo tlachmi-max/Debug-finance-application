@@ -1,0 +1,431 @@
+/* ============================================================
+   dashboard-upgrade.css v8
+   Quick-Access Dashboard Cards + Profile FAB
+   ============================================================ */
+
+/* ============================================================
+   1. PROFILE FAB — Round button in hero top-right
+   ============================================================ */
+
+.profile-fab {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    border: 1.5px solid rgba(255,255,255,0.3);
+    color: #FFFFFF;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(8px);
+    position: relative;
+    flex-shrink: 0;
+}
+
+.profile-fab:hover {
+    background: rgba(255,255,255,0.28);
+    border-color: rgba(255,255,255,0.5);
+    transform: scale(1.08);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.profile-fab:active {
+    transform: scale(0.96);
+}
+
+.profile-fab svg {
+    width: 22px;
+    height: 22px;
+    stroke: #FFFFFF;
+    fill: none;
+    stroke-width: 1.8;
+}
+
+/* Tooltip on hover */
+.profile-fab::after {
+    content: 'הפרופיל שלנו';
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 50%;
+    transform: translateX(50%);
+    background: var(--brand-deep);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 0.72em;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.profile-fab:hover::after {
+    opacity: 1;
+}
+
+/* ============================================================
+   2. QUICK-ACCESS GRID — 4 main action cards
+   ============================================================ */
+
+.qa-section {
+    margin-bottom: 28px;
+}
+
+.qa-section-title {
+    font-size: 0.88em;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 16px;
+    padding-right: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.qa-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+}
+
+.qa-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* ============================================================
+   3. QUICK-ACCESS CARD — Large, tactile, inviting
+   ============================================================ */
+
+.qa-card {
+    position: relative;
+    background: #FFFFFF;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 28px 24px 24px;
+    cursor: pointer;
+    transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 170px;
+    box-shadow: var(--shadow-card);
+}
+
+/* Colored top accent bar */
+.qa-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; left: 0;
+    height: 4px;
+    transition: height 0.35s ease;
+}
+
+.qa-card[data-accent="blue"]::before   { background: linear-gradient(90deg, #1E40AF, #3B82F6); }
+.qa-card[data-accent="green"]::before  { background: linear-gradient(90deg, #059669, #34D399); }
+.qa-card[data-accent="amber"]::before  { background: linear-gradient(90deg, #D97706, #FBBF24); }
+.qa-card[data-accent="purple"]::before { background: linear-gradient(90deg, #7C3AED, #A78BFA); }
+
+/* Hover: grow accent bar + lift */
+.qa-card:hover {
+    border-color: transparent;
+    transform: translateY(-6px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
+}
+
+.qa-card:hover::before {
+    height: 6px;
+}
+
+.qa-card:active {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+}
+
+/* Decorative background circle */
+.qa-card::after {
+    content: '';
+    position: absolute;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    top: -40px; left: -40px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.qa-card[data-accent="blue"]::after   { background: radial-gradient(circle, rgba(59,130,246,0.08), transparent 70%); }
+.qa-card[data-accent="green"]::after  { background: radial-gradient(circle, rgba(16,185,129,0.08), transparent 70%); }
+.qa-card[data-accent="amber"]::after  { background: radial-gradient(circle, rgba(245,158,11,0.08), transparent 70%); }
+.qa-card[data-accent="purple"]::after { background: radial-gradient(circle, rgba(124,58,237,0.08), transparent 70%); }
+
+.qa-card:hover::after {
+    opacity: 1;
+}
+
+/* Icon container */
+.qa-icon {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.qa-card:hover .qa-icon {
+    transform: scale(1.08);
+}
+
+.qa-icon svg {
+    width: 28px; height: 28px;
+    stroke-width: 1.8;
+    fill: none;
+}
+
+.qa-icon-blue   { background: #EFF6FF; }
+.qa-icon-blue svg   { stroke: #2563EB; }
+.qa-icon-green  { background: #ECFDF5; }
+.qa-icon-green svg  { stroke: #059669; }
+.qa-icon-amber  { background: #FFFBEB; }
+.qa-icon-amber svg  { stroke: #D97706; }
+.qa-icon-purple { background: #F5F3FF; }
+.qa-icon-purple svg { stroke: #7C3AED; }
+
+/* Text */
+.qa-title {
+    font-size: 1.12em;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+}
+
+.qa-desc {
+    font-size: 0.84em;
+    color: var(--text-secondary);
+    line-height: 1.55;
+}
+
+/* Arrow indicator */
+.qa-arrow {
+    margin-top: auto;
+    font-size: 0.82em;
+    font-weight: 700;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.qa-card[data-accent="blue"]   .qa-arrow { color: #2563EB; }
+.qa-card[data-accent="green"]  .qa-arrow { color: #059669; }
+.qa-card[data-accent="amber"]  .qa-arrow { color: #D97706; }
+.qa-card[data-accent="purple"] .qa-arrow { color: #7C3AED; }
+
+.qa-card:hover .qa-arrow {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Live metric badge on card */
+.qa-metric {
+    position: absolute;
+    top: 16px; left: 16px;
+    font-size: 0.75em;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--success-bg);
+    color: var(--success);
+    border: 1px solid var(--success-border);
+    opacity: 0.9;
+    transition: opacity 0.25s;
+}
+
+.qa-card:hover .qa-metric { opacity: 1; }
+
+/* ============================================================
+   4. SECONDARY GRID — Existing cards get subtle treatment
+   ============================================================ */
+
+.launchpad-grid-secondary-title {
+    font-size: 0.82em;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin: 8px 0 14px 0;
+    padding-right: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.launchpad-grid-secondary-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border-light), transparent);
+}
+
+/* Slightly smaller cards in the secondary grid */
+.launchpad-grid.secondary-grid .launch-card {
+    padding: 22px 20px 18px;
+    min-height: auto;
+}
+
+.launchpad-grid.secondary-grid .launch-card-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+}
+
+.launchpad-grid.secondary-grid .launch-card-icon svg {
+    width: 22px; height: 22px;
+}
+
+.launchpad-grid.secondary-grid .launch-card-body h3 {
+    font-size: 0.95em;
+}
+
+.launchpad-grid.secondary-grid .launch-card-body p {
+    font-size: 0.78em;
+}
+
+/* Hide profile card from secondary grid (moved to FAB) */
+.launchpad-grid.secondary-grid .launch-card[data-module="profile"] {
+    display: none;
+}
+
+/* ============================================================
+   5. BOTTOM NAV — Highlight primary tabs
+   ============================================================ */
+
+/* If bottom nav is ever shown, highlight the 4 main ones */
+.nav-item[data-panel="pension"],
+.nav-item[data-panel="investments"],
+.nav-item[data-panel="goals"],
+.nav-item[data-panel="summary"] {
+    position: relative;
+}
+
+.nav-item[data-panel="pension"]::before,
+.nav-item[data-panel="investments"]::before,
+.nav-item[data-panel="goals"]::before,
+.nav-item[data-panel="summary"]::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 20%; right: 20%;
+    height: 3px;
+    background: var(--brand-primary);
+    border-radius: 0 0 3px 3px;
+}
+
+/* ============================================================
+   6. ENTRANCE ANIMATIONS
+   ============================================================ */
+
+@keyframes qaCardIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.qa-card {
+    animation: qaCardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.qa-card:nth-child(1) { animation-delay: 0.05s; }
+.qa-card:nth-child(2) { animation-delay: 0.12s; }
+.qa-card:nth-child(3) { animation-delay: 0.19s; }
+.qa-card:nth-child(4) { animation-delay: 0.26s; }
+
+@keyframes profileFabIn {
+    from { opacity: 0; transform: scale(0.7); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+.profile-fab {
+    animation: profileFabIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s backwards;
+}
+
+/* ============================================================
+   7. RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .qa-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .qa-card {
+        padding: 20px 16px 16px;
+        min-height: 150px;
+        gap: 10px;
+    }
+
+    .qa-icon {
+        width: 46px; height: 46px;
+        border-radius: 12px;
+    }
+
+    .qa-icon svg {
+        width: 24px; height: 24px;
+    }
+
+    .qa-title { font-size: 1em; }
+    .qa-desc { font-size: 0.78em; }
+    .qa-metric { font-size: 0.68em; padding: 3px 8px; }
+
+    .profile-fab {
+        width: 40px; height: 40px;
+    }
+
+    .profile-fab svg {
+        width: 20px; height: 20px;
+    }
+
+    .profile-fab::after {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .qa-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .qa-card {
+        flex-direction: row;
+        align-items: center;
+        min-height: auto;
+        padding: 18px 16px;
+        gap: 14px;
+    }
+
+    .qa-card::after { display: none; }
+
+    .qa-card .qa-arrow { display: none; }
+
+    .qa-metric {
+        position: static;
+        align-self: flex-start;
+    }
+}
