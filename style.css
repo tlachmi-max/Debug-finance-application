@@ -1552,6 +1552,7 @@ canvas { max-width: 100%; }
 
 .dcard-icon-blue { background: #EFF6FF; }
 .dcard-icon-green { background: #ECFDF5; }
+.dcard-icon-amber { background: #FFFBEB; }
 
 /* Cards 2-3: Duo */
 .dcard-duo {
