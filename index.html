@@ -35,6 +35,7 @@
             </div>
         </div>
         <div class="hero-actions">
+            <button class="menu-toggle-btn" onclick="toggleSideMenu()" title="תפריט ראשי"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg></button>
             <button class="profile-fab" onclick="openModule('profile')" title="הפרופיל שלנו"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
             <div id="storageStatus" class="storage-status" title="מצב שמירה"><span class="status-icon">💾</span><span class="status-text">מקומי</span></div>
             <button id="cloudSyncBtn" class="btn-hero btn-cloud" disabled style="opacity:0.5;cursor:not-allowed;" title="סנכרון כרגע לא זמין"><span>☁️</span><span>סנכרון</span></button>
@@ -118,6 +119,17 @@
         <div class="dcard-sub" id="dashTotalSub"></div>
         <div class="dcard-chevron">‹</div>
     </div>
+    <div class="dcard dcard-total" id="dashDebtsCard" onclick="openModule('debts')">
+        <div class="dcard-row">
+            <div class="dcard-main">
+                <div class="dcard-label">החובות שלנו</div>
+                <div class="dcard-big-value" id="dashDebtsTotal">₪0</div>
+                <div class="dcard-sub" id="dashDebtsSub">אין התחייבויות רשומות</div>
+            </div>
+            <div class="dcard-icon-wrap dcard-icon-red"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        </div>
+        <div class="dcard-chevron">‹</div>
+    </div>
     <div class="dcard dcard-recommended" id="dashRecommendedCard" style="display:none;" onclick="openModule('profile')">
         <div class="dcard-row">
             <div class="dcard-main">
@@ -129,9 +141,6 @@
         </div>
     </div>
     <div class="dcard dcard-insight" id="dashActionWidget" style="display:none;" onclick="openModule('strategy')"></div>
-    <div class="dcard-report-row">
-        <button class="dcard-report-btn" onclick="generateReport()">הפק דו״ח מצב מלא (HTML)</button>
-    </div>
     <div class="dash-snap-row">
         <button class="btn-ghost btn-sm" onclick="saveHistorySnapshot()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -142,19 +151,40 @@
     <div id="dashPensionSub" style="display:none;"></div>
     <div id="dashOverview" style="display:none;"></div>
 
-    <div class="launchpad-grid">
-        <div class="launch-card" onclick="openModule('investments')"><div class="launch-card-icon lci-blue"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></div><div class="launch-card-body"><h3>תיק השקעות</h3><p>נכסים נזילים, קרנות השתלמות, גמל ותיקים עצמאיים</p></div><div class="launch-card-arrow">← כניסה</div></div>
-        <div class="launch-card" onclick="openModule('debts')"><div class="launch-card-icon lci-red"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="launch-card-body"><h3>החובות שלנו</h3><p>משכנתא, הלוואות צרכניות והתחייבויות נוספות</p></div><div class="launch-card-arrow">← כניסה</div></div>
-        <div class="launch-card" onclick="openModule('goals')"><div class="launch-card-icon lci-red"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><div class="launch-card-body"><h3>יעדים וחלומות</h3><p>יעדי חיים — חתונות, טיולים, רכישות</p></div><div class="launch-card-arrow">← כניסה</div></div>
-        <div class="launch-card" onclick="openModule('summary')"><div class="launch-card-icon lci-green"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><div class="launch-card-body"><h3>סיכום ועלויות</h3><p>הון, דמי ניהול, מס ומחשבון השפעה</p></div><div class="launch-card-arrow">← כניסה</div></div>
-        <div class="launch-card" onclick="openModule('strategy')"><div class="launch-card-icon lci-purple"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><div class="launch-card-body"><h3>המלצות ואסטרטגיה</h3><p>בקרת עלויות, אופטימיזציית מס וסדר משיכה</p></div><div class="launch-card-arrow">← כניסה</div></div>
-        <div class="launch-card" onclick="openModule('pension')"><div class="launch-card-icon lci-amber"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg></div><div class="launch-card-body"><h3>סימולטור פנסיה</h3><p>יעדי פרישה, קצבה חודשית, מס וסימולטור</p></div><div class="launch-card-arrow">← כניסה</div></div>
-        <div class="launch-card" onclick="openModule('projections')"><div class="launch-card-icon lci-indigo"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="launch-card-body"><h3>צמיחה ותחזיות</h3><p>ריבית דריבית, תחזית שנתית ופירוט לפי מסלול</p></div><div class="launch-card-arrow">← כניסה</div></div>
-        <div class="launch-card" onclick="openModule('roadmap')"><div class="launch-card-icon lci-teal"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="launch-card-body"><h3>מפת דרכים</h3><p>תכנון משיכות ואסטרטגיות מס</p></div><div class="launch-card-arrow">← כניסה</div></div>
-        <div class="launch-card" onclick="openModule('charts')"><div class="launch-card-icon lci-slate"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></div><div class="launch-card-body"><h3>גרפים</h3><p>חלוקות ופיזור לפי סוג, סיכון ומיסוי</p></div><div class="launch-card-arrow">← כניסה</div></div>
-        <div class="launch-card" data-module="profile" onclick="openModule('profile')"><div class="launch-card-icon lci-pink"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#DB2777" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="launch-card-body"><h3>פרופיל</h3><p>פרטים אישיים, בן/בת זוג וילדים</p></div><div class="launch-card-arrow">← כניסה</div></div>
+    <div class="launchpad-cta" onclick="toggleSideMenu()">
+        <div class="launchpad-cta-icon">☰</div>
+        <div class="launchpad-cta-body">
+            <h3>כל הכלים והדוחות</h3>
+            <p>פרופיל, תיק נכסים, פרישה, יעדים, חובות, מפת דרכים, גרפים והערות אישיות</p>
+        </div>
+        <div class="launchpad-cta-arrow">‹</div>
     </div>
 </div>
+
+<!-- ========== SIDE MENU ========== -->
+<div class="side-menu-overlay" id="sideMenuOverlay" onclick="closeSideMenu()"></div>
+<aside class="side-menu" id="sideMenu">
+    <div class="side-menu-header">
+        <div class="side-menu-title">📋 תפריט ראשי</div>
+        <button class="side-menu-close" onclick="closeSideMenu()" title="סגור">✕</button>
+    </div>
+    <nav class="side-menu-list">
+        <div class="side-menu-item" onclick="sideMenuNavigate('profile')"><span class="side-menu-icon">👤</span><span class="side-menu-label">פרופיל משפחתי</span><span class="side-menu-arrow">‹</span></div>
+        <div class="side-menu-item" onclick="sideMenuNavigate('investments')"><span class="side-menu-icon">📊</span><span class="side-menu-label">תיק הנכסים שלנו</span><span class="side-menu-arrow">‹</span></div>
+        <div class="side-menu-item" onclick="sideMenuNavigate('pension')"><span class="side-menu-icon">💰</span><span class="side-menu-label">הפרישה שלנו</span><span class="side-menu-arrow">‹</span></div>
+        <div class="side-menu-item" onclick="sideMenuNavigate('goals')"><span class="side-menu-icon">🎯</span><span class="side-menu-label">החלומות והיעדים שלנו</span><span class="side-menu-arrow">‹</span></div>
+        <div class="side-menu-item" onclick="sideMenuNavigate('summary')"><span class="side-menu-icon">📋</span><span class="side-menu-label">העתיד שלנו</span><span class="side-menu-arrow">‹</span></div>
+        <div class="side-menu-item" onclick="sideMenuNavigate('debts')"><span class="side-menu-icon">💳</span><span class="side-menu-label">החובות שלנו</span><span class="side-menu-arrow">‹</span></div>
+        <div class="side-menu-item" onclick="sideMenuReport()"><span class="side-menu-icon">🧾</span><span class="side-menu-label">הפק דו״ח מסכם</span><span class="side-menu-arrow">‹</span></div>
+        <div class="side-menu-item" onclick="sideMenuNavigate('roadmap')"><span class="side-menu-icon">📍</span><span class="side-menu-label">מפת דרכים</span><span class="side-menu-arrow">‹</span></div>
+        <div class="side-menu-item" onclick="sideMenuNavigate('charts')"><span class="side-menu-icon">📊</span><span class="side-menu-label">גרפים</span><span class="side-menu-arrow">‹</span></div>
+        <div class="side-menu-item disabled" onclick="sideMenuComingSoon()"><span class="side-menu-icon">💵</span><span class="side-menu-label">תזרים חודשי</span><span class="side-menu-badge">בקרוב</span></div>
+        <div class="side-menu-item" onclick="sideMenuNavigate('notes')"><span class="side-menu-icon">📝</span><span class="side-menu-label">תובנות והערות אישיות</span><span class="side-menu-arrow">‹</span></div>
+    </nav>
+    <div class="side-menu-footer">
+        <button class="side-menu-home-btn" onclick="sideMenuGoHome()"><span>🏠</span><span>חזרה לדף הבית</span></button>
+    </div>
+</aside>
 
 <!-- ========== MODULE VIEW ========== -->
 <div class="module-wrapper" id="moduleWrapper">
@@ -327,6 +357,22 @@
     <div class="card"><div class="card-header"><div class="card-title"><span>✓</span><span>משימות לביצוע ומעקב</span></div></div><div class="flex gap-2 mb-3"><input type="text" class="form-input" id="newTask" placeholder="הוסף משימה חדשה..." style="flex:1;" onkeypress="if(event.key==='Enter') addTask()"><button class="btn btn-success" onclick="addTask()"><span>➕</span><span>הוסף</span></button></div><div id="tasksList"></div><div class="alert alert-info mt-3"><span class="alert-icon">📊</span><div><strong>התקדמות:</strong> <span id="taskProgress">0% הושלמו</span></div></div></div>
 </div>
 
+<!-- ===== Notes / Insights ===== -->
+<div id="notes" class="panel">
+    <div class="inv-hero" style="margin-bottom:20px;"><div class="inv-hero-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><p>רשמו תובנות, מסקנות והחלטות מפגישות הייעוץ. כל הערה נשמרת עם תאריך ושעת הרישום, וניתנת לעריכה ולמחיקה בכל עת.</p></div>
+    <div class="card mb-4">
+        <div class="card-title">✏️ הוסף תובנה או הערה</div>
+        <div class="form-group" style="margin-top:14px;">
+            <textarea class="form-input" id="noteText" placeholder="כתבו כאן תובנה, החלטה או הערה לזיכרון..." style="min-height:120px;resize:vertical;line-height:1.6;"></textarea>
+        </div>
+        <div class="form-actions" style="display:flex;gap:10px;justify-content:flex-end;">
+            <button type="button" class="btn btn-secondary" id="btnCancelNoteEdit" onclick="cancelEditNote()" style="display:none;"><span>❌</span><span>בטל עריכה</span></button>
+            <button type="button" class="btn btn-primary" onclick="saveNote()"><span>💾</span><span id="btnSaveNoteText">שמור הערה</span></button>
+        </div>
+    </div>
+    <div id="notesList" class="items-list"></div>
+</div>
+
         </main>
     </div>
 </div>
@@ -344,6 +390,8 @@
 <script src="glide.js?v=4"></script>
 <script src="pension-profile-fix.js?v=8"></script>
 <script src="debts.js?v=1"></script>
+<script src="notes.js?v=1"></script>
+<script src="sidemenu.js?v=1"></script>
 
 <!-- NAVIGATION: Hero + Launchpad — Module -->
 <script>
@@ -358,7 +406,8 @@ var MODULE_TITLES = {
     'charts':      '📊 גרפים',
     'profile':     '👤 פרופיל משפחתי',
     'tasks':       '✓ משימות ומעקב',
-    'strategy':    '🧠 המלצות ואסטרטגיה'
+    'strategy':    '🧠 המלצות ואסטרטגיה',
+    'notes':       '📝 תובנות והערות אישיות'
 };
 
 function openModule(panelId) {
@@ -418,6 +467,7 @@ function renderActivePanel(panelId) {
     if (panelId === 'roadmap' && typeof renderWithdrawals === 'function') renderWithdrawals();
     if (panelId === 'investments' && typeof renderInvestments === 'function') renderInvestments();
     if (panelId === 'strategy' && typeof renderStrategy === 'function') renderStrategy();
+    if (panelId === 'notes' && typeof renderNotes === 'function') renderNotes();
 }
 
 var _origSwitchPlan = switchPlan;
@@ -538,7 +588,7 @@ var _baseSummaryRender = renderSummary;
 renderSummary = function() { _baseSummaryRender(); renderSummaryGrouped(); };
 function renderSummaryGrouped() { var container = document.getElementById('summaryBreakdown'); if (!container) return; var plan = getCurrentPlan(); var years = parseInt(document.getElementById('sumYears').value) || 20; var items = []; plan.investments.forEach(function(inv) { if (!inv.include || inv.type === 'פנסיה') return; var nominal = calculateFV(inv.amount, inv.monthly, inv.returnRate, years, inv.feeDeposit || 0, inv.feeAnnual || 0, inv.subTracks); var principal = (typeof calculatePrincipal === 'function') ? calculatePrincipal(inv.amount, inv.monthly, years, inv) : (inv.amount + inv.monthly * 12 * years); var profit = nominal - principal; var tax = (typeof calculateTax === 'function') ? calculateTax(principal, nominal, inv.tax, years) : 0; var real = (typeof calculateRealValue === 'function') ? calculateRealValue(nominal, years) : nominal; var fees = calculateFV(inv.amount, inv.monthly, inv.returnRate, years, 0, 0, null) - nominal; items.push({ inv: inv, nominal: nominal, real: real, tax: tax, principal: principal, profit: profit, fees: fees }); }); if (items.length === 0) return; var byHouse = {}; items.forEach(function(item) { var h = item.inv.house || 'לא מוגדר'; if (!byHouse[h]) byHouse[h] = []; byHouse[h].push(item); }); var html = ''; Object.keys(byHouse).forEach(function(house) { var group = byHouse[house]; var houseTotal = group.reduce(function(s, it) { return s + it.nominal; }, 0); html += '<div class="body-card" style="margin-bottom:16px;"><div class="body-card-header"><div class="body-card-info"><div class="body-card-name">' + house + '</div><div class="body-card-count">' + group.length + ' מסלולים</div></div><div class="body-card-total">' + formatCurrency(houseTotal) + '</div></div>'; html += '<div class="body-card-table"><table><thead><tr><th>מסלול</th><th>סוג</th><th>נומינלי</th><th>ריאלי</th><th>רווח</th><th>מס</th><th>נטו</th></tr></thead><tbody>'; group.forEach(function(item) { var net = item.nominal - item.tax; html += '<tr><td><div class="track-name">' + item.inv.name + '</div></td><td><span class="type-tag">' + item.inv.type + '</span></td><td class="num">' + formatCurrency(item.nominal) + '</td><td class="num" style="color:var(--brand-primary);">' + formatCurrency(item.real) + '</td><td class="num" style="color:var(--success);">' + formatCurrency(item.profit) + '</td><td class="num" style="color:var(--danger);">' + formatCurrency(item.tax) + '</td><td class="num" style="font-weight:700;color:var(--success);">' + formatCurrency(net) + '</td></tr>'; }); html += '</tbody></table></div></div>'; }); container.innerHTML = html; }
 
-function renderDashboard() { try { var plan = getCurrentPlan(); if (!plan || !plan.investments) return; var liquid = 0, pension = 0, stockPctTotal = 0, liquidTotal = 0; plan.investments.forEach(function(inv) { if (!inv.include) return; if (inv.type === 'פנסיה') { pension += (inv.amount || 0); } else { liquid += (inv.amount || 0); liquidTotal += (inv.amount || 0); if (inv.subTracks && inv.subTracks.length > 0) { inv.subTracks.forEach(function(st) { if (st.type && st.type.match(/מניות|S&P|סנופי/i)) stockPctTotal += (inv.amount || 0) * (st.percent || 0) / 100; }); } else if (inv.returnRate >= 6) stockPctTotal += (inv.amount || 0) * 0.7; } }); var totalDebts = (typeof getTotalDebts === 'function') ? getTotalDebts(plan) : 0; var total = liquid + pension - totalDebts; var el = document.getElementById('dashLiquid'); if (el) el.textContent = formatCurrency(liquid); el = document.getElementById('dashLiquidSub'); if (el) { var stockPct = liquidTotal > 0 ? Math.round(stockPctTotal / liquidTotal * 100) : 0; el.textContent = 'חשיפה מנייתית בתיק הנזיל: ' + stockPct + '%'; } renderDashGoal(plan); el = document.getElementById('dashPension'); if (el) el.textContent = formatCurrency(pension); renderDashGauge(plan); el = document.getElementById('dashTotal'); if (el) el.textContent = formatCurrency(total); el = document.getElementById('dashTotalSub'); if (el) { var cnt = plan.investments.filter(function(i) { return i.include; }).length; var subTxt = cnt + ' מסלולים פעילים'; if (totalDebts > 0) subTxt += ' · בניכוי ' + formatCurrency(totalDebts) + ' התחייבויות'; el.textContent = subTxt; } renderDashInsight(plan); renderHistoryTable(); if (typeof renderRecommendedNetWorth === 'function') renderRecommendedNetWorth(plan, total); } catch(e) { console.error('Dashboard:', e); } }
+function renderDashboard() { try { var plan = getCurrentPlan(); if (!plan || !plan.investments) return; var liquid = 0, pension = 0, stockPctTotal = 0, liquidTotal = 0; plan.investments.forEach(function(inv) { if (!inv.include) return; if (inv.type === 'פנסיה') { pension += (inv.amount || 0); } else { liquid += (inv.amount || 0); liquidTotal += (inv.amount || 0); if (inv.subTracks && inv.subTracks.length > 0) { inv.subTracks.forEach(function(st) { if (st.type && st.type.match(/מניות|S&P|סנופי/i)) stockPctTotal += (inv.amount || 0) * (st.percent || 0) / 100; }); } else if (inv.returnRate >= 6) stockPctTotal += (inv.amount || 0) * 0.7; } }); var totalDebts = (typeof getTotalDebts === 'function') ? getTotalDebts(plan) : 0; var total = liquid + pension - totalDebts; var elDebtsTotal = document.getElementById('dashDebtsTotal'); if (elDebtsTotal) elDebtsTotal.textContent = formatCurrency(totalDebts); var elDebtsSub = document.getElementById('dashDebtsSub'); if (elDebtsSub) { var numDebts = (plan.debts || []).length; elDebtsSub.textContent = numDebts > 0 ? (numDebts + ' הלוואות פעילות') : 'אין התחייבויות רשומות'; } var el = document.getElementById('dashLiquid'); if (el) el.textContent = formatCurrency(liquid); el = document.getElementById('dashLiquidSub'); if (el) { var stockPct = liquidTotal > 0 ? Math.round(stockPctTotal / liquidTotal * 100) : 0; el.textContent = 'חשיפה מנייתית בתיק הנזיל: ' + stockPct + '%'; } renderDashGoal(plan); el = document.getElementById('dashPension'); if (el) el.textContent = formatCurrency(pension); renderDashGauge(plan); el = document.getElementById('dashTotal'); if (el) el.textContent = formatCurrency(total); el = document.getElementById('dashTotalSub'); if (el) { var cnt = plan.investments.filter(function(i) { return i.include; }).length; var subTxt = cnt + ' מסלולים פעילים'; if (totalDebts > 0) subTxt += ' · בניכוי ' + formatCurrency(totalDebts) + ' התחייבויות'; el.textContent = subTxt; } renderDashInsight(plan); renderHistoryTable(); if (typeof renderRecommendedNetWorth === 'function') renderRecommendedNetWorth(plan, total); } catch(e) { console.error('Dashboard:', e); } }
 function renderDashGoal(plan) { var textEl = document.getElementById('dashGoalText'); if (!textEl) return; var goals = plan.goals; if (!goals || !goals.lifeGoals || goals.lifeGoals.length === 0) { textEl.innerHTML = '<span style="color:var(--text-secondary);font-size:0.85em;">הגדר יעדי חיים</span>'; return; } var now = new Date().getFullYear(); var nearest = null; goals.lifeGoals.forEach(function(lg) { if (!nearest || (lg.year && lg.year >= now && lg.year < (nearest.year || 9999))) nearest = lg; }); if (!nearest) { textEl.innerHTML = '<span style="color:var(--text-secondary);font-size:0.85em;">אין יעדים קרובים</span>'; return; } var pct = 0; if (nearest.amount) { var liquid = 0; plan.investments.forEach(function(inv) { if (inv.include && inv.type !== 'פנסיה') liquid += (inv.amount || 0); }); pct = Math.min(100, Math.round(liquid / nearest.amount * 100)); } textEl.innerHTML = '<div style="font-weight:700;color:var(--text-primary);font-size:0.95em;">' + (nearest.name || 'יעד') + ': ' + pct + '%</div>'; }
 function renderDashGauge(plan) { var arc = document.getElementById('gaugeArc'); var pctEl = document.getElementById('gaugePct'); var labelEl = document.getElementById('dashGaugeLabel'); if (!arc || !pctEl) return; var goals = plan.goals; var profile = plan.profile; if (!goals || !goals.retirement || !goals.retirement.monthlyPension || !profile || !profile.user || !profile.user.age) { arc.style.strokeDashoffset = '214'; pctEl.textContent = '—'; if (labelEl) labelEl.textContent = 'הגדר יעדים'; return; } var pct = 0; if (typeof analyzeGoals === 'function') { var analysis = analyzeGoals(); if (analysis && analysis.pension) pct = Math.min(Math.round(analysis.pension.percentage), 100); } var hasCostIssues = false; plan.investments.forEach(function(inv) { if (!inv.include) return; if (inv.type === 'פנסיה' && inv.feeAnnual >= 0.3) hasCostIssues = true; if (inv.type === 'קרן השתלמות' && inv.feeAnnual >= 0.7) hasCostIssues = true; }); var circ = 214; arc.style.strokeDashoffset = circ - (circ * pct / 100); arc.style.stroke = hasCostIssues ? '#D97706' : pct >= 90 ? '#059669' : pct >= 60 ? '#D97706' : '#DC2626'; pctEl.textContent = pct + '%'; if (labelEl) { if (hasCostIssues) labelEl.textContent = '⚠️ דמ"נ גבוהים'; else if (pct >= 90) labelEl.textContent = 'מצוין!'; else if (pct >= 60) labelEl.textContent = 'יש מקום לשיפור'; else labelEl.textContent = 'דרוש שיפור'; } }
 function renderDashInsight(plan) { var widget = document.getElementById('dashActionWidget'); if (!widget) return; var worstSaving = 0, worstName = ''; var BENCH_MAP = { 'קרן השתלמות': 0.4, 'גמל להשקעה': 0.45, 'פוליסת חסכון': 0.8, 'פנסיה': 0.15 }; plan.investments.forEach(function(inv) { if (!inv.include) return; var benchFee = BENCH_MAP[inv.type] || 0.5; if ((inv.feeAnnual || 0) > benchFee) { var saving = ((inv.feeAnnual || 0) - benchFee) * (inv.amount || 0) / 100; if (saving > worstSaving) { worstSaving = saving; worstName = inv.name; } } }); if (worstSaving > 100) { var monthly = Math.round(worstSaving / 12); widget.innerHTML = '<div class="dcard-insight-inner"><div class="dcard-insight-badge">⚠️ תובנה אסטרטגית</div><div class="dcard-insight-text">חיסכון פוטנציאלי של ' + formatCurrency(monthly) + '₪ בחודש בדמי ניהול ב' + worstName + '</div></div>'; widget.style.display = 'block'; } else { widget.style.display = 'none'; } }
