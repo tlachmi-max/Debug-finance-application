@@ -2179,6 +2179,10 @@ canvas { max-width: 100%; }
 /* Debts central shortcut card */
 .dcard-icon-red { background: #FEF2F2; }
 
+/* Non-clickable dcard variant (e.g. recommended net worth, now display-only) */
+.dcard-static { cursor: default; }
+.dcard-static:hover { transform: none; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04); }
+
 /* ============================================================
    NOTES / INSIGHTS PANEL
    ============================================================ */
@@ -2194,6 +2198,215 @@ canvas { max-width: 100%; }
     line-height: 1.7;
     white-space: pre-wrap;
 }
+
+/* ============================================================
+   MONTHLY CASH FLOW (תזרים חודשי)
+   ============================================================ */
+.cf-month-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    position: relative;
+}
+
+.cf-month-nav-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg-surface);
+    color: var(--brand-primary);
+    font-size: 1.1em;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+
+.cf-month-nav-btn:hover { background: var(--brand-bg); border-color: var(--brand-pale); }
+
+.cf-month-label {
+    font-size: 1.1em;
+    font-weight: 800;
+    color: var(--text-primary);
+    min-width: 140px;
+    text-align: center;
+}
+
+.cf-month-picker {
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 6px 12px;
+    font-family: inherit;
+    font-size: 0.82em;
+    color: var(--text-secondary);
+    background: var(--bg-surface);
+}
+
+.cf-toolbar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.cf-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.cf-stat-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    box-shadow: var(--shadow-card);
+}
+
+.cf-stat-label { font-size: 0.78em; color: var(--text-muted); font-weight: 600; margin-bottom: 6px; }
+.cf-stat-row { display: flex; justify-content: space-between; font-size: 0.85em; margin-top: 3px; }
+.cf-stat-row span:first-child { color: var(--text-secondary); }
+.cf-stat-row span:last-child { font-weight: 700; color: var(--text-primary); }
+
+.cf-net-card {
+    border-radius: var(--radius-xl);
+    padding: 22px 24px;
+    color: #fff;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow-card);
+}
+
+.cf-net-card.positive { background: linear-gradient(135deg, #059669, #10B981); }
+.cf-net-card.negative { background: linear-gradient(135deg, #DC2626, #EF4444); }
+
+.cf-net-label { font-size: 0.85em; opacity: 0.9; margin-bottom: 6px; font-weight: 600; }
+.cf-net-value { font-size: 1.9em; font-weight: 800; }
+.cf-net-sub { font-size: 0.8em; opacity: 0.85; margin-top: 4px; }
+
+.cf-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 16px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.cf-tab {
+    flex-shrink: 0;
+    padding: 10px 16px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: #FFFFFF;
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 0.85em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.cf-tab:hover { border-color: var(--brand-pale); }
+
+.cf-tab.active {
+    background: var(--brand-primary);
+    border-color: var(--brand-primary);
+    color: #fff;
+}
+
+.cf-form-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 12px;
+    margin-bottom: 14px;
+}
+
+@media (max-width: 640px) {
+    .cf-form-grid { grid-template-columns: 1fr; }
+}
+
+.cf-table-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+}
+
+.cf-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 480px;
+    background: #fff;
+}
+
+.cf-table thead th {
+    background: var(--brand-bg);
+    color: var(--brand-deep);
+    font-size: 0.82em;
+    font-weight: 700;
+    padding: 12px 14px;
+    text-align: right;
+    border-bottom: 1px solid var(--border);
+}
+
+.cf-table tbody td {
+    padding: 11px 14px;
+    font-size: 0.88em;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-primary);
+}
+
+.cf-table tbody tr:last-child td { border-bottom: none; }
+.cf-table tbody tr:hover { background: var(--bg-hover); }
+
+.cf-table tfoot td {
+    padding: 12px 14px;
+    font-weight: 800;
+    background: var(--bg-surface);
+    border-top: 2px solid var(--border);
+    font-size: 0.9em;
+}
+
+.cf-item-name { font-weight: 600; }
+.cf-linked-badge {
+    display: inline-block;
+    font-size: 0.72em;
+    color: var(--brand-primary);
+    background: var(--brand-bg);
+    border-radius: 100px;
+    padding: 1px 8px;
+    margin-right: 6px;
+    font-weight: 700;
+    vertical-align: middle;
+}
+
+.cf-row-actions { display: flex; gap: 6px; justify-content: flex-end; }
+.cf-row-actions button {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: #fff;
+    cursor: pointer;
+    font-size: 0.85em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    padding: 0;
+}
+.cf-row-actions button:hover { background: var(--bg-hover); }
 
 @media (max-width: 768px) {
     .side-menu { width: min(300px, 88vw); }

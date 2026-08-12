@@ -36,7 +36,6 @@
         </div>
         <div class="hero-actions">
             <button class="menu-toggle-btn" onclick="toggleSideMenu()" title="תפריט ראשי"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg></button>
-            <button class="profile-fab" onclick="openModule('profile')" title="הפרופיל שלנו"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
             <div id="storageStatus" class="storage-status" title="מצב שמירה"><span class="status-icon">💾</span><span class="status-text">מקומי</span></div>
             <button id="cloudSyncBtn" class="btn-hero btn-cloud" disabled style="opacity:0.5;cursor:not-allowed;" title="סנכרון כרגע לא זמין"><span>☁️</span><span>סנכרון</span></button>
             <select id="planSelector" class="plan-select" onchange="switchPlan(this.value)"><option value="">בחר תוכנית...</option></select>
@@ -130,7 +129,7 @@
         </div>
         <div class="dcard-chevron">‹</div>
     </div>
-    <div class="dcard dcard-recommended" id="dashRecommendedCard" style="display:none;" onclick="openModule('profile')">
+    <div class="dcard dcard-recommended dcard-static" id="dashRecommendedCard" style="display:none;">
         <div class="dcard-row">
             <div class="dcard-main">
                 <div class="dcard-label">שווי נקי מומלץ (לפי גיל והכנסה)</div>
@@ -178,7 +177,7 @@
         <div class="side-menu-item" onclick="sideMenuReport()"><span class="side-menu-icon">🧾</span><span class="side-menu-label">הפק דו״ח מסכם</span><span class="side-menu-arrow">‹</span></div>
         <div class="side-menu-item" onclick="sideMenuNavigate('roadmap')"><span class="side-menu-icon">📍</span><span class="side-menu-label">מפת דרכים</span><span class="side-menu-arrow">‹</span></div>
         <div class="side-menu-item" onclick="sideMenuNavigate('charts')"><span class="side-menu-icon">📊</span><span class="side-menu-label">גרפים</span><span class="side-menu-arrow">‹</span></div>
-        <div class="side-menu-item disabled" onclick="sideMenuComingSoon()"><span class="side-menu-icon">💵</span><span class="side-menu-label">תזרים חודשי</span><span class="side-menu-badge">בקרוב</span></div>
+        <div class="side-menu-item" onclick="sideMenuNavigate('cashflow')"><span class="side-menu-icon">💵</span><span class="side-menu-label">תזרים חודשי</span><span class="side-menu-arrow">‹</span></div>
         <div class="side-menu-item" onclick="sideMenuNavigate('notes')"><span class="side-menu-icon">📝</span><span class="side-menu-label">תובנות והערות אישיות</span><span class="side-menu-arrow">‹</span></div>
     </nav>
     <div class="side-menu-footer">
@@ -373,6 +372,50 @@
     <div id="notesList" class="items-list"></div>
 </div>
 
+<!-- ===== Monthly Cash Flow ===== -->
+<div id="cashflow" class="panel">
+    <div class="inv-hero" style="margin-bottom:18px;"><div class="inv-hero-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><p>נהלו את התזרים החודשי שלכם — הכנסות, הוצאות משתנות, קבועות-משתנות, קבועות והפקדות. השוו צפי לביצוע בפועל וראו כמה נשאר פנוי לחיסכון בסוף החודש.</p></div>
+
+    <!-- Month navigation -->
+    <div class="cf-month-bar">
+        <button class="cf-month-nav-btn" onclick="cfPrevMonth()" title="חודש קודם">›</button>
+        <div class="cf-month-label" id="cfMonthLabel">—</div>
+        <button class="cf-month-nav-btn" onclick="cfNextMonth()" title="חודש הבא">‹</button>
+        <input type="month" id="cfMonthPicker" class="cf-month-picker" onchange="cfSelectMonth(this.value)">
+    </div>
+
+    <!-- Toolbar -->
+    <div class="cf-toolbar">
+        <button class="btn btn-secondary btn-sm" onclick="cfCopyFromPrevMonth()"><span>📋</span><span>טען מבנה מחודש קודם</span></button>
+        <button class="btn btn-secondary btn-sm" onclick="cfSyncFixedItems()"><span>🔄</span><span>סנכרן מסעיפים קבועים</span></button>
+        <button class="btn btn-secondary btn-sm" onclick="cfExportHTML()"><span>🧾</span><span>ייצוא HTML</span></button>
+        <button class="btn btn-secondary btn-sm" onclick="cfExportExcel()"><span>📊</span><span>ייצוא Excel</span></button>
+    </div>
+
+    <!-- Summary -->
+    <div id="cfSummaryCard"></div>
+
+    <!-- Category tabs -->
+    <div class="cf-tabs" id="cfTabs"></div>
+
+    <!-- Add / edit item form -->
+    <div class="card mb-3">
+        <div class="card-title" id="cfFormTitle">הוסף שורה</div>
+        <div class="cf-form-grid">
+            <div class="form-group"><label>שם הסעיף</label><input type="text" id="cfItemName" class="form-input" placeholder="לדוגמה: מזון"></div>
+            <div class="form-group"><label>צפי (₪)</label><input type="number" id="cfItemPlanned" class="form-input" placeholder="0"></div>
+            <div class="form-group"><label>פועל (₪)</label><input type="number" id="cfItemActual" class="form-input" placeholder="0"></div>
+        </div>
+        <div class="form-actions" style="display:flex;gap:10px;justify-content:flex-end;">
+            <button type="button" class="btn btn-secondary" id="btnCancelCfEdit" onclick="cfCancelEdit()" style="display:none;"><span>❌</span><span>בטל עריכה</span></button>
+            <button type="button" class="btn btn-primary" onclick="cfSaveItem()"><span>💾</span><span id="btnSaveCfText">שמור שורה</span></button>
+        </div>
+    </div>
+
+    <!-- Active category table -->
+    <div id="cfCategoryPanel"></div>
+</div>
+
         </main>
     </div>
 </div>
@@ -391,6 +434,7 @@
 <script src="pension-profile-fix.js?v=8"></script>
 <script src="debts.js?v=1"></script>
 <script src="notes.js?v=1"></script>
+<script src="cashflow.js?v=1"></script>
 <script src="sidemenu.js?v=1"></script>
 
 <!-- NAVIGATION: Hero + Launchpad — Module -->
@@ -407,7 +451,8 @@ var MODULE_TITLES = {
     'profile':     '👤 פרופיל משפחתי',
     'tasks':       '✓ משימות ומעקב',
     'strategy':    '🧠 המלצות ואסטרטגיה',
-    'notes':       '📝 תובנות והערות אישיות'
+    'notes':       '📝 תובנות והערות אישיות',
+    'cashflow':    '💵 תזרים חודשי'
 };
 
 function openModule(panelId) {
@@ -468,6 +513,7 @@ function renderActivePanel(panelId) {
     if (panelId === 'investments' && typeof renderInvestments === 'function') renderInvestments();
     if (panelId === 'strategy' && typeof renderStrategy === 'function') renderStrategy();
     if (panelId === 'notes' && typeof renderNotes === 'function') renderNotes();
+    if (panelId === 'cashflow' && typeof renderCashflow === 'function') renderCashflow();
 }
 
 var _origSwitchPlan = switchPlan;
