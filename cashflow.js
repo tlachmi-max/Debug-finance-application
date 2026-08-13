@@ -525,25 +525,27 @@
         var w = window.open('', '_blank');
         if (!w) { alert('נא לאפשר חלונות קופצים כדי להפיק את הדוח'); return; }
 
-        w.document.write('<!DOCTYPE html><html dir="rtl" lang="he"><head><meta charset="UTF-8"><title>תזרים חודשי - ' + monthLabel + '</title>');
+        w.document.write('<!DOCTYPE html><html dir="rtl" lang="he"><head><meta charset="UTF-8"><title>תזרים חודשי - ' + monthLabel + ' — בנחת</title>');
         w.document.write('<style>');
-        w.document.write('body{font-family:Arial,Heebo,sans-serif;padding:40px;background:#f9fafb;color:#1f2937}');
+        w.document.write('body{font-family:Arial,Heebo,sans-serif;padding:40px;background:#F3FAF5;color:#1f2937}');
         w.document.write('.container{max-width:1100px;margin:0 auto;background:#fff;padding:40px;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.08)}');
-        w.document.write('h1{font-size:2.2em;border-bottom:4px solid #3b82f6;padding-bottom:16px;margin-bottom:8px}');
+        w.document.write('.report-brand{display:flex;align-items:center;gap:8px;margin-bottom:6px;color:#0C3D22;font-weight:800;font-size:1.05em}');
+        w.document.write('h1{font-size:2.2em;border-bottom:4px solid #0C3D22;padding-bottom:16px;margin-bottom:8px}');
         w.document.write('.sub{color:#6b7280;margin-bottom:28px}');
-        w.document.write('h2{color:#3b82f6;font-size:1.4em;margin:30px 0 12px;padding-right:12px;border-right:4px solid #3b82f6}');
+        w.document.write('h2{color:#0C3D22;font-size:1.4em;margin:30px 0 12px;padding-right:12px;border-right:4px solid #A3E64B}');
         w.document.write('.net-card{border-radius:14px;padding:22px 26px;color:#fff;margin-bottom:24px}');
         w.document.write('.net-pos{background:linear-gradient(135deg,#059669,#10b981)}.net-neg{background:linear-gradient(135deg,#dc2626,#ef4444)}');
         w.document.write('.net-label{font-size:0.9em;opacity:0.9;margin-bottom:6px}.net-val{font-size:2em;font-weight:800}');
         w.document.write('table{width:100%;border-collapse:collapse;margin:14px 0 26px;box-shadow:0 2px 8px rgba(0,0,0,0.08)}');
-        w.document.write('th{background:#3b82f6;color:#fff;padding:12px 14px;text-align:right;font-weight:600;font-size:0.9em}');
+        w.document.write('th{background:#0C3D22;color:#fff;padding:12px 14px;text-align:right;font-weight:600;font-size:0.9em}');
         w.document.write('td{padding:10px 14px;border-bottom:1px solid #e5e7eb;font-size:0.92em}');
-        w.document.write('tfoot td{font-weight:800;background:#f3f4f6}');
+        w.document.write('tfoot td{font-weight:800;background:#F3FAF5}');
         w.document.write('.good{color:#059669;font-weight:700}.bad{color:#dc2626;font-weight:700}');
-        w.document.write('.print-btn{position:fixed;bottom:30px;left:30px;background:#3b82f6;color:#fff;border:none;padding:16px 24px;border-radius:12px;font-size:1.05em;cursor:pointer;box-shadow:0 4px 12px rgba(59,130,246,0.4)}');
+        w.document.write('.print-btn{position:fixed;bottom:30px;left:30px;background:#0C3D22;color:#fff;border:none;padding:16px 24px;border-radius:12px;font-size:1.05em;cursor:pointer;box-shadow:0 4px 12px rgba(12, 61, 34,0.4)}');
         w.document.write('@media print{.print-btn{display:none}}');
         w.document.write('</style></head><body><div class="container">');
 
+        w.document.write('<div class="report-brand">🌿 בנחת — זוגיות, כסף וערכים</div>');
         w.document.write('<h1>💵 דוח תזרים חודשי</h1>');
         w.document.write('<div class="sub">תוכנית: ' + escapeHtmlCf(plan.name || '') + ' &nbsp;|&nbsp; חודש: ' + monthLabel + ' &nbsp;|&nbsp; הופק בתאריך: ' + new Date().toLocaleDateString('he-IL') + '</div>');
 

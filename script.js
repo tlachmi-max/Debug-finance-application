@@ -489,7 +489,7 @@ function calculateMonthlyPension(balance, gender) {
 
 // Clean number input - remove commas, extra dots, spaces
 function sanitizeNumber(value) {
-    if (typeof value === 'number') return value;
+    if (typeof value === 'number') return isNaN(value) ? 0 : value;
     if (!value) return 0;
     
     // Convert to string and remove spaces
@@ -512,7 +512,9 @@ function sanitizeNumber(value) {
 }
 
 function formatCurrency(amount) {
-    return '₪' + Math.round(amount).toLocaleString('he-IL');
+    var n = Number(amount);
+    if (!isFinite(n)) n = 0;
+    return '₪' + Math.round(n).toLocaleString('he-IL');
 }
 
 // ==========================================
@@ -1880,10 +1882,12 @@ function showPlanManager() {
     `).join('');
     
     modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
 }
 
 function closePlanManager() {
     document.getElementById('planModal').style.display = 'none';
+    document.body.style.overflow = '';
 }
 
 function createNewPlan() {
@@ -2431,7 +2435,7 @@ if ('serviceWorker' in navigator) {
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0C3D22 0%, #145C34 100%);
             color: white;
             padding: 16px 24px;
             border-radius: 12px;
@@ -3650,23 +3654,25 @@ function generateReport() {
     
     // Build HTML
     const reportWindow = window.open('', '_blank');
-    reportWindow.document.write('<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>דוח פיננסי</title>');
-    reportWindow.document.write('<style>body{font-family:Arial;padding:40px;background:#f9fafb}');
+    reportWindow.document.write('<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>דוח פיננסי — בנחת</title>');
+    reportWindow.document.write('<style>body{font-family:Arial;padding:40px;background:#F3FAF5}');
     reportWindow.document.write('.container{max-width:1200px;margin:0 auto;background:white;padding:40px;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.08)}');
-    reportWindow.document.write('h1{color:#1f2937;font-size:2.5em;border-bottom:4px solid #3b82f6;padding-bottom:16px;margin-bottom:24px}');
-    reportWindow.document.write('h2{color:#3b82f6;font-size:1.8em;margin:32px 0 16px;padding-right:12px;border-right:4px solid #3b82f6}');
+    reportWindow.document.write('.report-brand{display:flex;align-items:center;gap:10px;margin-bottom:6px;color:#0C3D22;font-weight:800;font-size:1.1em}');
+    reportWindow.document.write('h1{color:#1f2937;font-size:2.5em;border-bottom:4px solid #0C3D22;padding-bottom:16px;margin-bottom:24px}');
+    reportWindow.document.write('h2{color:#0C3D22;font-size:1.8em;margin:32px 0 16px;padding-right:12px;border-right:4px solid #A3E64B}');
     reportWindow.document.write('.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:24px 0}');
-    reportWindow.document.write('.summary-card{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:20px;border-radius:12px}');
+    reportWindow.document.write('.summary-card{background:linear-gradient(135deg,#0C3D22 0%,#145C34 100%);color:white;padding:20px;border-radius:12px}');
     reportWindow.document.write('.summary-card-title{font-size:0.9em;opacity:0.9;margin-bottom:8px}');
     reportWindow.document.write('.summary-card-value{font-size:1.8em;font-weight:bold}');
     reportWindow.document.write('table{width:100%;border-collapse:collapse;margin:20px 0;box-shadow:0 2px 8px rgba(0,0,0,0.1)}');
-    reportWindow.document.write('th{background:#3b82f6;color:white;padding:14px;text-align:right;font-weight:600}');
+    reportWindow.document.write('th{background:#0C3D22;color:white;padding:14px;text-align:right;font-weight:600}');
     reportWindow.document.write('td{padding:12px 14px;border-bottom:1px solid #e5e7eb}');
-    reportWindow.document.write('tr:hover{background:#f3f4f6}.profit{color:#10b981;font-weight:bold}');
-    reportWindow.document.write('.print-btn{position:fixed;bottom:30px;left:30px;background:#3b82f6;color:white;border:none;padding:16px 24px;border-radius:12px;font-size:1.1em;cursor:pointer;box-shadow:0 4px 12px rgba(59,130,246,0.4);z-index:1000}');
-    reportWindow.document.write('.print-btn:hover{background:#2563eb}@media print{.print-btn{display:none}}</style></head><body>');
+    reportWindow.document.write('tr:hover{background:#F3FAF5}.profit{color:#10b981;font-weight:bold}');
+    reportWindow.document.write('.print-btn{position:fixed;bottom:30px;left:30px;background:#0C3D22;color:white;border:none;padding:16px 24px;border-radius:12px;font-size:1.1em;cursor:pointer;box-shadow:0 4px 12px rgba(12, 61, 34,0.4);z-index:1000}');
+    reportWindow.document.write('.print-btn:hover{background:#052818}@media print{.print-btn{display:none}}</style></head><body>');
     
     reportWindow.document.write('<div class="container">');
+    reportWindow.document.write('<div class="report-brand">🌿 בנחת — זוגיות, כסף וערכים</div>');
     reportWindow.document.write('<h1>📊 דוח פיננסי מסכם</h1>');
     reportWindow.document.write('<p style="color:#6b7280;margin-bottom:32px">תוכנית: ' + plan.name + ' | תאריך: ' + new Date().toLocaleDateString('he-IL') + '</p>');
     
@@ -4223,7 +4229,7 @@ function renderGoalProgress() {
         return;
     }
     
-    let html = '<div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-bottom: 20px;">';
+    let html = '<div class="card" style="background: linear-gradient(135deg, #0C3D22 0%, #145C34 100%); color: white; margin-bottom: 20px;">';
     html += '<h3 style="margin: 0 0 16px 0;">🎯 התקדמות ביעדים</h3>';
     html += '<div style="display: grid; gap: 16px;">';
     
@@ -4825,12 +4831,12 @@ function generateAnalysisHTML(yearlyData, goals, profile, interval = 5) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>דוח ניתוח פיננסי מפורט</title>
+    <title>דוח ניתוח פיננסי מפורט — בנחת</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0C3D22 0%, #145C34 100%);
             padding: 40px 20px;
             color: #1f2937;
         }
@@ -4844,7 +4850,7 @@ function generateAnalysisHTML(yearlyData, goals, profile, interval = 5) {
         }
         h1 {
             font-size: 2.5em;
-            color: #667eea;
+            color: #0C3D22;
             margin-bottom: 10px;
             text-align: center;
         }
@@ -4878,7 +4884,7 @@ function generateAnalysisHTML(yearlyData, goals, profile, interval = 5) {
         }
         svg { width: 100%; height: 450px; }
         .grid-line { stroke: #e5e7eb; stroke-width: 1; }
-        .chart-line { fill: none; stroke: #667eea; stroke-width: 3; }
+        .chart-line { fill: none; stroke: #0C3D22; stroke-width: 3; }
         .goal-line { stroke: #10b981; stroke-width: 2; stroke-dasharray: 5,5; }
         .withdrawal-marker { fill: #ef4444; }
         .axis-label { font-size: 12px; fill: #666; }
@@ -4893,7 +4899,7 @@ function generateAnalysisHTML(yearlyData, goals, profile, interval = 5) {
             border-bottom: 1px solid #e5e7eb;
         }
         th {
-            background: #667eea;
+            background: #0C3D22;
             color: white;
             font-weight: bold;
         }
@@ -4912,7 +4918,7 @@ function generateAnalysisHTML(yearlyData, goals, profile, interval = 5) {
             padding: 20px;
             background: white;
             border-radius: 12px;
-            border-right: 4px solid #667eea;
+            border-right: 4px solid #0C3D22;
         }
         .summary-card-title {
             font-size: 0.9em;
@@ -4942,25 +4948,26 @@ function generateAnalysisHTML(yearlyData, goals, profile, interval = 5) {
             position: fixed;
             bottom: 30px;
             left: 30px;
-            background: #667eea;
+            background: #0C3D22;
             color: white;
             border: none;
             padding: 16px 32px;
             border-radius: 50px;
             font-size: 1.1em;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 12px rgba(12, 61, 34, 0.4);
             z-index: 1000;
         }
         .print-button:hover {
             background: #5568d3;
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+            box-shadow: 0 6px 16px rgba(12, 61, 34, 0.5);
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <div style="color:#0C3D22;font-weight:800;font-size:1.05em;margin-bottom:4px;">🌿 בנחת — זוגיות, כסף וערכים</div>
         <h1>📊 דוח ניתוח פיננסי מפורט</h1>
         <div class="subtitle">
             ${profile.user.name} | ${new Date().toLocaleDateString('he-IL')}
@@ -5039,7 +5046,7 @@ function generateAnalysisHTML(yearlyData, goals, profile, interval = 5) {
                     }).join('')}
                 </svg>
                 <div style="margin-top: 20px; display: flex; gap: 30px; justify-content: center; font-size: 0.9em;">
-                    <div><span style="color: #667eea;">━━</span> הון עצמי צפוי</div>
+                    <div><span style="color: #0C3D22;">━━</span> הון עצמי צפוי</div>
                     <div><span style="color: #10b981;">- - -</span> יעד הון</div>
                     <div><span style="color: #ef4444;">●</span> משיכות</div>
                 </div>

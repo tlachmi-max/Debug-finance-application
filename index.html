@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>הסוכן הפיננסי שלי — תכנון הון ופנסיה</title>
-    <meta name="description" content="מערכת לתכנון פיננסי אישי עם תחזיות, גרפים ומחשבון פנסיה">
+    <title>בנחת — זוגיות, כסף וערכים</title>
+    <meta name="description" content="בנחת — זוגיות, כסף וערכים. תוכנית ליווי זוגית לצמיחה כלכלית, עם תחזיות, תזרים חודשי, גרפים ומחשבון פנסיה">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1E40AF">
+    <meta name="theme-color" content="#0C3D22">
     <link rel="apple-touch-icon" href="icon-512.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="הסוכן הפיננסי שלי">
+    <meta name="apple-mobile-web-app-title" content="בנחת">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="dashboard-upgrade.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -25,32 +25,29 @@
 
 <!-- ========== HERO SECTION ========== -->
 <div class="hero hero-full" id="heroSection">
-    <div class="hero-wave"><svg viewBox="0 0 1440 50" preserveAspectRatio="none"><path d="M0,25 C360,50 720,0 1080,25 C1260,37.5 1380,50 1440,50 L1440,50 L0,50 Z" fill="#F5F7FA"/></svg></div>
+    <div class="hero-wave"><svg viewBox="0 0 1440 50" preserveAspectRatio="none"><path d="M0,25 C360,50 720,0 1080,25 C1260,37.5 1380,50 1440,50 L1440,50 L0,50 Z" fill="#F3FAF5"/></svg></div>
     <div class="hero-top">
         <div class="hero-logo">
-            <img src="icon-192.png" alt="לוגו" class="hero-logo-img">
+            <img src="logo.png" alt="בנחת" class="hero-logo-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <span class="hero-logo-fallback" style="display:none;">🌿</span>
             <div class="hero-logo-text">
-                <div class="hero-logo-title">הסוכן הפיננסי שלי</div>
-                <div class="hero-logo-sub">השותף לצמיחה של המשפחה שלך</div>
+                <div class="hero-logo-title">בנחת</div>
+                <div class="hero-logo-sub">זוגיות, כסף וערכים</div>
             </div>
         </div>
         <div class="hero-actions">
             <button class="menu-toggle-btn" onclick="toggleSideMenu()" title="תפריט ראשי"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg></button>
             <div id="storageStatus" class="storage-status" title="מצב שמירה"><span class="status-icon">💾</span><span class="status-text">מקומי</span></div>
             <button id="cloudSyncBtn" class="btn-hero btn-cloud" disabled style="opacity:0.5;cursor:not-allowed;" title="סנכרון כרגע לא זמין"><span>☁️</span><span>סנכרון</span></button>
-            <select id="planSelector" class="plan-select" onchange="switchPlan(this.value)"><option value="">בחר תוכנית...</option></select>
-            <button class="btn-hero" onclick="renamePlan()" title="שנה שם תוכנית"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-            <input type="file" id="excelImport" accept=".xlsx,.xls" style="display:none" onchange="importExcel(event)">
         </div>
     </div>
     <div class="hero-tagline">
-        <h2>העתיד הכלכלי שלך מתחיל כאן</h2>
-        <p>תכנון חכם של תיק הנכסים המשפחתי</p>
+        <h2>תוכנית ליווי זוגית לצמיחה כלכלית</h2>
     </div>
 </div>
 
 <!-- ========== HIDDEN HEADER (JS compatibility) ========== -->
-<header class="header"><div class="header-left"><div class="app-logo">💰</div><div class="app-title"><h1>סוכן פיננסי</h1></div></div></header>
+<header class="header"><div class="header-left"><div class="app-logo">💰</div><div class="app-title"><h1>בנחת</h1></div></div></header>
 
 <!-- ========== HIDDEN NAV (JS compatibility) ========== -->
 <nav class="nav" id="moduleNav">
@@ -65,24 +62,27 @@
     <button class="nav-item" data-panel="tasks" onclick="switchPanel('tasks')"><span>✓</span><span>משימות</span></button>
 </nav>
 
-<!-- ========== UTILITY BAR ========== -->
-<div class="utility-bar" id="utilityBar">
-    <div class="utility-bar-inner">
-        <div class="utility-group">
-            <button class="utility-btn" onclick="showPlanManager()" title="ניהול תוכניות">
+<!-- ========== MAIN TOOLBAR — plan controls + Excel import/export (consolidated) ========== -->
+<div class="main-toolbar" id="utilityBar">
+    <div class="main-toolbar-inner">
+        <div class="toolbar-group">
+            <select id="planSelector" class="plan-select" onchange="switchPlan(this.value)"><option value="">בחר תוכנית...</option></select>
+            <button class="toolbar-btn toolbar-btn-icon" onclick="renamePlan()" title="שנה שם תוכנית"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            <button class="toolbar-btn" onclick="showPlanManager()" title="ניהול תוכניות">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
                 <span>ניהול תוכניות</span>
             </button>
         </div>
-        <div class="utility-group">
-            <button class="utility-btn" onclick="exportExcel()" title="הורדת נתונים">
+        <div class="toolbar-group">
+            <button class="toolbar-btn" onclick="exportExcel()" title="הורדת נתונים">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 <span>הורדת נתונים</span>
             </button>
-            <button class="utility-btn" onclick="document.getElementById('excelImport').click()" title="טעינת קובץ">
+            <button class="toolbar-btn" onclick="document.getElementById('excelImport').click()" title="טעינת קובץ">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                 <span>טעינת קובץ</span>
             </button>
+            <input type="file" id="excelImport" accept=".xlsx,.xls" style="display:none" onchange="importExcel(event)">
         </div>
     </div>
 </div>
@@ -96,7 +96,7 @@
                 <div class="dcard-big-value" id="dashLiquid">₪0</div>
                 <div class="dcard-sub" id="dashLiquidSub">חשיפה מנייתית בתיק הנזיל: —</div>
             </div>
-            <div class="dcard-icon-wrap dcard-icon-blue"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></div>
+            <div class="dcard-icon-wrap dcard-icon-blue"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0C3D22" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></div>
         </div>
         <div class="dcard-chevron">‹</div>
     </div>
