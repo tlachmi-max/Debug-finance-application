@@ -65,28 +65,6 @@
     <button class="nav-item" data-panel="tasks" onclick="switchPanel('tasks')"><span>✓</span><span>משימות</span></button>
 </nav>
 
-<!-- ========== UTILITY BAR ========== -->
-<div class="utility-bar" id="utilityBar">
-    <div class="utility-bar-inner">
-        <div class="utility-group">
-            <button class="utility-btn" onclick="showPlanManager()" title="ניהול תוכניות">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                <span>ניהול תוכניות</span>
-            </button>
-        </div>
-        <div class="utility-group">
-            <button class="utility-btn" onclick="exportExcel()" title="הורדת נתונים">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                <span>הורדת נתונים</span>
-            </button>
-            <button class="utility-btn" onclick="document.getElementById('excelImport').click()" title="טעינת קובץ">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                <span>טעינת קובץ</span>
-            </button>
-        </div>
-    </div>
-</div>
-
 <!-- ========== DASHBOARD (Home) ========== -->
 <div class="launchpad" id="launchpad">
     <div class="dcard dcard-hero" onclick="openModule('investments')">
@@ -179,6 +157,10 @@
         <div class="side-menu-item" onclick="sideMenuNavigate('charts')"><span class="side-menu-icon">📊</span><span class="side-menu-label">גרפים</span><span class="side-menu-arrow">‹</span></div>
         <div class="side-menu-item" onclick="sideMenuNavigate('cashflow')"><span class="side-menu-icon">💵</span><span class="side-menu-label">תזרים חודשי</span><span class="side-menu-arrow">‹</span></div>
         <div class="side-menu-item" onclick="sideMenuNavigate('notes')"><span class="side-menu-icon">📝</span><span class="side-menu-label">תובנות והערות אישיות</span><span class="side-menu-arrow">‹</span></div>
+        <div class="side-menu-section-label">ניהול נתונים</div>
+        <div class="side-menu-item" onclick="sideMenuPlanManager()"><span class="side-menu-icon">🗂️</span><span class="side-menu-label">ניהול תוכניות</span><span class="side-menu-arrow">‹</span></div>
+        <div class="side-menu-item" onclick="sideMenuExportPlan()"><span class="side-menu-icon">📤</span><span class="side-menu-label">ייצוא תוכנית לאקסל</span><span class="side-menu-arrow">‹</span></div>
+        <div class="side-menu-item" onclick="sideMenuImportPlan()"><span class="side-menu-icon">📥</span><span class="side-menu-label">ייבוא תוכנית מאקסל</span><span class="side-menu-arrow">‹</span></div>
     </nav>
     <div class="side-menu-footer">
         <button class="side-menu-home-btn" onclick="sideMenuGoHome()"><span>🏠</span><span>חזרה לדף הבית</span></button>
@@ -424,6 +406,18 @@
 
 <!-- MODALS -->
 <div id="planModal" class="modal" style="display:none;"><div class="modal-content"><div class="modal-header"><h2>ניהול תוכניות</h2><button class="btn-close" onclick="closePlanManager()">✕</button></div><div class="modal-body"><button class="btn btn-success btn-full mb-2" onclick="createNewPlan()"><span>➕</span><span>צור תוכנית חדשה</span></button><div id="plansList"></div></div></div></div>
+
+<!-- ========== REPORT YEARS MODAL ========== -->
+<div id="reportYearsModal" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width:400px;">
+        <div class="modal-header"><h2>🧾 הפקת דו״ח מסכם</h2><button class="btn-close" onclick="closeReportYearsModal()">✕</button></div>
+        <div class="modal-body">
+            <label style="display:block;margin-bottom:8px;font-weight:600;color:var(--text-primary);">לפי כמה שנים תרצה לראות את קצב ההתקדמות בדוח?</label>
+            <input type="number" class="form-input" id="reportYearsInput" value="20" min="1" max="50" style="width:100%;margin-bottom:16px;">
+            <button class="btn btn-primary btn-full" onclick="confirmReportYears()">הפק דוח</button>
+        </div>
+    </div>
+</div>
 <div id="cloudSyncModal" class="modal" style="display:none;"><div class="modal-content" style="max-width:500px;"><div class="modal-header"><h2 id="cloudSyncTitle">☁️ סנכרון לענן</h2><button class="btn-close" onclick="closeCloudSync()">✕</button></div><div class="modal-body"><div id="guestModeInfo" class="alert alert-info"><span class="alert-icon">💾</span><div><strong>מצב אורח</strong><br>הנתונים נשמרים מקומית.</div></div><div id="loginForm"><div class="form-group"><label class="form-label">אימייל</label><input type="email" class="form-input" id="cloudEmail" placeholder="your@email.com"></div><div class="form-group"><label class="form-label">סיסמה</label><input type="password" class="form-input" id="cloudPassword" placeholder="••••••"></div><button class="btn btn-primary btn-full" onclick="cloudLogin()">🔐 התחבר</button><button class="btn btn-secondary btn-full" onclick="showCloudRegister()">✅ הרשמה</button></div><div id="registerForm" style="display:none;"><div class="form-group"><label class="form-label">אימייל</label><input type="email" class="form-input" id="registerEmail" placeholder="your@email.com"></div><div class="form-group"><label class="form-label">סיסמה</label><input type="password" class="form-input" id="registerPassword" placeholder="לפחות 6 תווים"></div><div class="form-group"><label class="form-label">אימות סיסמה</label><input type="password" class="form-input" id="registerConfirm" placeholder="הזן שוב"></div><button class="btn btn-success btn-full" onclick="cloudRegister()">✅ הרשם</button><button class="btn btn-secondary btn-full" onclick="showCloudLogin()">◀ חזרה</button></div><div id="loggedInView" style="display:none;"><div class="alert alert-success"><span class="alert-icon">✅</span><div><strong>מחובר לענן</strong><br><span id="cloudUserEmail"></span></div></div><button class="btn btn-danger btn-full" onclick="cloudLogout()">🚪 התנתק</button></div></div></div></div>
 
 <!-- SCRIPTS -->
@@ -438,6 +432,7 @@
 <script src="import-patch.js?v=1"></script>
 <script src="cashflow.js?v=1"></script>
 <script src="sidemenu.js?v=1"></script>
+<script src="menu-actions.js?v=1"></script>
 
 <!-- NAVIGATION: Hero + Launchpad — Module -->
 <script>

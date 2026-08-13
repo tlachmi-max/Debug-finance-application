@@ -2100,6 +2100,15 @@ canvas { max-width: 100%; }
 .side-menu-item.disabled { cursor: pointer; opacity: 0.62; }
 .side-menu-item.disabled:hover { background: transparent; }
 
+.side-menu-section-label {
+    padding: 16px 20px 6px;
+    font-size: 0.72em;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
 .side-menu-badge {
     font-size: 0.72em;
     font-weight: 700;
