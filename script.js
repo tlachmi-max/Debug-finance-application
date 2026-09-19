@@ -11,7 +11,7 @@ console.log('🚀 Financial Planner Pro v3.6.0 Loading...');
 // ==========================================
 // AGGRESSIVE CACHE CLEAR FOR v3.6.0
 // ==========================================
-const APP_VERSION = '3.6.0';
+const APP_VERSION = '3.6.1';
 const STORED_VERSION = localStorage.getItem('app_version');
 
 if (STORED_VERSION !== APP_VERSION) {
