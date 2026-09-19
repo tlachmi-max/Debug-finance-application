@@ -1539,6 +1539,8 @@ function simulateImpact() {
 
 function renderCharts() {
     const plan = getCurrentPlan();
+    const includePensionCheckbox = document.getElementById('chartsIncludePension');
+    const includePension = includePensionCheckbox ? includePensionCheckbox.checked : false;
     
     // Get timeframe from selector (default to 0 = today)
     const timeframeSelect = document.getElementById('chartsTimeframe');
@@ -1555,6 +1557,7 @@ function renderCharts() {
     
     plan.investments.forEach(inv => {
         if (!inv.include) return;
+        if (!includePension && inv.type === 'פנסיה') return;
         
         // If years = 0, use current amount only (no projection)
         let value;
