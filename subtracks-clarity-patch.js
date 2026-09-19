@@ -177,7 +177,11 @@ console.log('✅ subtracks-clarity-patch.js v1 loading...');
                 maintainAspectRatio: true,
                 animation: { duration: 300 },
                 plugins: {
-                    legend: { display: false },
+                    legend: {
+                        position: 'bottom',
+                        rtl: true,
+                        labels: { font: { size: 12, family: 'Heebo' }, padding: 15 }
+                    },
                     tooltip: {
                         rtl: true,
                         callbacks: { label: ctx => ' ' + formatCurrency(ctx.parsed) }

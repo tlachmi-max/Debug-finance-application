@@ -27,7 +27,19 @@ console.log('✅ image-download-fix-patch.js v1 loading...');
         }
 
         try {
-            canvas.toBlob(function (blob) {
+            // Chart.js canvases have a transparent background. Some
+            // iPhone viewers (Photos, dark mode) render transparency
+            // as solid black, making the exported chart look empty.
+            // Composite the chart onto a plain white canvas first.
+            const exportCanvas = document.createElement('canvas');
+            exportCanvas.width = canvas.width;
+            exportCanvas.height = canvas.height;
+            const exportCtx = exportCanvas.getContext('2d');
+            exportCtx.fillStyle = '#ffffff';
+            exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+            exportCtx.drawImage(canvas, 0, 0);
+
+            exportCanvas.toBlob(function (blob) {
                 if (!blob) {
                     alert('❌ שגיאה בהורדת הגרף');
                     return;
